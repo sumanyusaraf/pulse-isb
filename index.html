@@ -47,516 +47,298 @@
 // ─────────────────────────────────────────────
 const SAMPLE_PROFILES = [
   {
-    id: 1,
-    name: "Arjun Mehta",
-    section: "A",
-    photo: "https://api.dicebear.com/7.x/avataaars/svg?seed=Arjun&backgroundColor=b6e3f4",
-    prevCompany: "McKinsey & Company",
-    prevRole: "Business Analyst",
-    industry: "Consulting & Strategy",
-    function: "Strategy",
-    yearsExp: 4,
-    careerGoals: ["Investment Management", "Investment Management"],
-    skills: ["Financial Modeling", "Strategy", "Due Diligence", "Excel"],
-    hobbies: ["Cricket", "Reading", "Chess"],
-    interests: ["Investing", "Startups", "AI"],
-    undergrad: "IIT Bombay",
-    degree: "B.Tech",
-    major: "Computer Science",
-    location: "Mumbai",
-    status: "Single",
-    bio: "Ex-McKinsey BA with a passion for deals and value creation. Looking to transition into PE/VC post-ISB.",
-    contactStatus: "Not contacted",
-    interactions: [],
-    followUpDate: null,
-    notes: "",
+    id:1, name:"Arjun Mehta", section:"A",
+    photo:"https://api.dicebear.com/7.x/avataaars/svg?seed=Arjun&backgroundColor=b6e3f4",
+    prevCompany:"McKinsey & Company", prevRole:"Business Analyst",
+    industry:"Consulting & Strategy", function:"Strategy", yearsExp:4,
+    careerGoals:["Investment Management","Private Equity"],
+    skills:["Financial Modeling","Strategy","Due Diligence","Excel"],
+    hobbies:["Cricket","Chess","Running"],
+    interests:["Investing","Startups","AI"], undergrad:"IIT Bombay",
+    location:"Mumbai", bio:"Ex-McKinsey BA with a passion for deals. Targeting PE/VC post-ISB.",
+    contactStatus:"Not contacted", interactions:[], followUpDate:null, notes:"",
   },
   {
-    id: 2,
-    name: "Priya Sharma",
-    section: "B",
-    photo: "https://api.dicebear.com/7.x/avataaars/svg?seed=Priya&backgroundColor=ffdfbf",
-    prevCompany: "Goldman Sachs",
-    prevRole: "Analyst",
-    industry: "BFSI / Financial Services",
-    function: "Investment Banking",
-    yearsExp: 3,
-    careerGoals: ["Entrepreneurship", "Entrepreneurship"],
-    skills: ["Valuation", "Pitchbook", "Capital Markets", "Python"],
-    hobbies: ["Tennis", "Travel", "Cooking"],
-    interests: ["Startups", "Fintech", "Social Impact"],
-    undergrad: "SRCC Delhi",
-    degree: "B.Com",
-    major: "Finance",
-    location: "Delhi",
-    status: "Single",
-    bio: "Finance professional turned aspiring entrepreneur. Building at the intersection of fintech and social impact.",
-    contactStatus: "Contacted",
-    interactions: [{ date: "2024-01-15", note: "Met at finance club event, great conversation about VC trends." }],
-    followUpDate: "2024-02-10",
-    notes: "Interested in co-founding a fintech startup together.",
+    id:2, name:"Priya Sharma", section:"B",
+    photo:"https://api.dicebear.com/7.x/avataaars/svg?seed=Priya&backgroundColor=ffdfbf",
+    prevCompany:"Goldman Sachs", prevRole:"Analyst",
+    industry:"BFSI / Financial Services", function:"Investment Banking", yearsExp:3,
+    careerGoals:["Entrepreneurship","Strategy & Consulting"],
+    skills:["Valuation","Pitchbook","Capital Markets","Python"],
+    hobbies:["Tennis","Travel","Cooking"],
+    interests:["Startups","Fintech","Social Impact"], undergrad:"SRCC Delhi",
+    location:"Delhi", bio:"Finance professional turned aspiring entrepreneur. Building at the intersection of fintech and social impact.",
+    contactStatus:"Contacted", interactions:[{date:"2024-01-15",note:"Met at finance club. Great conversation about VC trends."}],
+    followUpDate:"2024-02-10", notes:"Interested in co-founding a fintech startup.",
   },
   {
-    id: 3,
-    name: "Rahul Nair",
-    section: "C",
-    photo: "https://api.dicebear.com/7.x/avataaars/svg?seed=Rahul&backgroundColor=c0aede",
-    prevCompany: "Google",
-    prevRole: "Product Manager",
-    industry: "Technology",
-    function: "Product",
-    yearsExp: 5,
-    careerGoals: ["Product Management", "Entrepreneurship"],
-    skills: ["Product Strategy", "Data Analytics", "UX", "Agile"],
-    hobbies: ["Football", "Photography", "Gaming"],
-    interests: ["AI", "Consumer Tech", "Startups"],
-    undergrad: "NIT Trichy",
-    degree: "B.Tech",
-    major: "Electronics",
-    location: "Bangalore",
-    status: "Married",
-    bio: "Seasoned PM from Google looking to build my own product company post-ISB.",
-    contactStatus: "Active connection",
-    interactions: [
-      { date: "2024-01-10", note: "Intro coffee chat." },
-      { date: "2024-01-25", note: "Collaborated on case competition." },
-    ],
-    followUpDate: null,
-    notes: "Great resource for product roles. Mutual interest in AI products.",
+    id:3, name:"Rahul Nair", section:"C",
+    photo:"https://api.dicebear.com/7.x/avataaars/svg?seed=Rahul&backgroundColor=c0aede",
+    prevCompany:"Google", prevRole:"Product Manager",
+    industry:"Technology", function:"Product", yearsExp:5,
+    careerGoals:["Product Management","Entrepreneurship"],
+    skills:["Product Strategy","Data Analytics","UX","Agile"],
+    hobbies:["Football","Photography","Gaming"],
+    interests:["AI","Consumer Tech","Startups"], undergrad:"NIT Trichy",
+    location:"Bangalore", bio:"Seasoned PM from Google. Looking to build my own product company post-ISB.",
+    contactStatus:"Active connection", interactions:[{date:"2024-01-10",note:"Intro coffee chat."},{date:"2024-01-25",note:"Collaborated on case competition."}],
+    followUpDate:null, notes:"Great resource for product roles. Mutual interest in AI.",
   },
   {
-    id: 4,
-    name: "Sneha Reddy",
-    section: "A",
-    photo: "https://api.dicebear.com/7.x/avataaars/svg?seed=Sneha&backgroundColor=d1f4cc",
-    prevCompany: "Boston Consulting Group",
-    prevRole: "Consultant",
-    industry: "Consulting & Strategy",
-    function: "Strategy",
-    yearsExp: 3,
-    careerGoals: ["Strategy & Consulting", "Investment Management"],
-    skills: ["Problem Solving", "Presentations", "Market Research", "Excel"],
-    hobbies: ["Yoga", "Reading", "Hiking"],
-    interests: ["Social Impact", "Healthcare", "Sustainability"],
-    undergrad: "BITS Pilani",
-    degree: "B.Tech",
-    major: "Chemical Engineering",
-    location: "Hyderabad",
-    status: "Committed",
-    bio: "BCG Consultant with a healthcare focus. Passionate about impact-driven careers.",
-    contactStatus: "Follow-up scheduled",
-    interactions: [{ date: "2024-01-20", note: "Met at orientation. She's working on healthcare case study." }],
-    followUpDate: "2024-02-15",
-    notes: "Follow up about healthcare consulting opportunities.",
+    id:4, name:"Sneha Reddy", section:"A",
+    photo:"https://api.dicebear.com/7.x/avataaars/svg?seed=Sneha&backgroundColor=d1f4cc",
+    prevCompany:"Boston Consulting Group", prevRole:"Consultant",
+    industry:"Consulting & Strategy", function:"Strategy", yearsExp:3,
+    careerGoals:["Strategy & Consulting","Social Impact"],
+    skills:["Problem Solving","Presentations","Market Research","Excel"],
+    hobbies:["Yoga","Reading","Hiking"],
+    interests:["Social Impact","Healthcare","Sustainability"], undergrad:"BITS Pilani",
+    location:"Hyderabad", bio:"BCG Consultant with a healthcare focus. Passionate about impact-driven careers.",
+    contactStatus:"Follow-up scheduled", interactions:[{date:"2024-01-20",note:"Met at orientation. Working on healthcare case study."}],
+    followUpDate:"2024-02-15", notes:"Follow up about healthcare consulting.",
   },
   {
-    id: 5,
-    name: "Vikram Singh",
-    section: "D",
-    photo: "https://api.dicebear.com/7.x/avataaars/svg?seed=Vikram&backgroundColor=ffd5dc",
-    prevCompany: "Sequoia Capital",
-    prevRole: "Analyst",
-    industry: "BFSI / Financial Services",
-    function: "Venture Capital",
-    yearsExp: 2,
-    careerGoals: ["Entrepreneurship", "Investment Management"],
-    skills: ["Deal Sourcing", "Term Sheets", "Market Analysis", "Networking"],
-    hobbies: ["Cricket", "Investing", "Podcasts"],
-    interests: ["Startups", "Investing", "Deep Tech"],
-    undergrad: "IIT Delhi",
-    degree: "B.Tech",
-    major: "Electrical Engineering",
-    location: "Bangalore",
-    status: "Single",
-    bio: "VC Analyst at Sequoia, now at ISB to build deeper business acumen for the next chapter.",
-    contactStatus: "Not contacted",
-    interactions: [],
-    followUpDate: null,
-    notes: "",
+    id:5, name:"Vikram Singh", section:"D",
+    photo:"https://api.dicebear.com/7.x/avataaars/svg?seed=Vikram&backgroundColor=ffd5dc",
+    prevCompany:"Sequoia Capital", prevRole:"Analyst",
+    industry:"BFSI / Financial Services", function:"Venture Capital", yearsExp:2,
+    careerGoals:["Entrepreneurship","Investment Management"],
+    skills:["Deal Sourcing","Term Sheets","Market Analysis","Networking"],
+    hobbies:["Cricket","Investing","Podcasts"],
+    interests:["Startups","Deep Tech","Climate Tech"], undergrad:"IIT Delhi",
+    location:"Bangalore", bio:"VC Analyst at Sequoia, now at ISB to build business acumen for the next chapter.",
+    contactStatus:"Not contacted", interactions:[], followUpDate:null, notes:"",
   },
   {
-    id: 6,
-    name: "Ananya Krishnan",
-    section: "B",
-    photo: "https://api.dicebear.com/7.x/avataaars/svg?seed=Ananya&backgroundColor=b6e3f4",
-    prevCompany: "Deloitte",
-    prevRole: "Senior Consultant",
-    industry: "Consulting & Strategy",
-    function: "Digital Transformation",
-    yearsExp: 5,
-    careerGoals: ["Product Management", "Strategy & Consulting"],
-    skills: ["Digital Strategy", "Change Management", "Stakeholder Management", "SQL"],
-    hobbies: ["Dance", "Travel", "Reading"],
-    interests: ["AI", "Digital Transformation", "Leadership"],
-    undergrad: "Christ University",
-    degree: "BBA",
-    major: "Business Administration",
-    location: "Chennai",
-    status: "Single",
-    bio: "Digital consultant helping enterprises transform. Now sharpening my leadership skills at ISB.",
-    contactStatus: "Contacted",
-    interactions: [{ date: "2024-01-18", note: "Had lunch together during club fair." }],
-    followUpDate: null,
-    notes: "Potential partner for digital strategy projects.",
+    id:6, name:"Ananya Krishnan", section:"B",
+    photo:"https://api.dicebear.com/7.x/avataaars/svg?seed=Ananya&backgroundColor=b6e3f4",
+    prevCompany:"Deloitte", prevRole:"Senior Consultant",
+    industry:"Consulting & Strategy", function:"Digital Transformation", yearsExp:5,
+    careerGoals:["Product Management","General Management"],
+    skills:["Digital Strategy","Change Management","Stakeholder Management","SQL"],
+    hobbies:["Dance","Travel","Photography"],
+    interests:["AI","Digital Transformation","Leadership"], undergrad:"Christ University",
+    location:"Chennai", bio:"Digital consultant helping enterprises transform. Sharpening leadership skills at ISB.",
+    contactStatus:"Contacted", interactions:[{date:"2024-01-18",note:"Had lunch during club fair."}],
+    followUpDate:null, notes:"Potential partner for digital strategy projects.",
   },
   {
-    id: 7,
-    name: "Karan Malhotra",
-    section: "C",
-    photo: "https://api.dicebear.com/7.x/avataaars/svg?seed=Karan&backgroundColor=ffdfbf",
-    prevCompany: "Blackstone",
-    prevRole: "Associate",
-    industry: "BFSI / Financial Services",
-    function: "Private Equity",
-    yearsExp: 4,
-    careerGoals: ["Investment Management", "Investment Management"],
-    skills: ["LBO Modeling", "M&A", "Portfolio Management", "Financial Analysis"],
-    hobbies: ["Squash", "Travel", "Wine Tasting"],
-    interests: ["Investing", "Real Estate", "Global Markets"],
-    undergrad: "St. Stephen's College",
-    degree: "B.A.",
-    major: "Economics",
-    location: "Mumbai",
-    status: "Single",
-    bio: "PE Associate at Blackstone with 4 years in deals. ISB to build a broader network and operational perspective.",
-    contactStatus: "Not contacted",
-    interactions: [],
-    followUpDate: null,
-    notes: "",
+    id:7, name:"Karan Malhotra", section:"C",
+    photo:"https://api.dicebear.com/7.x/avataaars/svg?seed=Karan&backgroundColor=ffdfbf",
+    prevCompany:"Blackstone", prevRole:"Associate",
+    industry:"BFSI / Financial Services", function:"Private Equity", yearsExp:4,
+    careerGoals:["Investment Management","Corporate Finance"],
+    skills:["LBO Modeling","M&A","Portfolio Management","Financial Analysis"],
+    hobbies:["Squash","Wine Tasting","Board Games"],
+    interests:["Investing","Real Estate","Global Markets"], undergrad:"St. Stephen's College",
+    location:"Mumbai", bio:"PE Associate at Blackstone. ISB to build a broader network and operational perspective.",
+    contactStatus:"Not contacted", interactions:[], followUpDate:null, notes:"",
   },
   {
-    id: 8,
-    name: "Meera Iyer",
-    section: "A",
-    photo: "https://api.dicebear.com/7.x/avataaars/svg?seed=Meera&backgroundColor=c0aede",
-    prevCompany: "Wipro",
-    prevRole: "Engineering Manager",
-    industry: "Technology",
-    function: "Engineering",
-    yearsExp: 7,
-    careerGoals: ["Entrepreneurship", "Product Management"],
-    skills: ["Software Architecture", "Team Leadership", "Python", "Cloud"],
-    hobbies: ["Running", "Cooking", "Reading"],
-    interests: ["AI", "Startups", "Women in Tech"],
-    undergrad: "PSG College of Technology",
-    degree: "B.Tech",
-    major: "Information Technology",
-    location: "Coimbatore",
-    status: "Married",
-    bio: "Tech leader turning entrepreneur. Building solutions that matter with a strong engineering foundation.",
-    contactStatus: "Not contacted",
-    interactions: [],
-    followUpDate: null,
-    notes: "",
+    id:8, name:"Meera Iyer", section:"A",
+    photo:"https://api.dicebear.com/7.x/avataaars/svg?seed=Meera&backgroundColor=c0aede",
+    prevCompany:"Wipro", prevRole:"Engineering Manager",
+    industry:"Technology", function:"Engineering", yearsExp:7,
+    careerGoals:["Entrepreneurship","Technology & Engineering"],
+    skills:["Software Architecture","Team Leadership","Python","Cloud"],
+    hobbies:["Running","Cooking","Board Games"],
+    interests:["AI","Startups","Women in Tech"], undergrad:"PSG College of Technology",
+    location:"Coimbatore", bio:"Tech leader turning entrepreneur. Building solutions that matter.",
+    contactStatus:"Not contacted", interactions:[], followUpDate:null, notes:"",
   },
   {
-    id: 9,
-    name: "Rohan Gupta",
-    section: "B",
-    photo: "https://api.dicebear.com/7.x/avataaars/svg?seed=Rohan&backgroundColor=d1f4cc",
-    prevCompany: "Bain & Company",
-    prevRole: "Consultant",
-    industry: "Consulting & Strategy",
-    function: "Strategy",
-    yearsExp: 3,
-    careerGoals: ["Investment Management", "Strategy & Consulting"],
-    skills: ["Strategy", "Operations", "Financial Modeling", "PowerPoint"],
-    hobbies: ["Football", "Chess", "Fitness"],
-    interests: ["Investing", "Sports Business", "Startups"],
-    undergrad: "IIM Indore",
-    degree: "BBA",
-    major: "Finance",
-    location: "Pune",
-    status: "Single",
-    bio: "Bain Consultant who loves the intersection of strategy and deals. Aspiring PE investor.",
-    contactStatus: "Not contacted",
-    interactions: [],
-    followUpDate: null,
-    notes: "",
+    id:9, name:"Rohan Gupta", section:"B",
+    photo:"https://api.dicebear.com/7.x/avataaars/svg?seed=Rohan&backgroundColor=d1f4cc",
+    prevCompany:"Bain & Company", prevRole:"Consultant",
+    industry:"Consulting & Strategy", function:"Strategy", yearsExp:3,
+    careerGoals:["Private Equity","Strategy & Consulting"],
+    skills:["Strategy","Operations","Financial Modeling","PowerPoint"],
+    hobbies:["Football","Chess","Gym"],
+    interests:["Investing","Sports Business","Startups"], undergrad:"IIM Indore",
+    location:"Pune", bio:"Bain Consultant who loves strategy and deals. Aspiring PE investor.",
+    contactStatus:"Not contacted", interactions:[], followUpDate:null, notes:"",
   },
   {
-    id: 10,
-    name: "Divya Patel",
-    section: "D",
-    photo: "https://api.dicebear.com/7.x/avataaars/svg?seed=Divya&backgroundColor=ffd5dc",
-    prevCompany: "Amazon",
-    prevRole: "Senior Product Manager",
-    industry: "Technology",
-    function: "Product",
-    yearsExp: 6,
-    careerGoals: ["Entrepreneurship", "Entrepreneurship"],
-    skills: ["Product Roadmapping", "Customer Research", "Analytics", "Leadership"],
-    hobbies: ["Yoga", "Travel", "Music"],
-    interests: ["Consumer Tech", "Startups", "Sustainability"],
-    undergrad: "NMIMS Mumbai",
-    degree: "B.Tech",
-    major: "Computer Engineering",
-    location: "Ahmedabad",
-    status: "Married",
-    bio: "Amazon PM with a builder's mindset. Looking to start my own venture in the sustainability space.",
-    contactStatus: "Contacted",
-    interactions: [{ date: "2024-01-22", note: "Great chat about Amazon's product culture. Wants to explore sustainability ideas." }],
-    followUpDate: "2024-02-05",
-    notes: "Explore potential co-founding opportunity.",
+    id:10, name:"Divya Patel", section:"D",
+    photo:"https://api.dicebear.com/7.x/avataaars/svg?seed=Divya&backgroundColor=ffd5dc",
+    prevCompany:"Amazon", prevRole:"Senior Product Manager",
+    industry:"Technology", function:"Product", yearsExp:6,
+    careerGoals:["Entrepreneurship","Product Management"],
+    skills:["Product Roadmapping","Customer Research","Analytics","Leadership"],
+    hobbies:["Yoga","Travel","Music"],
+    interests:["Consumer Tech","Startups","Sustainability"], undergrad:"NMIMS Mumbai",
+    location:"Ahmedabad", bio:"Amazon PM with a builder's mindset. Starting my own venture in sustainability.",
+    contactStatus:"Contacted", interactions:[{date:"2024-01-22",note:"Great chat about Amazon product culture."}],
+    followUpDate:"2024-02-05", notes:"Explore potential co-founding opportunity.",
   },
   {
-    id: 11,
-    name: "Aditya Banerjee",
-    section: "C",
-    photo: "https://api.dicebear.com/7.x/avataaars/svg?seed=Aditya&backgroundColor=b6e3f4",
-    prevCompany: "Morgan Stanley",
-    prevRole: "VP",
-    industry: "BFSI / Financial Services",
-    function: "Investment Banking",
-    yearsExp: 8,
-    careerGoals: ["Investment Management", "Entrepreneurship"],
-    skills: ["Capital Markets", "Derivatives", "Client Management", "Bloomberg"],
-    hobbies: ["Cricket", "Investing", "Reading"],
-    interests: ["Global Markets", "Macro Economics", "Fintech"],
-    undergrad: "Presidency College",
-    degree: "B.Sc",
-    major: "Mathematics",
-    location: "Kolkata",
-    status: "Married",
-    bio: "Senior banker with 8 years on the Street, pivoting to build something transformative in asset management.",
-    contactStatus: "Not contacted",
-    interactions: [],
-    followUpDate: null,
-    notes: "",
+    id:11, name:"Aditya Banerjee", section:"C",
+    photo:"https://api.dicebear.com/7.x/avataaars/svg?seed=Aditya&backgroundColor=b6e3f4",
+    prevCompany:"Morgan Stanley", prevRole:"VP",
+    industry:"BFSI / Financial Services", function:"Investment Banking", yearsExp:8,
+    careerGoals:["Investment Management","Chief of Staff / Founder's Office"],
+    skills:["Capital Markets","Derivatives","Client Management","Bloomberg"],
+    hobbies:["Cricket","Investing","Reading"],
+    interests:["Global Markets","Macro Economics","Fintech"], undergrad:"Presidency College",
+    location:"Kolkata", bio:"Senior banker with 8 years on the Street. Pivoting to build in asset management.",
+    contactStatus:"Not contacted", interactions:[], followUpDate:null, notes:"",
   },
   {
-    id: 12,
-    name: "Pooja Venkataraman",
-    section: "A",
-    photo: "https://api.dicebear.com/7.x/avataaars/svg?seed=Pooja&backgroundColor=ffdfbf",
-    prevCompany: "Teach For India",
-    prevRole: "Program Manager",
-    industry: "Social Sector",
-    function: "Operations",
-    yearsExp: 4,
-    careerGoals: ["Social Impact", "Strategy & Consulting"],
-    skills: ["Program Management", "Community Engagement", "Data Analysis", "Communication"],
-    hobbies: ["Bharatanatyam", "Reading", "Volunteering"],
-    interests: ["Social Impact", "Education", "Leadership"],
-    undergrad: "Lady Shri Ram College",
-    degree: "B.A.",
-    major: "Psychology",
-    location: "Delhi",
-    status: "Single",
-    bio: "Social sector leader passionate about education equity. Bringing purpose-driven leadership to business.",
-    contactStatus: "Active connection",
-    interactions: [
-      { date: "2024-01-08", note: "Connected at orientation. Passionate about impact careers." },
-      { date: "2024-01-30", note: "Joined the Social Impact Club together." },
-    ],
-    followUpDate: null,
-    notes: "Amazing person. Great for social enterprise networking.",
+    id:12, name:"Pooja Venkataraman", section:"A",
+    photo:"https://api.dicebear.com/7.x/avataaars/svg?seed=Pooja&backgroundColor=ffdfbf",
+    prevCompany:"Teach For India", prevRole:"Program Manager",
+    industry:"Social Sector", function:"Operations", yearsExp:4,
+    careerGoals:["Social Impact","General Management"],
+    skills:["Program Management","Community Engagement","Data Analysis","Communication"],
+    hobbies:["Bharatanatyam","Reading","Volunteering"],
+    interests:["Social Impact","Education","Leadership"], undergrad:"Lady Shri Ram College",
+    location:"Delhi", bio:"Social sector leader passionate about education equity. Bringing purpose to business.",
+    contactStatus:"Active connection", interactions:[{date:"2024-01-08",note:"Connected at orientation."},{date:"2024-01-30",note:"Joined Social Impact Club together."}],
+    followUpDate:null, notes:"Amazing person. Great for social enterprise networking.",
   },
   {
-    id: 13,
-    name: "Siddharth Rao",
-    section: "B",
-    photo: "https://api.dicebear.com/7.x/avataaars/svg?seed=Siddharth&backgroundColor=c0aede",
-    prevCompany: "Reliance Industries",
-    prevRole: "Strategy Manager",
-    industry: "Conglomerates",
-    function: "Corporate Strategy",
-    yearsExp: 5,
-    careerGoals: ["Entrepreneurship", "Investment Management"],
-    skills: ["Corporate Strategy", "Business Development", "Financial Analysis", "Leadership"],
-    hobbies: ["Badminton", "Travel", "Cooking"],
-    interests: ["Family Business", "Manufacturing", "India Growth Story"],
-    undergrad: "Symbiosis",
-    degree: "BBA",
-    major: "Marketing",
-    location: "Mumbai",
-    status: "Committed",
-    bio: "Strategy professional with experience across Reliance's diverse businesses. Exploring PE and family business opportunities.",
-    contactStatus: "Not contacted",
-    interactions: [],
-    followUpDate: null,
-    notes: "",
+    id:13, name:"Siddharth Rao", section:"B",
+    photo:"https://api.dicebear.com/7.x/avataaars/svg?seed=Siddharth&backgroundColor=c0aede",
+    prevCompany:"Reliance Industries", prevRole:"Strategy Manager",
+    industry:"Conglomerates", function:"Corporate Strategy", yearsExp:5,
+    careerGoals:["Family Business","General Management"],
+    skills:["Corporate Strategy","Business Development","Financial Analysis","Leadership"],
+    hobbies:["Badminton","Travel","Cooking"],
+    interests:["Family Business","Manufacturing","India Growth Story"], undergrad:"Symbiosis",
+    location:"Mumbai", bio:"Strategy professional across Reliance's diverse businesses. Exploring family enterprise opportunities.",
+    contactStatus:"Not contacted", interactions:[], followUpDate:null, notes:"",
   },
   {
-    id: 14,
-    name: "Nisha Agarwal",
-    section: "D",
-    photo: "https://api.dicebear.com/7.x/avataaars/svg?seed=Nisha&backgroundColor=d1f4cc",
-    prevCompany: "Zomato",
-    prevRole: "Growth Manager",
-    industry: "Technology",
-    function: "Growth & Marketing",
-    yearsExp: 3,
-    careerGoals: ["Entrepreneurship", "Entrepreneurship"],
-    skills: ["Growth Hacking", "Marketing Analytics", "User Acquisition", "SQL"],
-    hobbies: ["Fitness", "Food", "Travel"],
-    interests: ["Consumer Internet", "Startups", "D2C Brands"],
-    undergrad: "Delhi University",
-    degree: "B.Com",
-    major: "Commerce",
-    location: "Delhi",
-    status: "Single",
-    bio: "Growth hacker at Zomato who built 0-to-1 campaigns. Obsessed with consumer internet and new-age brands.",
-    contactStatus: "Not contacted",
-    interactions: [],
-    followUpDate: null,
-    notes: "",
+    id:14, name:"Nisha Agarwal", section:"D",
+    photo:"https://api.dicebear.com/7.x/avataaars/svg?seed=Nisha&backgroundColor=d1f4cc",
+    prevCompany:"Zomato", prevRole:"Growth Manager",
+    industry:"Technology", function:"Growth & Marketing", yearsExp:3,
+    careerGoals:["Entrepreneurship","Sales & Marketing"],
+    skills:["Growth Hacking","Marketing Analytics","User Acquisition","SQL"],
+    hobbies:["Gym","Cooking","Reading"],
+    interests:["Consumer Internet","Startups","D2C Brands"], undergrad:"Delhi University",
+    location:"Delhi", bio:"Growth hacker at Zomato who built 0-to-1 campaigns. Obsessed with consumer internet.",
+    contactStatus:"Not contacted", interactions:[], followUpDate:null, notes:"",
   },
   {
-    id: 15,
-    name: "Amit Sharma",
-    section: "C",
-    photo: "https://api.dicebear.com/7.x/avataaars/svg?seed=Amit&backgroundColor=ffd5dc",
-    prevCompany: "KPMG",
-    prevRole: "Manager - Transaction Advisory",
-    industry: "Consulting & Strategy",
-    function: "Finance",
-    yearsExp: 6,
-    careerGoals: ["Investment Management", "Corporate Finance"],
-    skills: ["Due Diligence", "Valuation", "M&A Advisory", "Excel"],
-    hobbies: ["Cricket", "Running", "Podcasts"],
-    interests: ["Investing", "Deal Making", "Real Estate"],
-    undergrad: "Shri Ram College of Commerce",
-    degree: "B.Com (H)",
-    major: "Finance",
-    location: "Delhi",
-    status: "Married",
-    bio: "Transaction advisor with 6 years of M&A experience. Targeting buyside PE roles post-ISB.",
-    contactStatus: "Contacted",
-    interactions: [{ date: "2024-01-28", note: "Had coffee. He's connected to many PE recruiters." }],
-    followUpDate: "2024-02-12",
-    notes: "Strong PE network. Very helpful. Follow up for recruiter intros.",
+    id:15, name:"Amit Sharma", section:"C",
+    photo:"https://api.dicebear.com/7.x/avataaars/svg?seed=Amit&backgroundColor=ffd5dc",
+    prevCompany:"KPMG", prevRole:"Manager - Transaction Advisory",
+    industry:"Consulting & Strategy", function:"Finance", yearsExp:6,
+    careerGoals:["Investment Management","Corporate Finance"],
+    skills:["Due Diligence","Valuation","M&A Advisory","Excel"],
+    hobbies:["Cricket","Running","Podcasts"],
+    interests:["Investing","Deal Making","Real Estate"], undergrad:"SRCC",
+    location:"Delhi", bio:"Transaction advisor with 6 years of M&A experience. Targeting buyside PE post-ISB.",
+    contactStatus:"Contacted", interactions:[{date:"2024-01-28",note:"Had coffee. Connected to many PE recruiters."}],
+    followUpDate:"2024-02-12", notes:"Strong PE network. Follow up for recruiter intros.",
   },
   {
-    id: 16,
-    name: "Shreya Joshi",
-    section: "A",
-    photo: "https://api.dicebear.com/7.x/avataaars/svg?seed=Shreya&backgroundColor=b6e3f4",
-    prevCompany: "Flipkart",
-    prevRole: "Category Manager",
-    industry: "E-commerce",
-    function: "Operations",
-    yearsExp: 4,
-    careerGoals: ["Product Management", "Entrepreneurship"],
-    skills: ["Category Management", "Vendor Negotiations", "Analytics", "Leadership"],
-    hobbies: ["Badminton", "Music", "Photography"],
-    interests: ["Consumer Tech", "D2C Brands", "Sustainability"],
-    undergrad: "IIM Lucknow",
-    degree: "BBA",
-    major: "Operations",
-    location: "Bangalore",
-    status: "Single",
-    bio: "E-commerce operations pro with a love for building products that delight customers.",
-    contactStatus: "Not contacted",
-    interactions: [],
-    followUpDate: null,
-    notes: "",
+    id:16, name:"Shreya Joshi", section:"A",
+    photo:"https://api.dicebear.com/7.x/avataaars/svg?seed=Shreya&backgroundColor=b6e3f4",
+    prevCompany:"Flipkart", prevRole:"Category Manager",
+    industry:"E-commerce", function:"Operations", yearsExp:4,
+    careerGoals:["Product Management","Sales & Marketing"],
+    skills:["Category Management","Vendor Negotiations","Analytics","Leadership"],
+    hobbies:["Badminton","Music","Photography"],
+    interests:["Consumer Tech","D2C Brands","Sustainability"], undergrad:"IIM Lucknow",
+    location:"Bangalore", bio:"E-commerce operations pro with a love for building products that delight customers.",
+    contactStatus:"Not contacted", interactions:[], followUpDate:null, notes:"",
   },
   {
-    id: 17,
-    name: "Varun Khanna",
-    section: "B",
-    photo: "https://api.dicebear.com/7.x/avataaars/svg?seed=Varun&backgroundColor=ffdfbf",
-    prevCompany: "Accenture Strategy",
-    prevRole: "Manager",
-    industry: "Consulting & Strategy",
-    function: "Strategy",
-    yearsExp: 5,
-    careerGoals: ["Strategy & Consulting", "Entrepreneurship"],
-    skills: ["Digital Strategy", "Innovation", "Client Management", "Agile"],
-    hobbies: ["Football", "Fitness", "Travel"],
-    interests: ["Deep Tech", "Innovation", "Startups"],
-    undergrad: "VIT Vellore",
-    degree: "B.Tech",
-    major: "Mechanical Engineering",
-    location: "Gurgaon",
-    status: "Single",
-    bio: "Strategy manager passionate about innovation. Loves helping companies rethink their business models.",
-    contactStatus: "Not contacted",
-    interactions: [],
-    followUpDate: null,
-    notes: "",
+    id:17, name:"Varun Khanna", section:"B",
+    photo:"https://api.dicebear.com/7.x/avataaars/svg?seed=Varun&backgroundColor=ffdfbf",
+    prevCompany:"Accenture Strategy", prevRole:"Manager",
+    industry:"Consulting & Strategy", function:"Strategy", yearsExp:5,
+    careerGoals:["Strategy & Consulting","Operations & Supply Chain"],
+    skills:["Digital Strategy","Innovation","Client Management","Agile"],
+    hobbies:["Football","Gym","Podcasts"],
+    interests:["Deep Tech","Innovation","Startups"], undergrad:"VIT Vellore",
+    location:"Gurgaon", bio:"Strategy manager passionate about innovation. Helping companies rethink their business models.",
+    contactStatus:"Not contacted", interactions:[], followUpDate:null, notes:"",
   },
   {
-    id: 18,
-    name: "Riya Desai",
-    section: "D",
-    photo: "https://api.dicebear.com/7.x/avataaars/svg?seed=Riya&backgroundColor=c0aede",
-    prevCompany: "Unilever",
-    prevRole: "Brand Manager",
-    industry: "FMCG & Consumer",
-    function: "Marketing",
-    yearsExp: 4,
-    careerGoals: ["Strategy & Consulting", "Product Management"],
-    skills: ["Brand Management", "Marketing Analytics", "Campaign Strategy", "Consumer Insights"],
-    hobbies: ["Art", "Travel", "Reading"],
-    interests: ["Marketing", "Consumer Behavior", "Sustainability"],
-    undergrad: "Sophia College",
-    degree: "B.A.",
-    major: "Economics",
-    location: "Ahmedabad",
-    status: "Single",
-    bio: "Brand strategist at Unilever with a focus on sustainable marketing. Pivoting to consulting.",
-    contactStatus: "Follow-up scheduled",
-    interactions: [{ date: "2024-01-25", note: "Met at marketing club. Great insights on brand building." }],
-    followUpDate: "2024-02-08",
-    notes: "Discuss marketing consulting opportunities.",
+    id:18, name:"Riya Desai", section:"D",
+    photo:"https://api.dicebear.com/7.x/avataaars/svg?seed=Riya&backgroundColor=c0aede",
+    prevCompany:"Unilever", prevRole:"Brand Manager",
+    industry:"FMCG & Consumer", function:"Marketing", yearsExp:4,
+    careerGoals:["Sales & Marketing","Strategy & Consulting"],
+    skills:["Brand Management","Marketing Analytics","Campaign Strategy","Consumer Insights"],
+    hobbies:["Art","Travel","Reading"],
+    interests:["Marketing","Consumer Behavior","Sustainability"], undergrad:"Sophia College",
+    location:"Ahmedabad", bio:"Brand strategist at Unilever focused on sustainable marketing. Pivoting to consulting.",
+    contactStatus:"Follow-up scheduled", interactions:[{date:"2024-01-25",note:"Met at marketing club."}],
+    followUpDate:"2024-02-08", notes:"Discuss marketing consulting opportunities.",
   },
   {
-    id: 19,
-    name: "Kabir Sethi",
-    section: "C",
-    photo: "https://api.dicebear.com/7.x/avataaars/svg?seed=Kabir&backgroundColor=d1f4cc",
-    prevCompany: "Ola Electric",
-    prevRole: "Business Development Manager",
-    industry: "EV / Automotive",
-    function: "Business Development",
-    yearsExp: 3,
-    careerGoals: ["Entrepreneurship", "Entrepreneurship"],
-    skills: ["Business Development", "Partnerships", "Startup Ecosystem", "Networking"],
-    hobbies: ["Cricket", "Motorcycles", "Podcasts"],
-    interests: ["Deep Tech", "EVs", "Climate Tech", "Startups"],
-    undergrad: "IIT Madras",
-    degree: "B.Tech",
-    major: "Aerospace Engineering",
-    location: "Bangalore",
-    status: "Single",
-    bio: "Working at the frontier of the EV revolution. Passionate about climate tech and building the next big thing.",
-    contactStatus: "Not contacted",
-    interactions: [],
-    followUpDate: null,
-    notes: "",
+    id:19, name:"Kabir Sethi", section:"C",
+    photo:"https://api.dicebear.com/7.x/avataaars/svg?seed=Kabir&backgroundColor=d1f4cc",
+    prevCompany:"Ola Electric", prevRole:"Business Development Manager",
+    industry:"EV / Automotive", function:"Business Development", yearsExp:3,
+    careerGoals:["Entrepreneurship","Technology & Engineering"],
+    skills:["Business Development","Partnerships","Startup Ecosystem","Networking"],
+    hobbies:["Cricket","Motorcycles","Podcasts"],
+    interests:["Deep Tech","EVs","Climate Tech","Startups"], undergrad:"IIT Madras",
+    location:"Bangalore", bio:"Working at the frontier of the EV revolution. Passionate about climate tech.",
+    contactStatus:"Not contacted", interactions:[], followUpDate:null, notes:"",
   },
   {
-    id: 20,
-    name: "Tanvi Mehrotra",
-    section: "A",
-    photo: "https://api.dicebear.com/7.x/avataaars/svg?seed=Tanvi&backgroundColor=ffd5dc",
-    prevCompany: "JP Morgan",
-    prevRole: "Associate - Equity Research",
-    industry: "BFSI / Financial Services",
-    function: "Research",
-    yearsExp: 4,
-    careerGoals: ["Investment Management", "Investment Management"],
-    skills: ["Equity Research", "Sector Analysis", "Financial Modeling", "Bloomberg"],
-    hobbies: ["Investing", "Reading", "Tennis"],
-    interests: ["Global Markets", "Investing", "Macro Economics"],
-    undergrad: "H.R. College",
-    degree: "B.Com",
-    major: "Finance",
-    location: "Mumbai",
-    status: "Prefer not to disclose",
-    bio: "Equity research associate at JP Morgan covering technology sector. Aspiring fund manager.",
-    contactStatus: "Active connection",
-    interactions: [
-      { date: "2024-01-12", note: "Connected through finance club." },
-      { date: "2024-01-28", note: "Study group for investments course." },
-    ],
-    followUpDate: null,
-    notes: "Great insights on equity markets. Study group partner.",
+    id:20, name:"Tanvi Mehrotra", section:"A",
+    photo:"https://api.dicebear.com/7.x/avataaars/svg?seed=Tanvi&backgroundColor=ffd5dc",
+    prevCompany:"JP Morgan", prevRole:"Associate - Equity Research",
+    industry:"BFSI / Financial Services", function:"Research", yearsExp:4,
+    careerGoals:["Investment Management","Corporate Finance"],
+    skills:["Equity Research","Sector Analysis","Financial Modeling","Bloomberg"],
+    hobbies:["Investing","Reading","Tennis"],
+    interests:["Global Markets","Investing","Macro Economics"], undergrad:"H.R. College",
+    location:"Mumbai", bio:"Equity research associate at JP Morgan covering technology. Aspiring fund manager.",
+    contactStatus:"Active connection", interactions:[{date:"2024-01-12",note:"Connected through finance club."},{date:"2024-01-28",note:"Study group for investments course."}],
+    followUpDate:null, notes:"Great insights on equity markets. Study group partner.",
+  },
+  {
+    id:12, title:"Pre-Term Mumbai Meetup",
+    community:"Mumbai Batch", category:"Social",
+    location:"The Finch, Bandra", date:getEventDate(0),
+    time:"18:00", timeLabel:"6 PM", campus:"Hyderabad",
+    vibe:"Meet your batchmates before campus life begins.",
+    createdBy:"Arjun Mehta",
+    attendees:["Arjun Mehta","Karan Malhotra","Tanvi Mehrotra","Siddharth Rao","Amit Sharma"],
+    maxSpots:30, color:"#EC4899", icon:"🏙️",
+  },
+  {
+    id:13, title:"Pre-Term Delhi Catchup",
+    community:"Delhi Batch", category:"Social",
+    location:"Molecule Air Bar, Aerocity", date:getEventDate(0),
+    time:"19:00", timeLabel:"7 PM", campus:"Hyderabad",
+    vibe:"Delhi folks — let's meet before Hyderabad.",
+    createdBy:"Priya Sharma",
+    attendees:["Priya Sharma","Nisha Agarwal","Pooja Venkataraman","Amit Sharma"],
+    maxSpots:25, color:"#F97316", icon:"🏙️",
+  },
+  {
+    id:14, title:"Pre-Term Bangalore Chai",
+    community:"Bangalore Batch", category:"Social",
+    location:"Third Wave Coffee, Indiranagar", date:getEventDate(1),
+    time:"10:00", timeLabel:"10 AM", campus:"Hyderabad",
+    vibe:"Casual chai before the madness starts.",
+    createdBy:"Rahul Nair",
+    attendees:["Rahul Nair","Vikram Singh","Kabir Sethi","Shreya Joshi","Varun Khanna","Meera Iyer"],
+    maxSpots:20, color:"#10B981", icon:"☕",
+  },
+  {
+    id:15, title:"Hyderabad Locals — Pre-Move Dinner",
+    community:"Hyderabad Batch", category:"Social",
+    location:"Ohri's Banjara Hills", date:getEventDate(2),
+    time:"20:00", timeLabel:"8 PM", campus:"Hyderabad",
+    vibe:"Hyderabadis hosting the rest. Biryani guaranteed.",
+    createdBy:"Sneha Reddy",
+    attendees:["Sneha Reddy","Ananya Krishnan"],
+    maxSpots:20, color:"#8B5CF6", icon:"🍛",
   },
 ];
 
+// ─────────────────────────────────────────────
+// CURRENT USER PROFILE
 // ─────────────────────────────────────────────
 // CURRENT USER PROFILE
 // ─────────────────────────────────────────────
@@ -932,118 +714,110 @@ function Avatar({ name = "", photo, size = 40, radius = 10, extraStyle = {} }) {
 // ─────────────────────────────────────────────
 // PROFILE CARD (Discover Page)
 // ─────────────────────────────────────────────
-function ProfileCard({ profile, onView, onStatusChange, compact = false, currentUser, showReasons = false }) {
-  const score = calculateCompatibility(profile, currentUser||CURRENT_USER);
+function ProfileCard({ profile, onView, onStatusChange, compact=false, currentUser, showReasons=false, attendingEvent=null }) {
+  const score      = calculateCompatibility(profile, currentUser||CURRENT_USER);
   const scoreColor = getCompatibilityColor(score);
-  const cu = currentUser || CURRENT_USER;
-  const sharedGoals   = showReasons ? profile.careerGoals.filter(g => (cu.careerGoals||[]).includes(g)) : [];
-  const sharedHobbies = showReasons ? profile.hobbies.filter(h => (cu.hobbies||[]).includes(h)) : [];
-  const isDiverse     = showReasons && profile.industry !== cu.industry && sharedGoals.length > 0;
+  const cu         = currentUser || CURRENT_USER;
+
+  // Reason computation
+  const sharedHobbies = profile.hobbies.filter(h => (cu.hobbies||[]).includes(h));
+  const sharedGoals   = profile.careerGoals.filter(g => (cu.careerGoals||[]).includes(g));
+  const isDiverse     = profile.industry !== cu.industry;
+
+  // Primary reason line
+  const reasonLine = (() => {
+    if (attendingEvent) return `Going to ${attendingEvent} ·`;
+    if (sharedHobbies.length > 0 && sharedGoals.length > 0)
+      return `Both into ${sharedHobbies[0]} · ${sharedGoals[0]}`;
+    if (sharedHobbies.length > 0) return `Both into ${sharedHobbies.slice(0,2).join(" & ")}`;
+    if (sharedGoals.length > 0)   return `Both targeting ${sharedGoals[0]}`;
+    if (isDiverse)                return `Different background — worth meeting`;
+    return null;
+  })();
 
   return (
     <div style={{
-      background: "#fff",
-      borderRadius: 16,
-      border: "1px solid #EEF2F7",
-      padding: compact ? 16 : 20,
-      display: "flex",
-      flexDirection: "column",
-      gap: 14,
-      transition: "all 0.2s ease",
-      cursor: "pointer",
-      boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
-      position: "relative",
-      overflow: "hidden",
+      background:"#fff", borderRadius:16, border:"1px solid #EEF2F7",
+      padding:compact?14:20, display:"flex", flexDirection:"column", gap:0,
+      transition:"all 0.2s ease", cursor:"pointer",
+      boxShadow:"0 1px 3px rgba(0,0,0,0.04)", position:"relative", overflow:"hidden",
     }}
-      onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 8px 30px rgba(0,58,143,0.12)"; e.currentTarget.style.transform = "translateY(-2px)"; }}
-      onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.04)"; e.currentTarget.style.transform = "translateY(0)"; }}
-      onClick={() => onView(profile)}
-    >
-      {/* Compatibility bar accent */}
-      <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: `linear-gradient(90deg, ${scoreColor}, ${scoreColor}80)`, borderRadius: "16px 16px 0 0" }} />
+      onMouseEnter={e=>{ e.currentTarget.style.boxShadow="0 8px 30px rgba(0,58,143,0.12)"; e.currentTarget.style.transform="translateY(-2px)"; }}
+      onMouseLeave={e=>{ e.currentTarget.style.boxShadow="0 1px 3px rgba(0,0,0,0.04)"; e.currentTarget.style.transform="translateY(0)"; }}
+      onClick={()=>onView(profile)}>
 
-      {/* Header */}
-      <div style={{ display: "flex", gap: 12, alignItems: "flex-start", marginTop: 6 }}>
-        <Avatar name={profile.name} photo={profile.photo} size={52} radius={12} extraStyle={{ border:"2px solid #EEF2F7" }}/>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 2 }}>
-            <span style={{ fontWeight: 700, fontSize: 15, color: "#0F172A", fontFamily: "'Sora', sans-serif" }}>{profile.name}</span>
-            <span style={{ fontSize: 11, color: "#64748B", background: "#F1F5F9", padding: "1px 6px", borderRadius: 6, fontWeight: 600 }}>§{profile.section}</span>
-          </div>
+      {/* Colour bar */}
+      <div style={{ position:"absolute", top:0, left:0, right:0, height:3, background:`linear-gradient(90deg,${scoreColor},${scoreColor}80)`, borderRadius:"16px 16px 0 0" }}/>
+
+      {/* ── Row 1: Avatar + Name + Score ── */}
+      <div style={{ display:"flex", gap:12, alignItems:"flex-start", marginTop:6, marginBottom:12 }}>
+        <Avatar name={profile.name} photo={profile.photo} size={50} radius={12} extraStyle={{ border:"2px solid #EEF2F7", flexShrink:0 }}/>
+        <div style={{ flex:1, minWidth:0 }}>
+          <div style={{ fontWeight:800, fontSize:15, color:"#0F172A", fontFamily:"'Sora',sans-serif", marginBottom:2 }}>{profile.name}</div>
           {(profile.prevRole||profile.prevCompany) ? (
             <>
-              {profile.prevRole && <div style={{ fontSize:12, color:"#2563EB", fontWeight:600 }}>{profile.prevRole}</div>}
+              {profile.prevRole && <div style={{ fontSize:12, color:"#2563EB", fontWeight:600, marginBottom:1 }}>{profile.prevRole}</div>}
               {profile.prevCompany && <div style={{ fontSize:12, color:"#64748B" }}>{profile.prevCompany}</div>}
             </>
           ) : (
-            <div style={{ fontSize:12, color:"#94A3B8", fontStyle:"italic" }}>Section {profile.section} · {profile.campus||"ISB"}</div>
+            <div style={{ fontSize:12, color:"#94A3B8", fontStyle:"italic" }}>ISB Co'27</div>
           )}
         </div>
-        {/* Compatibility Score */}
-        <div style={{ textAlign: "center", minWidth: 44 }}>
-          <div style={{ width: 44, height: 44, borderRadius: "50%", background: `${scoreColor}18`, border: `2px solid ${scoreColor}`, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column" }}>
-            <span style={{ fontSize: 13, fontWeight: 800, color: scoreColor, lineHeight: 1 }}>{score}</span>
+        <div style={{ textAlign:"center", flexShrink:0 }}>
+          <div style={{ width:44, height:44, borderRadius:"50%", background:`${scoreColor}18`, border:`2px solid ${scoreColor}`, display:"flex", alignItems:"center", justifyContent:"center" }}>
+            <span style={{ fontSize:13, fontWeight:800, color:scoreColor }}>{score}</span>
           </div>
-          <div style={{ fontSize: 9, color: "#94A3B8", marginTop: 2, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>Match</div>
+          <div style={{ fontSize:9, color:"#94A3B8", marginTop:2, fontWeight:600, textTransform:"uppercase", letterSpacing:"0.05em" }}>Match</div>
         </div>
       </div>
 
-      {/* Reason tags — only when showReasons */}
-      {showReasons && (sharedGoals.length > 0 || sharedHobbies.length > 0 || isDiverse) && (
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginBottom: 2 }}>
-          {sharedGoals.slice(0,1).map(g => (
-            <span key={g} style={{ fontSize:10, background:"#EFF6FF", color:"#1D4ED8", padding:"2px 8px", borderRadius:20, fontWeight:700 }}>🎯 {g}</span>
-          ))}
-          {sharedHobbies.slice(0,1).map(h => (
-            <span key={h} style={{ fontSize:10, background:"#F0FDF4", color:"#059669", padding:"2px 8px", borderRadius:20, fontWeight:700 }}>🤝 {h}</span>
-          ))}
-          {isDiverse && (
-            <span style={{ fontSize:10, background:"#FDF4FF", color:"#7C3AED", padding:"2px 8px", borderRadius:20, fontWeight:700 }}>💡 Diverse background</span>
-          )}
+      {/* ── Row 2: Context (industry · exp · location) ── */}
+      {(profile.industry || profile.yearsExp || profile.location) && (
+        <div style={{ display:"flex", flexWrap:"wrap", gap:10, marginBottom:12 }}>
+          {profile.industry && <span style={{ fontSize:11, color:"#64748B", display:"flex", alignItems:"center", gap:3 }}><Icon.Briefcase/>{profile.industry}</span>}
+          {profile.yearsExp && <span style={{ fontSize:11, color:"#64748B", display:"flex", alignItems:"center", gap:3 }}><Icon.Clock/>{profile.yearsExp}y exp</span>}
+          {profile.location && <span style={{ fontSize:11, color:"#64748B", display:"flex", alignItems:"center", gap:3 }}><Icon.MapPin/>{profile.location}</span>}
         </div>
       )}
-      {/* Info Row — only show fields that exist */}
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-        {profile.industry && <span style={{ fontSize: 11, color: "#64748B", display: "flex", alignItems: "center", gap: 3 }}>
-          <Icon.Briefcase />{profile.industry}
-        </span>}
-        {profile.yearsExp && <span style={{ fontSize: 11, color: "#64748B", display: "flex", alignItems: "center", gap: 3 }}>
-          <Icon.Clock />{profile.yearsExp}y exp
-        </span>}
-        {profile.location && <span style={{ fontSize: 11, color: "#64748B", display: "flex", alignItems: "center", gap: 3 }}>
-          <Icon.MapPin />{profile.location}
-        </span>}
-      </div>
 
-      {/* Career Goals */}
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
-        {profile.careerGoals.map((g) => (
-          <span key={g} style={{ fontSize: 11, background: "#EFF6FF", color: "#1D4ED8", padding: "2px 8px", borderRadius: 20, fontWeight: 600 }}>{g}</span>
-        ))}
-      </div>
-
-      {/* Hobbies */}
-      {!compact && (
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
-          {profile.hobbies.slice(0, 3).map((h) => (
-            <span key={h} style={{ fontSize: 11, background: "#F8FAFC", color: "#475569", padding: "2px 8px", borderRadius: 20, border: "1px solid #E2E8F0" }}>✦ {h}</span>
+      {/* ── Row 3: Hobbies with icons — FIRST ── */}
+      {!compact && profile.hobbies && profile.hobbies.length > 0 && (
+        <div style={{ display:"flex", flexWrap:"wrap", gap:6, marginBottom:12 }}>
+          {profile.hobbies.slice(0,3).map(h=>(
+            <span key={h} style={{ fontSize:11, background:"#F8FAFC", color:"#475569", padding:"3px 10px", borderRadius:20, border:"1px solid #E2E8F0", display:"flex", alignItems:"center", gap:4 }}>
+              <span>{hobbyIcon(h)}</span>{h}
+            </span>
           ))}
         </div>
       )}
 
-      {/* Footer */}
-      <div style={{ display: "flex", gap: 8, alignItems: "center", justifyContent: "space-between", marginTop: 2 }}>
-        <StatusBadge status={profile.contactStatus} />
-        <div style={{ display: "flex", gap: 6 }} onClick={e => e.stopPropagation()}>
-          <button
-            onClick={() => onView(profile)}
-            style={{ fontSize: 11, padding: "5px 12px", borderRadius: 8, background: "#003A8F", color: "#fff", border: "none", cursor: "pointer", fontWeight: 600, fontFamily: "inherit" }}>
+      {/* ── Row 4: Career goals ── */}
+      {profile.careerGoals && profile.careerGoals.length > 0 && (
+        <div style={{ display:"flex", flexWrap:"wrap", gap:5, marginBottom:12 }}>
+          {[...new Set(profile.careerGoals)].slice(0,2).map(g=>(
+            <span key={g} style={{ fontSize:11, background:"#EFF6FF", color:"#1D4ED8", padding:"3px 10px", borderRadius:20, fontWeight:600 }}>{g}</span>
+          ))}
+        </div>
+      )}
+
+      {/* ── Row 5: Reason line ── */}
+      {reasonLine && (
+        <div style={{ fontSize:11, color:"#0F766E", fontWeight:600, background:"#F0FDFA", border:"1px solid #99F6E4", borderRadius:8, padding:"5px 10px", marginBottom:12 }}>
+          ✦ {reasonLine}
+        </div>
+      )}
+
+      {/* ── Row 6: Footer ── */}
+      <div style={{ display:"flex", gap:8, alignItems:"center", justifyContent:"space-between" }}>
+        <StatusBadge status={profile.contactStatus}/>
+        <div style={{ display:"flex", gap:6 }} onClick={e=>e.stopPropagation()}>
+          <button onClick={()=>onView(profile)}
+            style={{ fontSize:11, padding:"5px 13px", borderRadius:8, background:"#003A8F", color:"#fff", border:"none", cursor:"pointer", fontWeight:700, fontFamily:"inherit" }}>
             View
           </button>
-          {profile.contactStatus === "Not contacted" && (
-            <button
-              onClick={() => onStatusChange(profile.id, "Contacted")}
-              style={{ fontSize: 11, padding: "5px 12px", borderRadius: 8, background: "#ECFDF5", color: "#059669", border: "1px solid #D1FAE5", cursor: "pointer", fontWeight: 600, fontFamily: "inherit" }}>
+          {profile.contactStatus==="Not contacted" && (
+            <button onClick={()=>onStatusChange(profile.id,"Contacted")}
+              style={{ fontSize:11, padding:"5px 13px", borderRadius:8, background:"#ECFDF5", color:"#059669", border:"1px solid #D1FAE5", cursor:"pointer", fontWeight:700, fontFamily:"inherit" }}>
               + Contact
             </button>
           )}
@@ -1052,6 +826,7 @@ function ProfileCard({ profile, onView, onStatusChange, compact = false, current
     </div>
   );
 }
+
 
 // ─────────────────────────────────────────────
 // SIDEBAR
@@ -1738,14 +1513,25 @@ function CreateEventModal({ newEvt, setNewEvt, onClose, onSubmit }) {
             </div>
             <div>
               <label style={labelStyle}>Max Spots</label>
-              <input
-                type="number"
-                value={newEvt.maxSpots||""}
-                onChange={e=>setF("maxSpots",e.target.value)}
-                placeholder="15"
-                style={inputStyle}
-                min="1" max="500"
-              />
+              {newEvt.noLimit ? (
+                <div style={{ ...inputStyle, background:"#F0FDF4", border:"1.5px solid #BBF7D0", color:"#059669", fontWeight:700, display:"flex", alignItems:"center" }}>
+                  Open to all ✓
+                </div>
+              ) : (
+                <input
+                  type="number"
+                  value={newEvt.maxSpots||""}
+                  onChange={e=>setF("maxSpots",e.target.value)}
+                  placeholder="e.g. 15"
+                  style={inputStyle}
+                  min="1" max="500"
+                />
+              )}
+              <label style={{ display:"flex", alignItems:"center", gap:6, marginTop:8, cursor:"pointer", fontSize:12, color:"#64748B", fontWeight:500 }}>
+                <input type="checkbox" checked={newEvt.noLimit||false} onChange={e=>setF("noLimit",e.target.checked)}
+                  style={{ width:14, height:14, cursor:"pointer", accentColor:"#003A8F" }}/>
+                No limit — open to all
+              </label>
             </div>
           </div>
 
@@ -1782,7 +1568,7 @@ function EventsPage({ currentUser, setActivePage }) {
   const [selectedEvt, setSelectedEvt] = React.useState(null);
   const [creating,    setCreating]    = React.useState(false);
   const [allEvents,   setAllEvents]   = React.useState(SAMPLE_EVENTS);
-  const [newEvt,      setNewEvt]      = React.useState({ title:"", community:"", category:"Social", location:"", timeLabel:"", vibe:"", maxSpots:15 });
+  const [newEvt,      setNewEvt]      = React.useState({ title:"", community:"", category:"Social", location:"", timeLabel:"", vibe:"", maxSpots:15, noLimit:false });
 
   // ── Match pool ─────────────────────────────────────────────────────────────
   const matchPool = React.useMemo(() => {
@@ -1864,8 +1650,8 @@ function EventsPage({ currentUser, setActivePage }) {
           <div style={{ display:"flex", gap:14, fontSize:11, color:"#64748B", fontWeight:600, marginBottom:10 }}>
             <span>🕐 {event.timeLabel}</span>
             <span>📍 {event.location}</span>
-            <span style={{ marginLeft:"auto", color:spots<=2?"#EF4444":"#94A3B8", fontWeight:700 }}>
-              {spots<=0?"Full":`${spots} spots`}
+            <span style={{ marginLeft:"auto", color:event.maxSpots===null?"#059669":spots<=2?"#EF4444":"#94A3B8", fontWeight:700 }}>
+              {event.maxSpots===null?"Open to all":spots<=0?"Full":`${spots} spots`}
             </span>
           </div>
 
@@ -1948,7 +1734,7 @@ function EventsPage({ currentUser, setActivePage }) {
                 { icon:"🕐", label:"Time",     val:event.timeLabel },
                 { icon:"📍", label:"Location", val:event.location  },
                 { icon:"👤", label:"Organiser",val:event.createdBy },
-                { icon:"🎟️", label:"Spots",    val:spots<=0?"Full":`${spots} of ${event.maxSpots} left` },
+                { icon:"🎟️", label:"Spots",    val:event.maxSpots===null?"Open to all":spots<=0?"Full":`${spots} of ${event.maxSpots} left` },
               ].map(({icon,label,val})=>(
                 <div key={label} style={{ background:"#F8FAFC", borderRadius:12, padding:"12px 14px" }}>
                   <div style={{ fontSize:10, color:"#94A3B8", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.05em", marginBottom:4 }}>{icon} {label}</div>
@@ -2043,13 +1829,13 @@ function EventsPage({ currentUser, setActivePage }) {
             vibe:      newEvt.vibe,
             createdBy: (currentUser||CURRENT_USER).name,
             attendees: [(currentUser||CURRENT_USER).name],
-            maxSpots:  parseInt(newEvt.maxSpots)||15,
+            maxSpots:  newEvt.noLimit ? null : (parseInt(newEvt.maxSpots)||15),
             color:     catInfo.color,
             icon:      catInfo.icon,
           };
           setAllEvents(prev=>[created,...prev]);
           setCreating(false);
-          setNewEvt({ title:"", community:"", category:"Social", location:"", timeLabel:"", vibe:"", maxSpots:15 });
+          setNewEvt({ title:"", community:"", category:"Social", location:"", timeLabel:"", vibe:"", maxSpots:15, noLimit:false });
         }}
       />}
 
@@ -2123,174 +1909,192 @@ function EventsPage({ currentUser, setActivePage }) {
 
 
 function DiscoverPage({ profiles, setProfiles, onViewProfile, searchQuery, currentUser }) {
-  const [filters, setFilters] = useState({ industry: "", function: "", careerGoal: "", hobby: "", section: "", status: "", minExp: "", maxExp: "" });
-  const [showFilters, setShowFilters] = useState(false);
-  const [sortBy, setSortBy] = useState("compatibility");
-
-  const industries = [...new Set(SAMPLE_PROFILES.map(p => p.industry))];
-  const functions = [...new Set(SAMPLE_PROFILES.map(p => p.function))];
-  const allGoals = [...new Set(SAMPLE_PROFILES.flatMap(p => p.careerGoals))];
-  const allHobbies = [...new Set(SAMPLE_PROFILES.flatMap(p => p.hobbies))];
-  const sections = [...new Set(SAMPLE_PROFILES.map(p => p.section))].sort();
-  const statuses = ["Single", "Married", "Committed", "Prefer not to disclose"];
-
-  const filtered = useMemo(() => {
-    let result = profiles.map(p => ({ ...p, score: calculateCompatibility(p, currentUser||CURRENT_USER) }));
-
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase();
-      result = result.filter(p =>
-        p.name.toLowerCase().includes(q) ||
-        p.prevCompany.toLowerCase().includes(q) ||
-        p.industry.toLowerCase().includes(q) ||
-        p.skills.some(s => s.toLowerCase().includes(q)) ||
-        p.careerGoals.some(g => g.toLowerCase().includes(q))
-      );
-    }
-
-    if (filters.industry) result = result.filter(p => p.industry === filters.industry);
-    if (filters.function) result = result.filter(p => p.function === filters.function);
-    if (filters.careerGoal) result = result.filter(p => p.careerGoals.includes(filters.careerGoal));
-    if (filters.hobby) result = result.filter(p => p.hobbies.includes(filters.hobby));
-    if (filters.section) result = result.filter(p => p.section === filters.section);
-    if (filters.status) result = result.filter(p => p.status === filters.status);
-    if (filters.minExp) result = result.filter(p => p.yearsExp >= parseInt(filters.minExp));
-    if (filters.maxExp) result = result.filter(p => p.yearsExp <= parseInt(filters.maxExp));
-
-    if (sortBy === "compatibility") result.sort((a, b) => b.score - a.score);
-    else if (sortBy === "recommended") {
-      // Unmet people first, sorted by score — mirrors Recommendations page logic
-      result.sort((a, b) => {
-        const aUnmet = a.contactStatus === "Not contacted" ? 1 : 0;
-        const bUnmet = b.contactStatus === "Not contacted" ? 1 : 0;
-        if (aUnmet !== bUnmet) return bUnmet - aUnmet;
-        return b.score - a.score;
-      });
-    }
-    else if (sortBy === "name") result.sort((a, b) => a.name.localeCompare(b.name));
-    else if (sortBy === "exp") result.sort((a, b) => b.yearsExp - a.yearsExp);
-
-    return result;
-  }, [profiles, filters, searchQuery, sortBy]);
-
-  const activeFilterCount = Object.values(filters).filter(v => v !== "").length;
+  const [showAll, setShowAll] = useState({ meet:false, like:false, diverse:false });
+  const cu = currentUser || CURRENT_USER;
 
   const handleStatusChange = (id, newStatus) => {
-    setProfiles(prev => prev.map(p => p.id === id ? { ...p, contactStatus: newStatus } : p));
+    setProfiles(prev => prev.map(p => p.id===id ? {...p, contactStatus:newStatus} : p));
   };
 
-  const clearFilter = (key) => setFilters(prev => ({ ...prev, [key]: "" }));
+  // Today's events — for "going to X tonight" nudge
+  const today = new Date(); today.setHours(0,0,0,0);
+  const todayStr = today.toISOString().split("T")[0];
+  const todayEvents = SAMPLE_EVENTS.filter(e => e.date===todayStr);
 
-  const Select = ({ label, value, onChange, options }) => (
-    <div>
-      <label style={{ display: "block", fontSize: 11, color: "#64748B", fontWeight: 700, marginBottom: 5, textTransform: "uppercase", letterSpacing: "0.05em" }}>{label}</label>
-      <select
-        value={value}
-        onChange={e => onChange(e.target.value)}
-        style={{ width: "100%", padding: "7px 10px", border: "1.5px solid #E2E8F0", borderRadius: 8, fontSize: 12, outline: "none", background: "#fff", color: value ? "#0F172A" : "#94A3B8", fontFamily: "inherit", cursor: "pointer" }}
-      >
-        <option value="">All</option>
-        {options.map(o => <option key={o} value={o}>{o}</option>)}
-      </select>
+  // Map: person name → event title they're attending today
+  const attendingTodayMap = useMemo(() => {
+    const map = {};
+    todayEvents.forEach(e => {
+      e.attendees.forEach(name => { if (!map[name]) map[name] = e.title; });
+    });
+    return map;
+  }, []);
+
+  // Score all profiles
+  const scored = useMemo(() =>
+    profiles.map(p => ({ ...p, score: calculateCompatibility(p, cu) })),
+    [profiles, cu]
+  );
+
+  // Search filter
+  const searched = useMemo(() => {
+    if (!searchQuery) return scored;
+    const q = searchQuery.toLowerCase();
+    return scored.filter(p =>
+      p.name.toLowerCase().includes(q) ||
+      (p.prevCompany||"").toLowerCase().includes(q) ||
+      (p.industry||"").toLowerCase().includes(q) ||
+      (p.skills||[]).some(s=>s.toLowerCase().includes(q)) ||
+      (p.careerGoals||[]).some(g=>g.toLowerCase().includes(q))
+    );
+  }, [scored, searchQuery]);
+
+  // ── Section 1: Meet This Week ──────────────────────────────
+  // Unmet people attending same events, or top unmet matches
+  const meetThisWeek = useMemo(() => {
+    const unmet = searched.filter(p => p.contactStatus==="Not contacted");
+    // Prioritise people going to today's events
+    const goingToday = unmet.filter(p => attendingTodayMap[p.name]);
+    const rest = unmet.filter(p => !attendingTodayMap[p.name]).sort((a,b)=>b.score-a.score);
+    return [...goingToday, ...rest].slice(0, showAll.meet ? 20 : 4);
+  }, [searched, showAll.meet]);
+
+  // ── Section 2: People Like You ────────────────────────────
+  // 55%+ score, shared hobby or goal, exclude already met
+  const likeYou = useMemo(() => {
+    return searched
+      .filter(p => {
+        if (p.contactStatus !== "Not contacted") return false;
+        const sharedH = (p.hobbies||[]).filter(h=>(cu.hobbies||[]).includes(h));
+        const sharedG = (p.careerGoals||[]).filter(g=>(cu.careerGoals||[]).includes(g));
+        return p.score >= 55 && (sharedH.length>0 || sharedG.length>0);
+      })
+      .sort((a,b)=>b.score-a.score)
+      .slice(0, showAll.like ? 20 : 4);
+  }, [searched, showAll.like, cu]);
+
+  // ── Section 3: Outside Your Bubble ───────────────────────
+  // Different industry from currentUser, unmet
+  const outsideBubble = useMemo(() => {
+    return searched
+      .filter(p => p.contactStatus==="Not contacted" && p.industry !== cu.industry && p.score >= 30)
+      .sort((a,b)=>b.score-a.score)
+      .slice(0, showAll.diverse ? 20 : 4);
+  }, [searched, showAll.diverse, cu]);
+
+  // Profile completeness check
+  const isThin = !(cu.prevRole) && !(cu.prevCompany) && !(cu.careerGoals||[]).length;
+
+  const SectionHeader = ({ title, subtitle, count, seeAll, onSeeAll }) => (
+    <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-end", marginBottom:14 }}>
+      <div>
+        <div style={{ fontSize:17, fontWeight:900, color:"#0F172A", fontFamily:"'Sora',sans-serif", letterSpacing:"-0.01em" }}>{title}</div>
+        {subtitle && <div style={{ fontSize:12, color:"#64748B", marginTop:2 }}>{subtitle}</div>}
+      </div>
+      {count > 4 && (
+        <button onClick={onSeeAll} style={{ fontSize:12, color:"#2563EB", fontWeight:700, background:"none", border:"none", cursor:"pointer", fontFamily:"inherit" }}>
+          {seeAll ? "Show less" : `See all ${count} →`}
+        </button>
+      )}
+    </div>
+  );
+
+  const EmptyState = ({ icon, text }) => (
+    <div style={{ textAlign:"center", padding:"28px 20px", background:"#F8FAFC", borderRadius:14, border:"1.5px dashed #E2E8F0", color:"#94A3B8", fontSize:13 }}>
+      <div style={{ fontSize:28, marginBottom:8 }}>{icon}</div>{text}
     </div>
   );
 
   return (
-    <div style={{ display: "flex", height: "calc(100vh - 64px)", overflow: "hidden" }}>
-      {/* Filter Panel */}
-      {showFilters && (
-        <div style={{ width: 240, background: "#fff", borderRight: "1px solid #EEF2F7", padding: "20px 16px", overflowY: "auto", flexShrink: 0 }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-            <span style={{ fontWeight: 800, fontSize: 14, color: "#0F172A", fontFamily: "'Sora', sans-serif" }}>Filters</span>
-            <button onClick={() => setFilters({ industry: "", function: "", careerGoal: "", hobby: "", section: "", status: "", minExp: "", maxExp: "" })}
-              style={{ fontSize: 11, color: "#EF4444", background: "none", border: "none", cursor: "pointer", fontWeight: 600, fontFamily: "inherit" }}>Clear All</button>
-          </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-            <Select label="Industry" value={filters.industry} onChange={v => setFilters(p => ({ ...p, industry: v }))} options={industries} />
-            <Select label="Function" value={filters.function} onChange={v => setFilters(p => ({ ...p, function: v }))} options={functions} />
-            <Select label="Career Goal" value={filters.careerGoal} onChange={v => setFilters(p => ({ ...p, careerGoal: v }))} options={allGoals} />
-            <Select label="Hobby" value={filters.hobby} onChange={v => setFilters(p => ({ ...p, hobby: v }))} options={allHobbies} />
-            <Select label="Section" value={filters.section} onChange={v => setFilters(p => ({ ...p, section: v }))} options={sections} />
-            <Select label="Status" value={filters.status} onChange={v => setFilters(p => ({ ...p, status: v }))} options={statuses} />
-            <div>
-              <label style={{ display: "block", fontSize: 11, color: "#64748B", fontWeight: 700, marginBottom: 5, textTransform: "uppercase", letterSpacing: "0.05em" }}>Experience (years)</label>
-              <div style={{ display: "flex", gap: 6 }}>
-                <input type="number" placeholder="Min" value={filters.minExp} onChange={e => setFilters(p => ({ ...p, minExp: e.target.value }))} style={{ width: "50%", padding: "7px 8px", border: "1.5px solid #E2E8F0", borderRadius: 8, fontSize: 12, outline: "none", fontFamily: "inherit" }} />
-                <input type="number" placeholder="Max" value={filters.maxExp} onChange={e => setFilters(p => ({ ...p, maxExp: e.target.value }))} style={{ width: "50%", padding: "7px 8px", border: "1.5px solid #E2E8F0", borderRadius: 8, fontSize: 12, outline: "none", fontFamily: "inherit" }} />
-              </div>
-            </div>
-          </div>
+    <div style={{ display:"flex", height:"calc(100vh - 64px)", overflow:"hidden" }}>
+      <div style={{ flex:1, overflowY:"auto", padding:"24px 28px" }}>
+
+        {/* Header */}
+        <div style={{ marginBottom:20 }}>
+          <h1 style={{ margin:0, fontSize:22, fontWeight:900, color:"#0F172A", fontFamily:"'Sora',sans-serif", letterSpacing:"-0.02em" }}>Discover People</h1>
+          <div style={{ fontSize:12, color:"#64748B", marginTop:3 }}>{profiles.length} people in your batch</div>
         </div>
-      )}
 
-      {/* Main Content */}
-      <div style={{ flex: 1, overflowY: "auto", padding: "20px 24px" }}>
-        {/* Profile completeness banner — only for current user, not shown on others */}
-        {(() => {
-          const cu = currentUser || CURRENT_USER;
-          const isThin = !(cu.prevRole) && !(cu.prevCompany) && !(cu.careerGoals||[]).length;
-          return isThin ? (
-            <div style={{ background:"#EFF6FF", border:"1.5px solid #BFDBFE", borderRadius:12, padding:"11px 16px", marginBottom:16, display:"flex", alignItems:"center", justifyContent:"space-between", gap:12 }}>
-              <div style={{ fontSize:12, color:"#1D4ED8", fontWeight:600 }}>
-                💡 Add your background to appear in more searches
-              </div>
-              <button onClick={()=>window.dispatchEvent(new CustomEvent("goToProfile"))}
-                style={{ fontSize:11, fontWeight:700, color:"#1D4ED8", background:"#DBEAFE", border:"none", borderRadius:8, padding:"5px 12px", cursor:"pointer", fontFamily:"inherit", whiteSpace:"nowrap" }}>
-                Complete profile →
-              </button>
+        {/* Profile completeness banner */}
+        {isThin && (
+          <div style={{ background:"#EFF6FF", border:"1.5px solid #BFDBFE", borderRadius:12, padding:"11px 16px", marginBottom:20, display:"flex", alignItems:"center", justifyContent:"space-between", gap:12 }}>
+            <div style={{ fontSize:12, color:"#1D4ED8", fontWeight:600 }}>
+              💡 Add your background to appear in more searches and improve your matches
             </div>
-          ) : null;
-        })()}
-
-        {/* Controls */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18 }}>
-          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-            <button
-              onClick={() => setShowFilters(v => !v)}
-              style={{ display: "flex", alignItems: "center", gap: 6, padding: "7px 14px", border: "1.5px solid #E2E8F0", borderRadius: 9, background: showFilters ? "#003A8F" : "#fff", color: showFilters ? "#fff" : "#64748B", cursor: "pointer", fontSize: 12, fontWeight: 600, fontFamily: "inherit" }}>
-              <Icon.Filter /> Filters {activeFilterCount > 0 && <span style={{ background: "#EF4444", color: "#fff", borderRadius: "50%", width: 16, height: 16, display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 9, fontWeight: 800 }}>{activeFilterCount}</span>}
+            <button onClick={()=>window.dispatchEvent(new CustomEvent("goToProfile"))}
+              style={{ fontSize:11, fontWeight:700, color:"#1D4ED8", background:"#DBEAFE", border:"none", borderRadius:8, padding:"5px 12px", cursor:"pointer", fontFamily:"inherit", whiteSpace:"nowrap" }}>
+              Complete profile →
             </button>
-            {/* Active filter chips */}
-            {Object.entries(filters).filter(([, v]) => v !== "").map(([k, v]) => (
-              <span key={k} style={{ display: "inline-flex", alignItems: "center", gap: 4, background: "#EFF6FF", color: "#1D4ED8", padding: "4px 10px", borderRadius: 20, fontSize: 11, fontWeight: 600 }}>
-                {v}
-                <button onClick={() => clearFilter(k)} style={{ background: "none", border: "none", cursor: "pointer", color: "#1D4ED8", padding: 0, display: "flex" }}><Icon.X /></button>
-              </span>
-            ))}
-          </div>
-          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-            <span style={{ fontSize: 12, color: "#64748B" }}>{filtered.length} people</span>
-            <select value={sortBy} onChange={e => setSortBy(e.target.value)} style={{ padding: "6px 10px", border: "1.5px solid #E2E8F0", borderRadius: 8, fontSize: 12, outline: "none", background: "#fff", fontFamily: "inherit", cursor: "pointer" }}>
-              <option value="compatibility">Best Match</option>
-              <option value="recommended">Recommended for You</option>
-              <option value="name">Name A–Z</option>
-              <option value="exp">Most Experienced</option>
-            </select>
-          </div>
-        </div>
-
-        {/* Cards Grid */}
-        {filtered.length === 0 ? (
-          <div style={{ textAlign: "center", padding: "60px 20px", color: "#94A3B8" }}>
-            <div style={{ fontSize: 40, marginBottom: 12 }}>🔍</div>
-            <div style={{ fontSize: 16, fontWeight: 700, color: "#64748B" }}>No matches found</div>
-            <div style={{ fontSize: 13 }}>Try adjusting your filters</div>
-          </div>
-        ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 16 }}>
-            {filtered.map(p => (
-              <ProfileCard key={p.id} profile={p} onView={onViewProfile} onStatusChange={handleStatusChange} currentUser={currentUser} showReasons={sortBy === "recommended"}/>
-            ))}
           </div>
         )}
+
+        {/* ── Section 1: Meet This Week ── */}
+        <div style={{ marginBottom:32 }}>
+          <SectionHeader
+            title="👋 Meet This Week"
+            subtitle={todayEvents.length > 0 ? `Based on today's events and your top matches` : "Your top unmet connections"}
+            count={searched.filter(p=>p.contactStatus==="Not contacted").length}
+            seeAll={showAll.meet}
+            onSeeAll={()=>setShowAll(s=>({...s,meet:!s.meet}))}
+          />
+          {meetThisWeek.length === 0
+            ? <EmptyState icon="👋" text="No suggestions right now — check back soon"/>
+            : <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))", gap:14 }}>
+                {meetThisWeek.map(p=>(
+                  <ProfileCard key={p.id} profile={p} onView={onViewProfile}
+                    onStatusChange={handleStatusChange} currentUser={cu}
+                    attendingEvent={attendingTodayMap[p.name]||null}/>
+                ))}
+              </div>
+          }
+        </div>
+
+        {/* ── Section 2: People Like You ── */}
+        <div style={{ marginBottom:32 }}>
+          <SectionHeader
+            title="🤝 People Like You"
+            subtitle="Shared interests, similar goals"
+            count={searched.filter(p=>{ const sh=(p.hobbies||[]).filter(h=>(cu.hobbies||[]).includes(h)); const sg=(p.careerGoals||[]).filter(g=>(cu.careerGoals||[]).includes(g)); return p.score>=55&&(sh.length>0||sg.length>0); }).length}
+            seeAll={showAll.like}
+            onSeeAll={()=>setShowAll(s=>({...s,like:!s.like}))}
+          />
+          {likeYou.length === 0
+            ? <EmptyState icon="🤝" text="Add more interests to your profile to see matches here"/>
+            : <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))", gap:14 }}>
+                {likeYou.map(p=>(
+                  <ProfileCard key={p.id} profile={p} onView={onViewProfile}
+                    onStatusChange={handleStatusChange} currentUser={cu} showReasons/>
+                ))}
+              </div>
+          }
+        </div>
+
+        {/* ── Section 3: Outside Your Bubble ── */}
+        <div style={{ marginBottom:32 }}>
+          <SectionHeader
+            title="🌍 Outside Your Bubble"
+            subtitle="Different backgrounds — the most valuable connections"
+            count={searched.filter(p=>p.contactStatus==="Not contacted"&&p.industry!==cu.industry&&p.score>=30).length}
+            seeAll={showAll.diverse}
+            onSeeAll={()=>setShowAll(s=>({...s,diverse:!s.diverse}))}
+          />
+          {outsideBubble.length === 0
+            ? <EmptyState icon="🌍" text="You've met everyone outside your bubble — impressive!"/>
+            : <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))", gap:14 }}>
+                {outsideBubble.map(p=>(
+                  <ProfileCard key={p.id} profile={p} onView={onViewProfile}
+                    onStatusChange={handleStatusChange} currentUser={cu}/>
+                ))}
+              </div>
+          }
+        </div>
+
       </div>
     </div>
   );
 }
 
-// ─────────────────────────────────────────────
-// PROFILE DETAIL PAGE
-// ─────────────────────────────────────────────
+
 function ProfileDetailPage({ profile, onBack, onUpdate, currentUser }) {
   const [tab, setTab] = useState("overview");
   const [note, setNote] = useState("");
@@ -2611,6 +2415,19 @@ function MyNetworkPage({ profiles, onViewProfile }) {
 // ─────────────────────────────────────────────
 // MY PROFILE PAGE
 // ─────────────────────────────────────────────
+// Hobby → emoji icon map
+const HOBBY_ICONS = {
+  "Cricket":"🏏","Football":"⚽","Tennis":"🎾","Running":"🏃","Cycling":"🚴",
+  "Swimming":"🏊","Chess":"♟️","Poker":"🃏","Board Games":"🎲","Reading":"📚",
+  "Music":"🎵","Photography":"📷","Travel":"✈️","Cooking":"🍳","Gaming":"🎮",
+  "Yoga":"🧘","Gym":"💪","Fitness":"💪","Badminton":"🏸","Squash":"🏸",
+  "Investing":"📈","Podcasts":"🎙️","Art":"🎨","Dance":"💃","Motorcycles":"🏍️",
+  "Hiking":"🥾","Volunteering":"🤝","Wine Tasting":"🍷","Food":"🍜",
+  "Bharatanatyam":"💃","Photography":"📷",
+};
+const hobbyIcon = (h) => HOBBY_ICONS[h] || "✦";
+
+
 function ProfileField({ label, value, onChange, textarea = false, editing }) {
   return (
     <div>
@@ -2660,7 +2477,7 @@ function MyProfilePage({ currentUser, setCurrentUser }) {
             )}
           </div>
           <button
-            onClick={() => { if (editing) { setUser(draft); if(setCurrentUser) setCurrentUser(draft); } setEditing(!editing); }}
+            onClick={() => { if (editing) { setUser(draft); if(setCurrentUser){ setCurrentUser(draft); try{localStorage.setItem("pulse_currentUser",JSON.stringify(draft));}catch(e){} } } setEditing(!editing); }}
             style={{ padding: "9px 18px", background: editing ? "#10B981" : "rgba(255,255,255,0.2)", border: "none", borderRadius: 10, color: "#fff", cursor: "pointer", fontWeight: 700, fontSize: 12, fontFamily: "inherit", display: "flex", alignItems: "center", gap: 6 }}>
             {editing ? <><Icon.Check /> Save</> : <><Icon.Edit /> Edit</>}
           </button>
@@ -3024,15 +2841,27 @@ function OBField({ label, value, onChange, placeholder, type="text" }) {
 // MAIN APP
 // ─────────────────────────────────────────────
 function App() {
-  const [isOnboarded, setIsOnboarded] = useState(false);
-  const [currentUser, setCurrentUser] = useState(CURRENT_USER);
+  const [isOnboarded, setIsOnboarded] = useState(!!savedUser);
+  const [currentUser, setCurrentUser] = useState(savedUser || CURRENT_USER);
   const [activePage, setActivePage] = useState("events");
+
+  // ── localStorage helpers ──────────────────────────────────
+  const LS_USER     = "pulse_currentUser";
+  const LS_PROFILES = "pulse_profiles";
+
+  const savedUser = (() => {
+    try { const s = localStorage.getItem(LS_USER); return s ? JSON.parse(s) : null; } catch(e) { return null; }
+  })();
+  const savedProfiles = (() => {
+    try { const s = localStorage.getItem(LS_PROFILES); return s ? JSON.parse(s) : null; } catch(e) { return null; }
+  })();
+
   React.useEffect(() => {
     const handler = () => setActivePage("profile");
     window.addEventListener("goToProfile", handler);
     return () => window.removeEventListener("goToProfile", handler);
   }, []);
-  const [profiles, setProfiles] = useState(SAMPLE_PROFILES);
+  const [profiles, setProfiles] = useState(savedProfiles || SAMPLE_PROFILES);
   const [selectedProfile, setSelectedProfile] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -3065,6 +2894,7 @@ function App() {
     setCurrentUser(user);
     setProfiles(prev => prev.map(p => ({ ...p, _rescored: calculateCompatibility(p, user) })));
     setIsOnboarded(true);
+    try { localStorage.setItem("pulse_currentUser", JSON.stringify(user)); } catch(e) {}
   };
 
   if (!isOnboarded) return <OnboardingFlow onComplete={handleOnboardingComplete}/>;
@@ -3075,12 +2905,20 @@ function App() {
   };
 
   const handleUpdateProfile = (updatedProfile) => {
-    setProfiles(prev => prev.map(p => p.id === updatedProfile.id ? updatedProfile : p));
+    setProfiles(prev => {
+      const next = prev.map(p => p.id === updatedProfile.id ? updatedProfile : p);
+      try { localStorage.setItem("pulse_profiles", JSON.stringify(next)); } catch(e) {}
+      return next;
+    });
     setSelectedProfile(updatedProfile);
   };
 
   const handleStatusChange = (id, newStatus) => {
-    setProfiles(prev => prev.map(p => p.id === id ? { ...p, contactStatus: newStatus } : p));
+    setProfiles(prev => {
+      const next = prev.map(p => p.id===id ? {...p, contactStatus:newStatus} : p);
+      try { localStorage.setItem("pulse_profiles", JSON.stringify(next)); } catch(e) {}
+      return next;
+    });
   };
 
   const safeBack = selectedProfile?._backPage || "discover";
