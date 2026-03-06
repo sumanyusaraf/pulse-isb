@@ -2611,33 +2611,56 @@ function OnboardingFlow({ onComplete }) {
       : (p[k]||[]).length < max ? [...(p[k]||[]),v] : (p[k]||[])
   }));
 
-  // Communities — mirror exact event communities + popular campus activities
-  const COMMUNITIES = [
-    { name:"Poker",        icon:"🃏", color:"#F59E0B" },
-    { name:"Cricket",      icon:"🏏", color:"#F97316" },
-    { name:"Running",      icon:"🏃", color:"#10B981" },
-    { name:"Football",     icon:"⚽", color:"#059669" },
-    { name:"Badminton",    icon:"🏸", color:"#0EA5E9" },
-    { name:"Gym",          icon:"💪", color:"#8B5CF6" },
-    { name:"Yoga",         icon:"🧘", color:"#0D9488" },
-    { name:"Swimming",     icon:"🏊", color:"#06B6D4" },
-    { name:"Board Games",  icon:"🎲", color:"#EC4899" },
-    { name:"Chess",        icon:"♟️", color:"#64748B" },
-    { name:"VC & Startups",icon:"💼", color:"#7C3AED" },
-    { name:"PE & Deals",   icon:"📊", color:"#003A8F" },
-    { name:"AI & Tech",    icon:"🤖", color:"#0EA5E9" },
-    { name:"Consulting",   icon:"🧠", color:"#2563EB" },
-    { name:"Reading",      icon:"📚", color:"#92400E" },
-    { name:"Music",        icon:"🎵", color:"#DB2777" },
-    { name:"Photography",  icon:"📷", color:"#B45309" },
-    { name:"Travel",       icon:"✈️",  color:"#0369A1" },
-    { name:"Cooking",      icon:"🍳", color:"#C2410C" },
-    { name:"Social Impact",icon:"🌱", color:"#15803D" },
+  // Communities — grouped from real ISB Co'27 WhatsApp groups
+  const COMMUNITY_GROUPS = [
+    {
+      label: "🏅 Sports & Fitness",
+      items: [
+        { name:"Cricket",    icon:"🏏", color:"#F97316" },
+        { name:"Football",   icon:"⚽", color:"#059669" },
+        { name:"Running",    icon:"🏃", color:"#10B981" },
+        { name:"Swimming",   icon:"🏊", color:"#06B6D4" },
+        { name:"Badminton",  icon:"🏸", color:"#0EA5E9" },
+        { name:"Tennis",     icon:"🎾", color:"#84CC16" },
+        { name:"Gym",        icon:"💪", color:"#8B5CF6" },
+        { name:"Yoga",       icon:"🧘", color:"#0D9488" },
+        { name:"Pickleball", icon:"🏓", color:"#F59E0B" },
+        { name:"Cycling",    icon:"🚴", color:"#14B8A6" },
+      ],
+    },
+    {
+      label: "🎮 Games & Hobbies",
+      items: [
+        { name:"Poker",       icon:"🃏", color:"#F59E0B" },
+        { name:"Chess",       icon:"♟️", color:"#64748B" },
+        { name:"Board Games", icon:"🎲", color:"#EC4899" },
+        { name:"Gaming",      icon:"🎮", color:"#7C3AED" },
+        { name:"Biking",      icon:"🏍️", color:"#DC2626" },
+        { name:"F1",          icon:"🏎️", color:"#EF4444" },
+        { name:"Music",       icon:"🎵", color:"#DB2777" },
+        { name:"Movies",      icon:"🎬", color:"#9333EA" },
+        { name:"Photography", icon:"📷", color:"#B45309" },
+        { name:"Cooking",     icon:"🍳", color:"#C2410C" },
+      ],
+    },
+    {
+      label: "💼 Career & Learning",
+      items: [
+        { name:"VC & Startups",      icon:"🚀", color:"#7C3AED" },
+        { name:"PE & Deals",         icon:"💰", color:"#003A8F" },
+        { name:"Stock Market",       icon:"📈", color:"#059669" },
+        { name:"Consulting",         icon:"🧠", color:"#2563EB" },
+        { name:"AI & Tech",          icon:"🤖", color:"#0EA5E9" },
+        { name:"Product Management", icon:"📦", color:"#8B5CF6" },
+        { name:"Marketing",          icon:"📣", color:"#F97316" },
+        { name:"Case Prep",          icon:"📋", color:"#64748B" },
+        { name:"Healthcare",         icon:"⚕️", color:"#DC2626" },
+        { name:"Social Impact",      icon:"🌱", color:"#15803D" },
+      ],
+    },
   ];
-
-  const sectionOptions = data.campus === "Hyderabad"
-    ? ["A","B","C","D","E","F"]
-    : ["G","H","I","J","K","L"];
+  // Flat list for toggle logic
+  const COMMUNITIES = COMMUNITY_GROUPS.flatMap(g => g.items);
 
   // Step 2 — show relevant events based on chosen communities
   const relevantEvents = React.useMemo(() => {
@@ -2648,9 +2671,9 @@ function OnboardingFlow({ onComplete }) {
   }, [data.communities]);
 
   const canContinue = [
-    (data.name||"").trim() && data.campus && data.section,
+    (data.name||"").trim() && data.campus,
     (data.communities||[]).length >= 1,
-    true, // step 2 is always passable
+    true,
   ][step];
 
   const STEPS_META = [
@@ -2675,17 +2698,7 @@ function OnboardingFlow({ onComplete }) {
         </div>
       </div>
 
-      <div style={{ marginBottom:16 }}>
-        <label style={{ fontSize:11, color:"rgba(255,255,255,0.6)", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.07em", display:"block", marginBottom:8 }}>Section</label>
-        <div style={{ display:"flex", gap:7, flexWrap:"wrap" }}>
-          {sectionOptions.map(s=>(
-            <button key={s} onClick={()=>set("section",s)}
-              style={{ width:44, height:44, border:`1.5px solid ${data.section===s?"rgba(255,255,255,0.85)":"rgba(255,255,255,0.2)"}`, borderRadius:10, background:data.section===s?"rgba(255,255,255,0.2)":"transparent", color:data.section===s?"#fff":"rgba(255,255,255,0.5)", cursor:"pointer", fontSize:14, fontWeight:data.section===s?800:500, fontFamily:"inherit", transition:"all 0.15s" }}>{s}</button>
-          ))}
-        </div>
-      </div>
-
-      {/* TODO: ISB email verification — add magic link before production launch */}
+      {/* Section will be added once term begins — TODO: add magic link email verification before production */}
 
       <div style={{ background:"rgba(255,255,255,0.06)", borderRadius:11, padding:"11px 15px", borderLeft:"3px solid rgba(255,255,255,0.15)", marginTop:14 }}>
         <div style={{ fontSize:12, color:"rgba(255,255,255,0.45)", lineHeight:1.7 }}>
@@ -2703,25 +2716,32 @@ function OnboardingFlow({ onComplete }) {
           {(data.communities||[]).length}/6
         </span>
       </div>
-      <div style={{ display:"flex", flexWrap:"wrap", gap:8 }}>
-        {COMMUNITIES.map(({ name, icon, color }) => {
-          const active = (data.communities||[]).includes(name);
-          const maxed  = (data.communities||[]).length >= 6 && !active;
-          return (
-            <button key={name} onClick={()=>toggleArr("communities",name,6)}
-              style={{
-                padding:"8px 14px", borderRadius:22, cursor:maxed?"not-allowed":"pointer",
-                border:`1.5px solid ${active?color+"CC":"rgba(255,255,255,0.18)"}`,
-                background:active?color+"28":"transparent",
-                color:active?"#fff":maxed?"rgba(255,255,255,0.25)":"rgba(255,255,255,0.65)",
-                fontSize:13, fontWeight:active?700:500, fontFamily:"inherit",
-                transition:"all 0.15s", display:"flex", alignItems:"center", gap:6,
-                opacity:maxed?0.5:1,
-              }}>
-              <span>{icon}</span>{name}
-            </button>
-          );
-        })}
+      <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
+        {COMMUNITY_GROUPS.map(group => (
+          <div key={group.label}>
+            <div style={{ fontSize:10, color:"rgba(255,255,255,0.4)", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:8 }}>{group.label}</div>
+            <div style={{ display:"flex", flexWrap:"wrap", gap:7 }}>
+              {group.items.map(({ name, icon, color }) => {
+                const active = (data.communities||[]).includes(name);
+                const maxed  = (data.communities||[]).length >= 6 && !active;
+                return (
+                  <button key={name} onClick={()=>toggleArr("communities",name,6)}
+                    style={{
+                      padding:"7px 13px", borderRadius:22, cursor:maxed?"not-allowed":"pointer",
+                      border:`1.5px solid ${active?color+"CC":"rgba(255,255,255,0.15)"}`,
+                      background:active?color+"30":"rgba(255,255,255,0.04)",
+                      color:active?"#fff":maxed?"rgba(255,255,255,0.2)":"rgba(255,255,255,0.6)",
+                      fontSize:12, fontWeight:active?700:500, fontFamily:"inherit",
+                      transition:"all 0.15s", display:"flex", alignItems:"center", gap:5,
+                      opacity:maxed?0.45:1,
+                    }}>
+                    <span>{icon}</span>{name}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        ))}
       </div>
     </div>,
 
@@ -2841,27 +2861,24 @@ function OBField({ label, value, onChange, placeholder, type="text" }) {
 // MAIN APP
 // ─────────────────────────────────────────────
 function App() {
-  const [isOnboarded, setIsOnboarded] = useState(!!savedUser);
-  const [currentUser, setCurrentUser] = useState(savedUser || CURRENT_USER);
-  const [activePage, setActivePage] = useState("events");
-
-  // ── localStorage helpers ──────────────────────────────────
-  const LS_USER     = "pulse_currentUser";
-  const LS_PROFILES = "pulse_profiles";
-
+  // ── localStorage reads MUST come before any useState that uses them ──
   const savedUser = (() => {
-    try { const s = localStorage.getItem(LS_USER); return s ? JSON.parse(s) : null; } catch(e) { return null; }
+    try { const s = localStorage.getItem("pulse_currentUser"); return s ? JSON.parse(s) : null; } catch(e) { return null; }
   })();
   const savedProfiles = (() => {
-    try { const s = localStorage.getItem(LS_PROFILES); return s ? JSON.parse(s) : null; } catch(e) { return null; }
+    try { const s = localStorage.getItem("pulse_profiles"); return s ? JSON.parse(s) : null; } catch(e) { return null; }
   })();
+
+  const [isOnboarded,  setIsOnboarded]  = useState(!!savedUser);
+  const [currentUser,  setCurrentUser]  = useState(savedUser   || CURRENT_USER);
+  const [profiles,     setProfiles]     = useState(savedProfiles || SAMPLE_PROFILES);
+  const [activePage,   setActivePage]   = useState("events");
 
   React.useEffect(() => {
     const handler = () => setActivePage("profile");
     window.addEventListener("goToProfile", handler);
     return () => window.removeEventListener("goToProfile", handler);
   }, []);
-  const [profiles, setProfiles] = useState(savedProfiles || SAMPLE_PROFILES);
   const [selectedProfile, setSelectedProfile] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
 
