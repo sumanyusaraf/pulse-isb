@@ -303,7 +303,7 @@ const SAMPLE_PROFILES = [
     vibe:"Meet your batchmates before campus life begins.",
     createdBy:"Arjun Mehta",
     attendees:["Arjun Mehta","Karan Malhotra","Tanvi Mehrotra","Siddharth Rao","Amit Sharma"],
-    maxSpots:30, color:"#EC4899", icon:"🏙️",
+    maxSpots:30, color:"#EC4899", icon:"🏙",
   },
   {
     id:13, title:"Pre-Term Delhi Catchup",
@@ -313,7 +313,7 @@ const SAMPLE_PROFILES = [
     vibe:"Delhi folks — let's meet before Hyderabad.",
     createdBy:"Priya Sharma",
     attendees:["Priya Sharma","Nisha Agarwal","Pooja Venkataraman","Amit Sharma"],
-    maxSpots:25, color:"#F97316", icon:"🏙️",
+    maxSpots:25, color:"#F97316", icon:"🏙",
   },
   {
     id:14, title:"Pre-Term Bangalore Chai",
@@ -1442,7 +1442,7 @@ const EVENT_CATS = [
   { id:"Social",   label:"Social",   icon:"🎉", color:"#EC4899" },
   { id:"Career",   label:"Career",   icon:"💼", color:"#8B5CF6" },
   { id:"Wellness", label:"Wellness", icon:"🧘", color:"#0D9488" },
-  { id:"Talks",    label:"Talks",    icon:"🎙️", color:"#0F766E" },
+  { id:"Talks",    label:"Talks",    icon:"🎙", color:"#0F766E" },
 ];
 
 function CreateEventModal({ newEvt, setNewEvt, onClose, onSubmit }) {
@@ -1599,7 +1599,7 @@ function EventsPage({ currentUser, setActivePage }) {
     { id:"Social",   label:"Social",   icon:"🎉", color:"#EC4899" },
     { id:"Career",   label:"Career",   icon:"💼", color:"#8B5CF6" },
     { id:"Wellness", label:"Wellness", icon:"🧘", color:"#0D9488" },
-    { id:"Talks",    label:"Talks",    icon:"🎙️", color:"#0F766E" },
+    { id:"Talks",    label:"Talks",    icon:"🎙", color:"#0F766E" },
   ];
 
   const toggleJoin = (id) => setJoined(j=>({...j,[id]:!j[id]}));
@@ -1734,7 +1734,7 @@ function EventsPage({ currentUser, setActivePage }) {
                 { icon:"🕐", label:"Time",     val:event.timeLabel },
                 { icon:"📍", label:"Location", val:event.location  },
                 { icon:"👤", label:"Organiser",val:event.createdBy },
-                { icon:"🎟️", label:"Spots",    val:event.maxSpots===null?"Open to all":spots<=0?"Full":`${spots} of ${event.maxSpots} left` },
+                { icon:"🎟", label:"Spots",    val:event.maxSpots===null?"Open to all":spots<=0?"Full":`${spots} of ${event.maxSpots} left` },
               ].map(({icon,label,val})=>(
                 <div key={label} style={{ background:"#F8FAFC", borderRadius:12, padding:"12px 14px" }}>
                   <div style={{ fontSize:10, color:"#94A3B8", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.05em", marginBottom:4 }}>{icon} {label}</div>
@@ -2418,10 +2418,10 @@ function MyNetworkPage({ profiles, onViewProfile }) {
 // Hobby → emoji icon map
 const HOBBY_ICONS = {
   "Cricket":"🏏","Football":"⚽","Tennis":"🎾","Running":"🏃","Cycling":"🚴",
-  "Swimming":"🏊","Chess":"♟️","Poker":"🃏","Board Games":"🎲","Reading":"📚",
-  "Music":"🎵","Photography":"📷","Travel":"✈️","Cooking":"🍳","Gaming":"🎮",
+  "Swimming":"🏊","Chess":"♟","Poker":"🃏","Board Games":"🎲","Reading":"📚",
+  "Music":"🎵","Photography":"📷","Travel":"✈","Cooking":"🍳","Gaming":"🎮",
   "Yoga":"🧘","Gym":"💪","Fitness":"💪","Badminton":"🏸","Squash":"🏸",
-  "Investing":"📈","Podcasts":"🎙️","Art":"🎨","Dance":"💃","Motorcycles":"🏍️",
+  "Investing":"📈","Podcasts":"🎙","Art":"🎨","Dance":"💃","Motorcycles":"🏍",
   "Hiking":"🥾","Volunteering":"🤝","Wine Tasting":"🍷","Food":"🍜",
   "Bharatanatyam":"💃","Photography":"📷",
 };
@@ -2632,11 +2632,11 @@ function OnboardingFlow({ onComplete }) {
       label: "🎮 Games & Hobbies",
       items: [
         { name:"Poker",       icon:"🃏", color:"#F59E0B" },
-        { name:"Chess",       icon:"♟️", color:"#64748B" },
+        { name:"Chess",       icon:"♟", color:"#64748B" },
         { name:"Board Games", icon:"🎲", color:"#EC4899" },
         { name:"Gaming",      icon:"🎮", color:"#7C3AED" },
-        { name:"Biking",      icon:"🏍️", color:"#DC2626" },
-        { name:"F1",          icon:"🏎️", color:"#EF4444" },
+        { name:"Biking",      icon:"🏍", color:"#DC2626" },
+        { name:"F1",          icon:"🏎", color:"#EF4444" },
         { name:"Music",       icon:"🎵", color:"#DB2777" },
         { name:"Movies",      icon:"🎬", color:"#9333EA" },
         { name:"Photography", icon:"📷", color:"#B45309" },
@@ -2654,7 +2654,7 @@ function OnboardingFlow({ onComplete }) {
         { name:"Product Management", icon:"📦", color:"#8B5CF6" },
         { name:"Marketing",          icon:"📣", color:"#F97316" },
         { name:"Case Prep",          icon:"📋", color:"#64748B" },
-        { name:"Healthcare",         icon:"⚕️", color:"#DC2626" },
+        { name:"Healthcare",         icon:"⚕", color:"#DC2626" },
         { name:"Social Impact",      icon:"🌱", color:"#15803D" },
       ],
     },
