@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -40,6 +41,7 @@
 
   <script type="text/babel">
     const { useState, useEffect, useMemo, useCallback } = React;
+
 
 // ─────────────────────────────────────────────
 // SAMPLE DATA — 20 ISB Student Profiles
@@ -969,8 +971,14 @@ function ProfileCard({ profile, onView, onStatusChange, compact = false, current
             <span style={{ fontWeight: 700, fontSize: 15, color: "#0F172A", fontFamily: "'Sora', sans-serif" }}>{profile.name}</span>
             <span style={{ fontSize: 11, color: "#64748B", background: "#F1F5F9", padding: "1px 6px", borderRadius: 6, fontWeight: 600 }}>§{profile.section}</span>
           </div>
-          <div style={{ fontSize: 12, color: "#2563EB", fontWeight: 600 }}>{profile.prevRole}</div>
-          <div style={{ fontSize: 12, color: "#64748B" }}>{profile.prevCompany}</div>
+          {(profile.prevRole||profile.prevCompany) ? (
+            <>
+              {profile.prevRole && <div style={{ fontSize:12, color:"#2563EB", fontWeight:600 }}>{profile.prevRole}</div>}
+              {profile.prevCompany && <div style={{ fontSize:12, color:"#64748B" }}>{profile.prevCompany}</div>}
+            </>
+          ) : (
+            <div style={{ fontSize:12, color:"#94A3B8", fontStyle:"italic" }}>Section {profile.section} · {profile.campus||"ISB"}</div>
+          )}
         </div>
         {/* Compatibility Score */}
         <div style={{ textAlign: "center", minWidth: 44 }}>
@@ -995,12 +1003,12 @@ function ProfileCard({ profile, onView, onStatusChange, compact = false, current
           )}
         </div>
       )}
-      {/* Info Row */}
+      {/* Info Row — only show fields that exist */}
       <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-        <span style={{ fontSize: 11, color: "#64748B", display: "flex", alignItems: "center", gap: 3 }}>
+        {profile.industry && <span style={{ fontSize: 11, color: "#64748B", display: "flex", alignItems: "center", gap: 3 }}>
           <Icon.Briefcase />{profile.industry}
-        </span>
-        <span style={{ fontSize: 11, color: "#64748B", display: "flex", alignItems: "center", gap: 3 }}>
+        </span>}
+        {profile.yearsExp && <span style={{ fontSize: 11, color: "#64748B", display: "flex", alignItems: "center", gap: 3 }}>
           <Icon.Clock />{profile.yearsExp}y exp
         </span>
         <span style={{ fontSize: 11, color: "#64748B", display: "flex", alignItems: "center", gap: 3 }}>
@@ -1077,7 +1085,7 @@ function Sidebar({ activePage, setActivePage, currentUser }) {
       <div style={{ padding: "24px 20px 20px", borderBottom: "1px solid rgba(255,255,255,0.1)", marginBottom: 8 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <div style={{ width: 36, height: 36, borderRadius: 10, background: "linear-gradient(135deg, #2563EB, #60A5FA)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <span style={{ color: "#fff", fontSize: 16, fontWeight: 800, fontFamily: "'Sora', sans-serif" }}>N</span>
+            <span style={{ color: "#fff", fontSize: 16, fontWeight: 800, fontFamily: "'Sora', sans-serif" }}>P</span>
           </div>
           <div>
             <div style={{ color: "#fff", fontWeight: 800, fontSize: 15, fontFamily: "'Sora', sans-serif", letterSpacing: "-0.01em" }}>Pulse</div>
@@ -1645,14 +1653,19 @@ function DashboardPage({ profiles, onViewProfile, onStatusChange, setActivePage,
 // EVENTS PAGE
 // ─────────────────────────────────────────────
 function EventsPage({ currentUser, setActivePage }) {
-  const [joined, setJoined]   = React.useState({});
-  const [catFilter, setCatFilter] = React.useState("All");
+  const [joined,      setJoined]      = React.useState({});
+  const [catFilter,   setCatFilter]   = React.useState("All");
+  const [timeTab,     setTimeTab]     = React.useState("today");
+  const [selectedEvt, setSelectedEvt] = React.useState(null);
+  const [creating,    setCreating]    = React.useState(false);
+  const [allEvents,   setAllEvents]   = React.useState(SAMPLE_EVENTS);
+  const [newEvt,      setNewEvt]      = React.useState({ title:"", community:"", category:"Social", location:"", timeLabel:"", vibe:"", maxSpots:15 });
 
-  // ── Broader match pool — anyone 55%+ compatibility ────────────────────────
+  // ── Match pool ─────────────────────────────────────────────────────────────
   const matchPool = React.useMemo(() => {
     const cu = currentUser || CURRENT_USER;
     return SAMPLE_PROFILES
-      .map(p => ({ name: p.name, photo: p.photo, score: calculateCompatibility(p, cu) }))
+      .map(p => ({ name:p.name, photo:p.photo, score:calculateCompatibility(p,cu) }))
       .filter(p => p.score >= 55);
   }, [currentUser]);
   const matchPoolNames = matchPool.map(p => p.name);
@@ -1660,47 +1673,56 @@ function EventsPage({ currentUser, setActivePage }) {
   // ── Date helpers ────────────────────────────────────────────────────────────
   const today    = new Date(); today.setHours(0,0,0,0);
   const todayStr = today.toISOString().split("T")[0];
+  const tomorrowStr = new Date(today.getTime()+86400000).toISOString().split("T")[0];
 
   const dayLabel = (dateStr) => {
-    const d    = new Date(dateStr + "T00:00:00");
-    const diff = Math.round((d - today) / 86400000);
-    if (diff === 0) return "Today";
-    if (diff === 1) return "Tomorrow";
-    return d.toLocaleDateString("en-IN", { weekday:"long", day:"numeric", month:"short" });
+    const d    = new Date(dateStr+"T00:00:00");
+    const diff = Math.round((d-today)/86400000);
+    if(diff===0) return "Today";
+    if(diff===1) return "Tomorrow";
+    return d.toLocaleDateString("en-IN",{weekday:"long",day:"numeric",month:"short"});
   };
 
   // ── Category config ─────────────────────────────────────────────────────────
   const CATS = [
-    { id:"All",      label:"All",     icon:"✦",  color:"#003A8F" },
-    { id:"Sports",   label:"Sports",  icon:"🏃",  color:"#F97316" },
-    { id:"Social",   label:"Social",  icon:"🎉",  color:"#EC4899" },
-    { id:"Career",   label:"Career",  icon:"💼",  color:"#8B5CF6" },
-    { id:"Wellness", label:"Wellness",icon:"🧘",  color:"#0D9488" },
+    { id:"All",      label:"All",      icon:"✦", color:"#003A8F" },
+    { id:"Sports",   label:"Sports",   icon:"🏃", color:"#F97316" },
+    { id:"Social",   label:"Social",   icon:"🎉", color:"#EC4899" },
+    { id:"Career",   label:"Career",   icon:"💼", color:"#8B5CF6" },
+    { id:"Wellness", label:"Wellness", icon:"🧘", color:"#0D9488" },
+    { id:"Talks",    label:"Talks",    icon:"🎙️", color:"#0F766E" },
   ];
 
-  const toggleJoin = (id) => setJoined(j => ({ ...j, [id]: !j[id] }));
+  const toggleJoin = (id) => setJoined(j=>({...j,[id]:!j[id]}));
 
-  const filtered     = catFilter === "All" ? SAMPLE_EVENTS : SAMPLE_EVENTS.filter(e => e.category === catFilter);
-  const todayEvents  = filtered.filter(e => e.date === todayStr);
-  const upcoming     = filtered.filter(e => e.date !== todayStr);
+  // ── Filtering ───────────────────────────────────────────────────────────────
+  const catFiltered = catFilter==="All" ? allEvents : allEvents.filter(e=>e.category===catFilter);
+  const tabFiltered = timeTab==="today"    ? catFiltered.filter(e=>e.date===todayStr)
+                    : timeTab==="tomorrow" ? catFiltered.filter(e=>e.date===tomorrowStr)
+                    : catFiltered; // "week" = all
 
   // ── EventCard ───────────────────────────────────────────────────────────────
   const EventCard = ({ event, large }) => {
-    const isJoined   = joined[event.id];
-    const spots      = event.maxSpots - event.attendees.length;
+    const isJoined = joined[event.id];
+    const spots    = event.maxSpots - event.attendees.length;
     const matchProfiles = event.attendees
-      .filter(n => matchPoolNames.includes(n))
-      .map(name => matchPool.find(p => p.name === name))
+      .filter(n=>matchPoolNames.includes(n))
+      .map(name=>matchPool.find(p=>p.name===name))
       .filter(Boolean);
 
+    // Names display — "Arjun · Kabir · Riya +2 going"
+    const displayNames = event.attendees.slice(0,3).map(n=>n.split(" ")[0]);
+    const extraCount   = event.attendees.length - 3;
+    const attendeeLabel = event.attendees.length === 0
+      ? null
+      : displayNames.join(" · ") + (extraCount>0 ? ` +${extraCount}` : "") + " going";
+
     return (
-      <div style={{
-        background:"#fff", borderRadius:16, border:`1.5px solid ${event.color}33`,
-        overflow:"hidden", boxShadow:`0 2px 12px ${event.color}11`,
-        transition:"transform 0.15s",
-      }}
+      <div style={{ background:"#fff", borderRadius:16, border:`1.5px solid ${event.color}33`,
+        overflow:"hidden", boxShadow:`0 2px 12px ${event.color}11`, transition:"transform 0.15s", cursor:"pointer" }}
         onMouseEnter={e=>e.currentTarget.style.transform="translateY(-2px)"}
-        onMouseLeave={e=>e.currentTarget.style.transform="translateY(0)"}>
+        onMouseLeave={e=>e.currentTarget.style.transform="translateY(0)"}
+        onClick={()=>setSelectedEvt(event)}>
 
         {/* Colour header */}
         <div style={{ background:`linear-gradient(135deg,${event.color},${event.color}CC)`, padding:"14px 16px 12px", position:"relative", overflow:"hidden" }}>
@@ -1711,13 +1733,11 @@ function EventsPage({ currentUser, setActivePage }) {
           <div style={{ fontSize:large?18:15, fontWeight:900, color:"#fff", fontFamily:"'Sora',sans-serif", letterSpacing:"-0.01em", lineHeight:1.2 }}>
             {event.title}
           </div>
-          {event.vibe && (
-            <div style={{ fontSize:11, color:"rgba(255,255,255,0.75)", fontStyle:"italic", marginTop:3 }}>"{event.vibe}"</div>
-          )}
+          {event.vibe && <div style={{ fontSize:11, color:"rgba(255,255,255,0.75)", fontStyle:"italic", marginTop:3 }}>"{event.vibe}"</div>}
         </div>
 
         <div style={{ padding:"12px 14px" }}>
-          {/* Meta row */}
+          {/* Meta */}
           <div style={{ display:"flex", gap:14, fontSize:11, color:"#64748B", fontWeight:600, marginBottom:10 }}>
             <span>🕐 {event.timeLabel}</span>
             <span>📍 {event.location}</span>
@@ -1726,34 +1746,42 @@ function EventsPage({ currentUser, setActivePage }) {
             </span>
           </div>
 
-          {/* Real matches going */}
+          {/* Match nudge — only when there's a match */}
           {matchProfiles.length > 0 && (
-            <div style={{ background:`${event.color}0F`, border:`1px solid ${event.color}22`, borderRadius:9, padding:"8px 10px", marginBottom:10, display:"flex", alignItems:"center", gap:8 }}>
+            <div style={{ background:`${event.color}0F`, border:`1px solid ${event.color}22`, borderRadius:9, padding:"7px 10px", marginBottom:10, display:"flex", alignItems:"center", gap:8 }}>
               <div style={{ display:"flex" }}>
-                {matchProfiles.slice(0,3).map((p,i) => (
-                  <Avatar key={p.name} name={p.name} photo={p.photo} size={22} radius={11}
-                    extraStyle={{ border:"2px solid #fff", marginLeft:i>0?-6:0 }}/>
+                {matchProfiles.slice(0,3).map((p,i)=>(
+                  <Avatar key={p.name} name={p.name} photo={p.photo} size={20} radius={10} extraStyle={{ border:"2px solid #fff", marginLeft:i>0?-5:0 }}/>
                 ))}
               </div>
               <span style={{ fontSize:11, color:event.color, fontWeight:700 }}>
                 {matchProfiles.length===1
-                  ? `${matchProfiles[0].name.split(" ")[0]} is going — they're a top match`
-                  : `${matchProfiles[0].name.split(" ")[0]} + ${matchProfiles.length-1} of your top matches going`}
+                  ? `${matchProfiles[0].name.split(" ")[0]} is going — top match`
+                  : `${matchProfiles[0].name.split(" ")[0]} + ${matchProfiles.length-1} of your matches going`}
               </span>
             </div>
           )}
 
-          {/* Attendees + Join */}
+          {/* Faces + names + Join */}
           <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
-            <div style={{ display:"flex", alignItems:"center", gap:6 }}>
-              {event.attendees.slice(0,4).map((name,i) => (
-                <Avatar key={name} name={name} size={22} radius={11}
-                  extraStyle={{ border:"2px solid #fff", marginLeft:i>0?-6:0 }}/>
-              ))}
-              <span style={{ fontSize:10, color:"#94A3B8", marginLeft:4 }}>{event.attendees.length} going</span>
+            <div style={{ flex:1, minWidth:0 }}>
+              {event.attendees.length === 0 ? (
+                <span style={{ fontSize:11, color:"#94A3B8", fontStyle:"italic" }}>Be the first to join →</span>
+              ) : (
+                <div style={{ display:"flex", alignItems:"center", gap:7 }}>
+                  <div style={{ display:"flex" }}>
+                    {event.attendees.slice(0,3).map((name,i)=>(
+                      <Avatar key={name} name={name} size={24} radius={12} extraStyle={{ border:"2px solid #fff", marginLeft:i>0?-7:0 }}/>
+                    ))}
+                  </div>
+                  <span style={{ fontSize:11, color:"#64748B", fontWeight:600, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>
+                    {attendeeLabel}
+                  </span>
+                </div>
+              )}
             </div>
-            <button onClick={()=>toggleJoin(event.id)} style={{
-              padding:"7px 16px", border:"none", borderRadius:9, cursor:"pointer",
+            <button onClick={e=>{ e.stopPropagation(); toggleJoin(event.id); }} style={{
+              padding:"7px 14px", border:"none", borderRadius:9, cursor:"pointer", flexShrink:0, marginLeft:10,
               fontWeight:700, fontSize:11, fontFamily:"'Sora',sans-serif", transition:"all 0.15s",
               background:isJoined?"#ECFDF5":event.color,
               color:isJoined?"#059669":"#fff",
@@ -1767,44 +1795,248 @@ function EventsPage({ currentUser, setActivePage }) {
     );
   };
 
-  const activeCat = CATS.find(c=>c.id===catFilter) || CATS[0];
+  // ── Event Detail Modal ──────────────────────────────────────────────────────
+  const EventDetail = ({ event }) => {
+    const isJoined = joined[event.id];
+    const spots    = event.maxSpots - event.attendees.length;
+    const matchProfiles = event.attendees
+      .filter(n=>matchPoolNames.includes(n))
+      .map(name=>matchPool.find(p=>p.name===name))
+      .filter(Boolean);
+
+    return (
+      <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.5)", zIndex:200, display:"flex", alignItems:"center", justifyContent:"center", padding:20 }}
+        onClick={()=>setSelectedEvt(null)}>
+        <div style={{ background:"#fff", borderRadius:22, width:"100%", maxWidth:480, overflow:"hidden", boxShadow:"0 24px 60px rgba(0,0,0,0.3)", maxHeight:"90vh", overflowY:"auto" }}
+          onClick={e=>e.stopPropagation()}>
+
+          {/* Header */}
+          <div style={{ background:`linear-gradient(135deg,${event.color},${event.color}CC)`, padding:"24px 24px 20px", position:"relative" }}>
+            <button onClick={()=>setSelectedEvt(null)} style={{ position:"absolute", top:16, right:16, background:"rgba(255,255,255,0.2)", border:"none", borderRadius:"50%", width:32, height:32, cursor:"pointer", color:"#fff", fontSize:16, display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"inherit" }}>✕</button>
+            <div style={{ fontSize:11, color:"rgba(255,255,255,0.75)", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:6 }}>{event.icon} {event.community} · {event.category}</div>
+            <div style={{ fontSize:24, fontWeight:900, color:"#fff", fontFamily:"'Sora',sans-serif", letterSpacing:"-0.02em", lineHeight:1.2, marginBottom:6 }}>{event.title}</div>
+            {event.vibe && <div style={{ fontSize:13, color:"rgba(255,255,255,0.8)", fontStyle:"italic" }}>"{event.vibe}"</div>}
+          </div>
+
+          <div style={{ padding:"20px 24px" }}>
+            {/* Details */}
+            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12, marginBottom:20 }}>
+              {[
+                { icon:"🕐", label:"Time",     val:event.timeLabel },
+                { icon:"📍", label:"Location", val:event.location  },
+                { icon:"👤", label:"Organiser",val:event.createdBy },
+                { icon:"🎟️", label:"Spots",    val:spots<=0?"Full":`${spots} of ${event.maxSpots} left` },
+              ].map(({icon,label,val})=>(
+                <div key={label} style={{ background:"#F8FAFC", borderRadius:12, padding:"12px 14px" }}>
+                  <div style={{ fontSize:10, color:"#94A3B8", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.05em", marginBottom:4 }}>{icon} {label}</div>
+                  <div style={{ fontSize:13, fontWeight:700, color:"#0F172A" }}>{val}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* Match nudge */}
+            {matchProfiles.length > 0 && (
+              <div style={{ background:`${event.color}0D`, border:`1.5px solid ${event.color}22`, borderRadius:12, padding:"12px 16px", marginBottom:20 }}>
+                <div style={{ fontSize:12, fontWeight:800, color:event.color, marginBottom:8 }}>
+                  ✦ {matchProfiles.length===1?`${matchProfiles[0].name.split(" ")[0]} is going`:`${matchProfiles.length} of your matches are going`}
+                </div>
+                <div style={{ display:"flex", gap:10, flexWrap:"wrap" }}>
+                  {matchProfiles.map(p=>(
+                    <div key={p.name} style={{ display:"flex", alignItems:"center", gap:7 }}>
+                      <Avatar name={p.name} photo={p.photo} size={28} radius={8}/>
+                      <span style={{ fontSize:12, color:"#0F172A", fontWeight:600 }}>{p.name.split(" ")[0]}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Who's going */}
+            <div style={{ marginBottom:20 }}>
+              <div style={{ fontSize:12, fontWeight:800, color:"#0F172A", marginBottom:10, textTransform:"uppercase", letterSpacing:"0.05em" }}>
+                Who's going · {event.attendees.length}
+              </div>
+              {event.attendees.length === 0 ? (
+                <div style={{ fontSize:13, color:"#94A3B8", fontStyle:"italic" }}>Nobody yet — be the first!</div>
+              ) : (
+                <div style={{ display:"flex", flexWrap:"wrap", gap:8 }}>
+                  {event.attendees.map(name=>(
+                    <div key={name} style={{ display:"flex", alignItems:"center", gap:7, background:"#F8FAFC", borderRadius:20, padding:"5px 12px 5px 6px" }}>
+                      <Avatar name={name} size={24} radius={12}/>
+                      <span style={{ fontSize:12, fontWeight:600, color:"#0F172A" }}>{name.split(" ")[0]}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Join button */}
+            <button onClick={()=>{ toggleJoin(event.id); setSelectedEvt(null); }} style={{
+              width:"100%", padding:"14px", border:"none", borderRadius:13, cursor:"pointer",
+              fontWeight:800, fontSize:15, fontFamily:"'Sora',sans-serif", transition:"all 0.2s",
+              background:isJoined?"#ECFDF5":event.color,
+              color:isJoined?"#059669":"#fff",
+              boxShadow:isJoined?"none":`0 4px 20px ${event.color}44`,
+            }}>
+              {isJoined?"✓ You're going — tap to leave":"Join this event →"}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // ── Create Event Modal ──────────────────────────────────────────────────────
+  const CreateEventModal = () => {
+    const setF = (k,v) => setNewEvt(p=>({...p,[k]:v}));
+    const canCreate = newEvt.title.trim() && newEvt.category && newEvt.location.trim() && newEvt.timeLabel.trim();
+
+    const handleCreate = () => {
+      const today2 = new Date(); today2.setHours(0,0,0,0);
+      const created = {
+        id: Date.now(),
+        title:     newEvt.title,
+        community: newEvt.community || newEvt.category,
+        category:  newEvt.category,
+        location:  newEvt.location,
+        date:      today2.toISOString().split("T")[0],
+        time:      "18:00",
+        timeLabel: newEvt.timeLabel,
+        campus:    "Hyderabad",
+        vibe:      newEvt.vibe,
+        createdBy: (currentUser||CURRENT_USER).name,
+        attendees: [(currentUser||CURRENT_USER).name],
+        maxSpots:  parseInt(newEvt.maxSpots)||15,
+        color:     CATS.find(c=>c.id===newEvt.category)?.color || "#003A8F",
+        icon:      CATS.find(c=>c.id===newEvt.category)?.icon  || "📅",
+      };
+      setAllEvents(prev=>[created,...prev]);
+      setCreating(false);
+      setNewEvt({ title:"", community:"", category:"Social", location:"", timeLabel:"", vibe:"", maxSpots:15 });
+    };
+
+    const inputStyle = { width:"100%", padding:"10px 13px", border:"1.5px solid #E2E8F0", borderRadius:10, fontSize:13, outline:"none", fontFamily:"inherit", color:"#0F172A", background:"#fff", boxSizing:"border-box" };
+    const labelStyle = { display:"block", fontSize:11, color:"#64748B", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.05em", marginBottom:6 };
+
+    return (
+      <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.5)", zIndex:200, display:"flex", alignItems:"center", justifyContent:"center", padding:20 }}
+        onClick={()=>setCreating(false)}>
+        <div style={{ background:"#fff", borderRadius:22, width:"100%", maxWidth:460, padding:"24px", boxShadow:"0 24px 60px rgba(0,0,0,0.25)", maxHeight:"90vh", overflowY:"auto" }}
+          onClick={e=>e.stopPropagation()}>
+
+          <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:20 }}>
+            <div style={{ fontSize:18, fontWeight:900, color:"#0F172A", fontFamily:"'Sora',sans-serif" }}>Create Event</div>
+            <button onClick={()=>setCreating(false)} style={{ background:"#F1F5F9", border:"none", borderRadius:"50%", width:32, height:32, cursor:"pointer", fontSize:16, display:"flex", alignItems:"center", justifyContent:"center" }}>✕</button>
+          </div>
+
+          <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
+            <div>
+              <label style={labelStyle}>Event Name ✱</label>
+              <input value={newEvt.title} onChange={e=>setF("title",e.target.value)} placeholder="e.g. Poker Night, Study Group, Morning Run" style={inputStyle}/>
+            </div>
+
+            <div>
+              <label style={labelStyle}>Category ✱</label>
+              <div style={{ display:"flex", gap:8 }}>
+                {CATS.filter(c=>c.id!=="All").map(cat=>(
+                  <button key={cat.id} onClick={()=>setF("category",cat.id)}
+                    style={{ flex:1, padding:"9px 4px", border:`1.5px solid ${newEvt.category===cat.id?cat.color:"#E2E8F0"}`, borderRadius:10, background:newEvt.category===cat.id?cat.color+"18":"#fff", color:newEvt.category===cat.id?cat.color:"#64748B", cursor:"pointer", fontSize:11, fontWeight:newEvt.category===cat.id?700:500, fontFamily:"inherit", textAlign:"center" }}>
+                    {cat.icon}<br/>{cat.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <label style={labelStyle}>Location ✱</label>
+              <input value={newEvt.location} onChange={e=>setF("location",e.target.value)} placeholder="e.g. Block 3 Common Room" style={inputStyle}/>
+            </div>
+
+            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
+              <div>
+                <label style={labelStyle}>Time ✱</label>
+                <input value={newEvt.timeLabel} onChange={e=>setF("timeLabel",e.target.value)} placeholder="e.g. 9 PM" style={inputStyle}/>
+              </div>
+              <div>
+                <label style={labelStyle}>Max Spots</label>
+                <input type="number" value={newEvt.maxSpots} onChange={e=>setF("maxSpots",e.target.value)} placeholder="15" style={inputStyle}/>
+              </div>
+            </div>
+
+            <div>
+              <label style={labelStyle}>Vibe <span style={{textTransform:"none",fontWeight:400}}>— optional</span></label>
+              <input value={newEvt.vibe} onChange={e=>setF("vibe",e.target.value)} placeholder="One line — what's the feel of this event?" style={inputStyle}/>
+            </div>
+          </div>
+
+          <button onClick={handleCreate} disabled={!canCreate} style={{
+            width:"100%", marginTop:20, padding:"13px", border:"none", borderRadius:13,
+            background:canCreate?"#003A8F":"#E2E8F0", color:canCreate?"#fff":"#94A3B8",
+            cursor:canCreate?"pointer":"not-allowed", fontWeight:800, fontSize:14,
+            fontFamily:"'Sora',sans-serif", boxShadow:canCreate?"0 4px 20px rgba(0,58,143,0.3)":"none",
+          }}>
+            Post Event →
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+  const activeCat = CATS.find(c=>c.id===catFilter)||CATS[0];
+  const TIME_TABS = [
+    { id:"today",    label:"Today" },
+    { id:"tomorrow", label:"Tomorrow" },
+    { id:"week",     label:"This Week" },
+  ];
 
   return (
     <div style={{ padding:"24px 28px" }}>
+      {/* Detail modal */}
+      {selectedEvt && <EventDetail event={selectedEvt}/>}
+      {/* Create modal */}
+      {creating && <CreateEventModal/>}
+
       {/* Header */}
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:16 }}>
         <div>
           <h1 style={{ margin:0, fontSize:22, fontWeight:900, color:"#0F172A", fontFamily:"'Sora',sans-serif", letterSpacing:"-0.02em" }}>Events</h1>
-          <div style={{ fontSize:12, color:"#64748B", marginTop:3 }}>{SAMPLE_EVENTS.length} events this week on campus</div>
+          <div style={{ fontSize:12, color:"#64748B", marginTop:3 }}>{allEvents.length} events this week on campus</div>
         </div>
-        <button style={{ padding:"9px 20px", background:"#003A8F", color:"#fff", border:"none", borderRadius:10, fontWeight:700, fontSize:13, fontFamily:"'Sora',sans-serif", cursor:"pointer", boxShadow:"0 2px 12px rgba(0,58,143,0.25)" }}>
+        <button onClick={()=>setCreating(true)} style={{ padding:"9px 20px", background:"#003A8F", color:"#fff", border:"none", borderRadius:10, fontWeight:700, fontSize:13, fontFamily:"'Sora',sans-serif", cursor:"pointer", boxShadow:"0 2px 12px rgba(0,58,143,0.25)" }}>
           + Create Event
         </button>
       </div>
 
+      {/* Time tabs */}
+      <div style={{ display:"flex", gap:6, marginBottom:16 }}>
+        {TIME_TABS.map(tab=>{
+          const active = timeTab===tab.id;
+          const count  = tab.id==="today"    ? (catFilter==="All"?allEvents:allEvents.filter(e=>e.category===catFilter)).filter(e=>e.date===todayStr).length
+                       : tab.id==="tomorrow" ? (catFilter==="All"?allEvents:allEvents.filter(e=>e.category===catFilter)).filter(e=>e.date===tomorrowStr).length
+                       : (catFilter==="All"?allEvents:allEvents.filter(e=>e.category===catFilter)).length;
+          return (
+            <button key={tab.id} onClick={()=>setTimeTab(tab.id)}
+              style={{ padding:"7px 16px", borderRadius:22, cursor:"pointer", fontFamily:"'Sora',sans-serif", border:`1.5px solid ${active?"#003A8F":"#E2E8F0"}`, background:active?"#003A8F":"#fff", color:active?"#fff":"#64748B", fontSize:12, fontWeight:active?700:500, transition:"all 0.15s", display:"flex", alignItems:"center", gap:6 }}>
+              {tab.label}
+              <span style={{ fontSize:10, background:active?"rgba(255,255,255,0.25)":"#F1F5F9", color:active?"#fff":"#64748B", borderRadius:10, padding:"1px 6px", fontWeight:700 }}>{count}</span>
+            </button>
+          );
+        })}
+      </div>
+
       {/* Category filter pills */}
-      <div style={{ display:"flex", gap:8, marginBottom:24 }}>
-        {CATS.map(cat => {
-          const active = catFilter === cat.id;
+      <div style={{ display:"flex", gap:8, marginBottom:24, flexWrap:"wrap" }}>
+        {CATS.map(cat=>{
+          const active = catFilter===cat.id;
           return (
             <button key={cat.id} onClick={()=>setCatFilter(cat.id)}
-              style={{
-                padding:"7px 16px", borderRadius:22, cursor:"pointer", fontFamily:"'Sora',sans-serif",
-                border:`1.5px solid ${active?cat.color:"#E2E8F0"}`,
-                background:active?cat.color:"#fff",
-                color:active?"#fff":"#64748B",
-                fontSize:12, fontWeight:active?700:500,
-                transition:"all 0.15s",
-                display:"flex", alignItems:"center", gap:5,
-                boxShadow:active?`0 2px 10px ${cat.color}40`:"none",
-              }}
-              onMouseEnter={e=>{ if(!active){ e.currentTarget.style.borderColor=cat.color; e.currentTarget.style.color=cat.color; }}}
-              onMouseLeave={e=>{ if(!active){ e.currentTarget.style.borderColor="#E2E8F0"; e.currentTarget.style.color="#64748B"; }}}>
-              <span>{cat.icon}</span>
-              {cat.label}
+              style={{ padding:"6px 14px", borderRadius:22, cursor:"pointer", fontFamily:"'Sora',sans-serif", border:`1.5px solid ${active?cat.color:"#E2E8F0"}`, background:active?cat.color:"#fff", color:active?"#fff":"#64748B", fontSize:12, fontWeight:active?700:500, transition:"all 0.15s", display:"flex", alignItems:"center", gap:5, boxShadow:active?`0 2px 10px ${cat.color}40`:"none" }}
+              onMouseEnter={e=>{ if(!active){e.currentTarget.style.borderColor=cat.color;e.currentTarget.style.color=cat.color;}}}
+              onMouseLeave={e=>{ if(!active){e.currentTarget.style.borderColor="#E2E8F0";e.currentTarget.style.color="#64748B";}}}>
+              <span>{cat.icon}</span>{cat.label}
               {cat.id!=="All" && (
                 <span style={{ fontSize:10, background:active?"rgba(255,255,255,0.25)":cat.color+"18", color:active?"#fff":cat.color, borderRadius:10, padding:"1px 6px", fontWeight:700 }}>
-                  {SAMPLE_EVENTS.filter(e=>e.category===cat.id).length}
+                  {allEvents.filter(e=>e.category===cat.id).length}
                 </span>
               )}
             </button>
@@ -1812,42 +2044,20 @@ function EventsPage({ currentUser, setActivePage }) {
         })}
       </div>
 
-      {/* Today */}
-      {todayEvents.length > 0 && (
-        <div style={{ marginBottom:28 }}>
-          <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:14 }}>
-            <span style={{ width:8, height:8, borderRadius:"50%", background:"#EF4444", display:"inline-block", animation:"dashPulse 2s infinite" }}/>
-            <span style={{ fontSize:12, fontWeight:800, color:"#0F172A", textTransform:"uppercase", letterSpacing:"0.06em" }}>Today</span>
-          </div>
-          <div style={{ display:"grid", gridTemplateColumns:`repeat(${Math.min(todayEvents.length,2)},1fr)`, gap:14 }}>
-            {todayEvents.map(e=><EventCard key={e.id} event={e} large/>)}
-          </div>
-        </div>
-      )}
-
-      {/* Coming up */}
-      {upcoming.length > 0 && (
-        <div>
-          <div style={{ fontSize:12, fontWeight:800, color:"#0F172A", textTransform:"uppercase", letterSpacing:"0.06em", marginBottom:14 }}>
-            Coming Up
-          </div>
-          <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:14 }}>
-            {upcoming.map(e=>(
-              <div key={e.id}>
-                <div style={{ fontSize:11, fontWeight:700, color:"#64748B", marginBottom:6 }}>{dayLabel(e.date)}</div>
-                <EventCard event={e}/>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Empty state */}
-      {todayEvents.length===0 && upcoming.length===0 && (
+      {/* Events grid */}
+      {tabFiltered.length === 0 ? (
         <div style={{ textAlign:"center", padding:"60px 20px", background:"#F8FAFC", borderRadius:16, border:"1.5px dashed #E2E8F0" }}>
           <div style={{ fontSize:32, marginBottom:10 }}>{activeCat.icon}</div>
-          <div style={{ fontSize:15, fontWeight:700, color:"#64748B", fontFamily:"'Sora',sans-serif" }}>No {activeCat.label} events this week</div>
-          <div style={{ fontSize:12, color:"#94A3B8", marginTop:6 }}>Be the first to create one.</div>
+          <div style={{ fontSize:15, fontWeight:700, color:"#64748B", fontFamily:"'Sora',sans-serif" }}>
+            No {catFilter==="All"?"":catFilter} events {timeTab==="today"?"today":timeTab==="tomorrow"?"tomorrow":"this week"}
+          </div>
+          <div style={{ fontSize:12, color:"#94A3B8", marginTop:6 }}>
+            <button onClick={()=>setCreating(true)} style={{ background:"none", border:"none", color:"#2563EB", cursor:"pointer", fontWeight:700, fontFamily:"inherit", fontSize:12 }}>Be the first to create one →</button>
+          </div>
+        </div>
+      ) : (
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(290px,1fr))", gap:16 }}>
+          {tabFiltered.map(e=><EventCard key={e.id} event={e} large={tabFiltered.length<=2}/>)}
         </div>
       )}
     </div>
@@ -1855,9 +2065,6 @@ function EventsPage({ currentUser, setActivePage }) {
 }
 
 
-// ─────────────────────────────────────────────
-// DISCOVER PAGE
-// ─────────────────────────────────────────────
 function DiscoverPage({ profiles, setProfiles, onViewProfile, searchQuery, currentUser }) {
   const [filters, setFilters] = useState({ industry: "", function: "", careerGoal: "", hobby: "", section: "", status: "", minExp: "", maxExp: "" });
   const [showFilters, setShowFilters] = useState(false);
@@ -1961,6 +2168,23 @@ function DiscoverPage({ profiles, setProfiles, onViewProfile, searchQuery, curre
 
       {/* Main Content */}
       <div style={{ flex: 1, overflowY: "auto", padding: "20px 24px" }}>
+        {/* Profile completeness banner — only for current user, not shown on others */}
+        {(() => {
+          const cu = currentUser || CURRENT_USER;
+          const isThin = !(cu.prevRole) && !(cu.prevCompany) && !(cu.careerGoals||[]).length;
+          return isThin ? (
+            <div style={{ background:"#EFF6FF", border:"1.5px solid #BFDBFE", borderRadius:12, padding:"11px 16px", marginBottom:16, display:"flex", alignItems:"center", justifyContent:"space-between", gap:12 }}>
+              <div style={{ fontSize:12, color:"#1D4ED8", fontWeight:600 }}>
+                💡 Add your background to appear in more searches
+              </div>
+              <button onClick={()=>window.dispatchEvent(new CustomEvent("goToProfile"))}
+                style={{ fontSize:11, fontWeight:700, color:"#1D4ED8", background:"#DBEAFE", border:"none", borderRadius:8, padding:"5px 12px", cursor:"pointer", fontFamily:"inherit", whiteSpace:"nowrap" }}>
+                Complete profile →
+              </button>
+            </div>
+          ) : null;
+        })()}
+
         {/* Controls */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18 }}>
           <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
@@ -2368,9 +2592,11 @@ function MyProfilePage({ currentUser, setCurrentUser }) {
           <div style={{ flex: 1 }}>
             <h2 style={{ margin: "0 0 4px", color: "#fff", fontWeight: 900, fontSize: 22, fontFamily: "'Sora', sans-serif" }}>{user.name}</h2>
             <div style={{ color: "#BFDBFE", fontSize: 13 }}>Section {user.section} · {user.prevRole} @ {user.prevCompany}</div>
-            <div style={{ display: "flex", gap: 6, marginTop: 8 }}>
-              {user.careerGoals.map(g => <span key={g} style={{ fontSize: 10, background: "rgba(255,255,255,0.2)", color: "#fff", padding: "2px 9px", borderRadius: 20, fontWeight: 600 }}>{g}</span>)}
-            </div>
+            {(user.careerGoals||[]).length > 0 && (
+              <div style={{ display: "flex", gap: 6, marginTop: 8, flexWrap:"wrap" }}>
+                {(user.careerGoals||[]).map(g => <span key={g} style={{ fontSize: 10, background: "rgba(255,255,255,0.2)", color: "#fff", padding: "2px 9px", borderRadius: 20, fontWeight: 600 }}>{g}</span>)}
+              </div>
+            )}
           </div>
           <button
             onClick={() => { if (editing) { setUser(draft); if(setCurrentUser) setCurrentUser(draft); } setEditing(!editing); }}
@@ -2379,6 +2605,38 @@ function MyProfilePage({ currentUser, setCurrentUser }) {
           </button>
         </div>
       </div>
+
+      {/* ── Profile completeness nudge ─────────────────────────────── */}
+      {(() => {
+        const fields = [
+          user.name, user.prevRole, user.prevCompany, user.industry,
+          user.undergrad, user.bio,
+          (user.careerGoals||[]).length > 0 ? "y" : "",
+          (user.hobbies||[]).length > 0 ? "y" : "",
+        ];
+        const filled   = fields.filter(Boolean).length;
+        const total    = fields.length;
+        const pct      = Math.round((filled/total)*100);
+        const complete = pct >= 75;
+        return !complete ? (
+          <div style={{ background:"#FFFBEB", border:"1.5px solid #FDE68A", borderRadius:14, padding:"14px 18px", marginBottom:16, display:"flex", alignItems:"center", gap:14 }}>
+            <div style={{ flex:1 }}>
+              <div style={{ fontSize:13, fontWeight:700, color:"#92400E", marginBottom:6 }}>
+                Your profile is {pct}% complete
+              </div>
+              <div style={{ background:"#FEF3C7", borderRadius:20, height:6, overflow:"hidden" }}>
+                <div style={{ width:`${pct}%`, height:"100%", background:"linear-gradient(90deg,#F59E0B,#D97706)", borderRadius:20, transition:"width 0.4s ease" }}/>
+              </div>
+              <div style={{ fontSize:11, color:"#B45309", marginTop:6 }}>
+                {!user.prevRole ? "Add your previous role · " : ""}
+                {!user.prevCompany ? "Add your company · " : ""}
+                {!(user.careerGoals||[]).length ? "Add career goals · " : ""}
+                {!user.bio ? "Write a bio" : ""}
+              </div>
+            </div>
+          </div>
+        ) : null;
+      })()}
 
       <Section title="💼 Professional Information">
         <Field label="Full Name" value={draft.name} onChange={v => setDraft(p => ({ ...p, name: v }))} />
@@ -2461,10 +2719,10 @@ function OnboardingFlow({ onComplete }) {
   const [step, setStep] = useState(0);
   const [data, setData] = useState({
     name:"", email:"", campus:"Hyderabad", section:"B",
-    homeCity:"", undergrad:"", relationshipStatus:"Unmarried",
+    communities:[],
+    // profile fields — filled later in My Profile
     prevRole:"", prevCompany:"", preISBIndustry:"", yearsExp:"",
-    targetIndustry:"", careerGoals:[], skills:[],
-    hobbies:[], bio:"",
+    targetIndustry:"", careerGoals:[], skills:[], hobbies:[], bio:"",
   });
 
   const set = (k,v) => setData(p=>({...p,[k]:v}));
@@ -2475,232 +2733,180 @@ function OnboardingFlow({ onComplete }) {
       : (p[k]||[]).length < max ? [...(p[k]||[]),v] : (p[k]||[])
   }));
 
-  // TARGET INDUSTRY — where you want to work (sector/employer type)
-  const INDUSTRIES_LIST = [
-    "Consulting & Strategy","Investment Banking","Private Equity","Venture Capital",
-    "Technology","BFSI / Financial Services","FMCG & Consumer","Healthcare & Pharma",
-    "Real Estate","Manufacturing","Media & Entertainment","Government / PSU",
-    "Social Impact / NGO","Energy","Education",
+  // Communities — mirror exact event communities + popular campus activities
+  const COMMUNITIES = [
+    { name:"Poker",        icon:"🃏", color:"#F59E0B" },
+    { name:"Cricket",      icon:"🏏", color:"#F97316" },
+    { name:"Running",      icon:"🏃", color:"#10B981" },
+    { name:"Football",     icon:"⚽", color:"#059669" },
+    { name:"Badminton",    icon:"🏸", color:"#0EA5E9" },
+    { name:"Gym",          icon:"💪", color:"#8B5CF6" },
+    { name:"Yoga",         icon:"🧘", color:"#0D9488" },
+    { name:"Swimming",     icon:"🏊", color:"#06B6D4" },
+    { name:"Board Games",  icon:"🎲", color:"#EC4899" },
+    { name:"Chess",        icon:"♟️", color:"#64748B" },
+    { name:"VC & Startups",icon:"💼", color:"#7C3AED" },
+    { name:"PE & Deals",   icon:"📊", color:"#003A8F" },
+    { name:"AI & Tech",    icon:"🤖", color:"#0EA5E9" },
+    { name:"Consulting",   icon:"🧠", color:"#2563EB" },
+    { name:"Reading",      icon:"📚", color:"#92400E" },
+    { name:"Music",        icon:"🎵", color:"#DB2777" },
+    { name:"Photography",  icon:"📷", color:"#B45309" },
+    { name:"Travel",       icon:"✈️",  color:"#0369A1" },
+    { name:"Cooking",      icon:"🍳", color:"#C2410C" },
+    { name:"Social Impact",icon:"🌱", color:"#15803D" },
   ];
 
-  // CAREER GOALS — what you want to do or become (role/function aspiration)
-  const CAREER_GOALS_LIST = [
-    "General Management","Product Management","Strategy & Consulting",
-    "Entrepreneurship","Chief of Staff / Founder's Office","Sales & Marketing",
-    "Operations & Supply Chain","Investment Management","Corporate Finance",
-    "Technology & Engineering","Family Business","Social Impact",
-    "Human Resources","Healthcare Management",
-  ];
+  const sectionOptions = data.campus === "Hyderabad"
+    ? ["A","B","C","D","E","F"]
+    : ["G","H","I","J","K","L"];
 
-  const SKILLS_LIST = ["Financial Modelling","Valuation","M&A","Strategy","Case Interviews","Business Development","Market Research","Python","SQL","Excel","Data Viz","Public Speaking","Leadership","Negotiation","Operations","Product Management","Due Diligence","Corporate Finance","Storytelling","Team Management","Project Management"];
-  const HOBBIES_LIST = ["Cricket","Football","Tennis","Running","Cycling","Swimming","Chess","Poker","Board Games","Reading","Music","Photography","Travel","Cooking","Gaming","Yoga","Gym","Badminton","Squash"];
-
-  const STEPS_META = [
-    { heading:"Let's get you set up 👋",           sub:"Takes about 2 minutes. The more you share, the better your matches." },
-    { heading:"Tell us about yourself ✨",        sub:"Your batchmates want to know the real you" },
-    { heading:"What's your story before ISB? 💼", sub:"Your background is what makes you unique here" },
-    { heading:"Where are you headed? 🎯",          sub:"Help us find the right people for your journey" },
-    { heading:"What's your crowd? 🤝",             sub:"Pick activities that drive your events and matches" },
-  ];
-
-  const sectionOptions = data.campus === "Hyderabad" ? ["A","B","C","D","E","F"] : ["G","H","I","J","K","L"];
-  const emailOk = true; // prototype mode — no email gate
+  // Step 2 — show relevant events based on chosen communities
+  const relevantEvents = React.useMemo(() => {
+    const picked = data.communities;
+    if (picked.length === 0) return SAMPLE_EVENTS.slice(0,3);
+    const matched = SAMPLE_EVENTS.filter(e => picked.includes(e.community));
+    return matched.length > 0 ? matched.slice(0,3) : SAMPLE_EVENTS.slice(0,3);
+  }, [data.communities]);
 
   const canContinue = [
-    (data.name||"").trim(),
-    data.campus && data.section && (data.homeCity||"").trim() && (data.undergrad||"").trim(),
-    (data.prevRole||"").trim() && (data.prevCompany||"").trim() && data.preISBIndustry && data.yearsExp,
-    data.targetIndustry && (data.careerGoals||[]).length > 0,
-    true,
+    (data.name||"").trim() && data.campus && data.section,
+    (data.communities||[]).length >= 1,
+    true, // step 2 is always passable
   ][step];
 
+  const STEPS_META = [
+    { heading:"Welcome to Pulse 👋", sub:"ISB Co'27 · Takes 60 seconds" },
+    { heading:"What are you into? 🎯",  sub:"Pick up to 6 — this personalises your events feed" },
+    { heading:"Here's what's on this week ✨", sub:"Events matched to your interests" },
+  ];
+
   const stepContent = [
-    // Step 0 — Verification
+
+    // ── Step 0 — Identity ──────────────────────────────────────────────────────
     <div key="s0">
-      <div style={{ marginBottom:18 }}>
-        <label style={{ fontSize:11, color:"rgba(255,255,255,0.6)", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.07em", display:"block", marginBottom:7 }}>Your ISB Email</label>
-        <div style={{ position:"relative" }}>
-          <input type="email" value={data.email} onChange={e=>set("email",e.target.value)} placeholder="yourname@isb.edu"
-            style={{ width:"100%", padding:"13px 16px", border:"1.5px solid rgba(255,255,255,0.2)", borderRadius:12, fontSize:14, outline:"none", fontFamily:"inherit", color:"#fff", background:"rgba(255,255,255,0.1)", boxSizing:"border-box" }}
-            onFocus={e=>e.target.style.borderColor="rgba(255,255,255,0.6)"}
-            onBlur={e=>e.target.style.borderColor="rgba(255,255,255,0.2)"}/>
+      <OBField label="Your Name" value={data.name} onChange={v=>set("name",v)} placeholder="As it appears on your ISB ID"/>
+
+      <div style={{ marginBottom:16 }}>
+        <label style={{ fontSize:11, color:"rgba(255,255,255,0.6)", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.07em", display:"block", marginBottom:8 }}>Campus</label>
+        <div style={{ display:"flex", gap:8 }}>
+          {["Hyderabad","Mohali"].map(c=>(
+            <button key={c} onClick={()=>{ set("campus",c); set("section",c==="Hyderabad"?"A":"G"); }}
+              style={{ flex:1, padding:"11px 8px", border:`1.5px solid ${data.campus===c?"rgba(255,255,255,0.85)":"rgba(255,255,255,0.2)"}`, borderRadius:11, background:data.campus===c?"rgba(255,255,255,0.2)":"transparent", color:data.campus===c?"#fff":"rgba(255,255,255,0.5)", cursor:"pointer", fontSize:13, fontWeight:data.campus===c?700:500, fontFamily:"inherit", transition:"all 0.15s" }}>{c}</button>
+          ))}
         </div>
-        <div style={{ fontSize:11, color:"rgba(255,255,255,0.4)", marginTop:7 }}>Check your ISB inbox — one click and you're in</div>
       </div>
 
-      <OBField label="Full Name" value={data.name} onChange={v=>set("name",v)} placeholder="As it appears on your ISB ID"/>
+      <div style={{ marginBottom:16 }}>
+        <label style={{ fontSize:11, color:"rgba(255,255,255,0.6)", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.07em", display:"block", marginBottom:8 }}>Section</label>
+        <div style={{ display:"flex", gap:7, flexWrap:"wrap" }}>
+          {sectionOptions.map(s=>(
+            <button key={s} onClick={()=>set("section",s)}
+              style={{ width:44, height:44, border:`1.5px solid ${data.section===s?"rgba(255,255,255,0.85)":"rgba(255,255,255,0.2)"}`, borderRadius:10, background:data.section===s?"rgba(255,255,255,0.2)":"transparent", color:data.section===s?"#fff":"rgba(255,255,255,0.5)", cursor:"pointer", fontSize:14, fontWeight:data.section===s?800:500, fontFamily:"inherit", transition:"all 0.15s" }}>{s}</button>
+          ))}
+        </div>
+      </div>
 
+      {/* TODO: ISB email verification — add magic link before production launch */}
 
-
-      <div style={{ background:"rgba(255,255,255,0.06)", borderRadius:12, padding:"12px 16px", borderLeft:"3px solid rgba(255,255,255,0.15)" }}>
+      <div style={{ background:"rgba(255,255,255,0.06)", borderRadius:11, padding:"11px 15px", borderLeft:"3px solid rgba(255,255,255,0.15)", marginTop:14 }}>
         <div style={{ fontSize:12, color:"rgba(255,255,255,0.45)", lineHeight:1.7 }}>
           🔒 We don't share data with ISB administration.<br/>
-          This is <b style={{color:"rgba(255,255,255,0.65)"}}>student-built and student-run.</b>
+          This is <b style={{color:"rgba(255,255,255,0.7)"}}>student-built and student-run.</b>
         </div>
       </div>
     </div>,
 
-    // Step 1 — Identity
+    // ── Step 1 — Communities ───────────────────────────────────────────────────
     <div key="s1">
-      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12, marginBottom:14 }}>
-        <div>
-          <label style={{ fontSize:11, color:"rgba(255,255,255,0.6)", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.07em", display:"block", marginBottom:7 }}>Campus</label>
-          <div style={{ display:"flex", gap:8 }}>
-            {["Hyderabad","Mohali"].map(c=>(
-              <button key={c} onClick={()=>{ set("campus",c); set("section",c==="Hyderabad"?"A":"G"); }}
-                style={{ flex:1, padding:"10px 8px", border:`1.5px solid ${data.campus===c?"rgba(255,255,255,0.8)":"rgba(255,255,255,0.25)"}`, borderRadius:10, background:data.campus===c?"rgba(255,255,255,0.2)":"transparent", color:data.campus===c?"#fff":"rgba(255,255,255,0.5)", cursor:"pointer", fontSize:12, fontWeight:data.campus===c?700:500, fontFamily:"inherit" }}>{c}</button>
-            ))}
-          </div>
-        </div>
-        <div>
-          <label style={{ fontSize:11, color:"rgba(255,255,255,0.6)", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.07em", display:"block", marginBottom:7 }}>Section</label>
-          <select value={data.section} onChange={e=>set("section",e.target.value)}
-            style={{ width:"100%", padding:"10px 14px", border:"1.5px solid rgba(255,255,255,0.2)", borderRadius:10, fontSize:13, outline:"none", fontFamily:"inherit", color:"#fff", background:"rgba(255,255,255,0.1)", cursor:"pointer" }}>
-            {sectionOptions.map(s=><option key={s} value={s} style={{color:"#333"}}>{s}</option>)}
-          </select>
-        </div>
+      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:14 }}>
+        <span style={{ fontSize:12, color:"rgba(255,255,255,0.5)" }}>Pick what you're into — events will be filtered for you</span>
+        <span style={{ fontSize:13, fontWeight:800, color:(data.communities||[]).length>=6?"#34D399":"rgba(255,255,255,0.4)", background:"rgba(255,255,255,0.08)", padding:"3px 10px", borderRadius:20 }}>
+          {(data.communities||[]).length}/6
+        </span>
       </div>
-      <OBField label="Home City" value={data.homeCity} onChange={v=>set("homeCity",v)} placeholder="e.g. Mumbai, Delhi, Bangalore"/>
-      <OBField label="Undergrad Institution" value={data.undergrad} onChange={v=>set("undergrad",v)} placeholder="e.g. IIT Bombay, SRCC, BITS Pilani"/>
-      <div style={{ marginBottom:14 }}>
-        <label style={{ fontSize:11, color:"rgba(255,255,255,0.6)", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.07em", display:"block", marginBottom:8 }}>
-          Relationship Status <span style={{fontWeight:400,textTransform:"none",fontSize:11}}>— optional</span>
-        </label>
-        <div style={{ display:"flex", gap:7, flexWrap:"wrap" }}>
-          {["Unmarried","Married","In a relationship","Prefer not to disclose"].map(s=>(
-            <button key={s} onClick={()=>set("relationshipStatus",s)}
-              style={{ padding:"6px 13px", border:`1.5px solid ${data.relationshipStatus===s?"rgba(255,255,255,0.8)":"rgba(255,255,255,0.2)"}`, borderRadius:22, background:data.relationshipStatus===s?"rgba(255,255,255,0.18)":"transparent", color:data.relationshipStatus===s?"#fff":"rgba(255,255,255,0.5)", cursor:"pointer", fontSize:12, fontWeight:data.relationshipStatus===s?700:500, fontFamily:"inherit" }}>{s}</button>
-          ))}
-        </div>
-      </div>
-    </div>,
-
-    // Step 2 — Pre-ISB
-    <div key="s2">
-      <OBField label="Your Role Before ISB" value={data.prevRole} onChange={v=>set("prevRole",v)} placeholder="e.g. Business Analyst, Product Manager"/>
-      <OBField label="Company" value={data.prevCompany} onChange={v=>set("prevCompany",v)} placeholder="e.g. McKinsey, Google, Goldman Sachs"/>
-      <OBField label="Years of Experience" value={data.yearsExp} onChange={v=>set("yearsExp",v)} placeholder="e.g. 4" type="number"/>
-      <div style={{ marginBottom:14 }}>
-        <label style={{ fontSize:11, color:"rgba(255,255,255,0.6)", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.07em", display:"block", marginBottom:8 }}>Industry</label>
-        <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
-          {INDUSTRIES_LIST.map(ind=>(
-            <button key={ind} onClick={()=>set("preISBIndustry",ind)}
-              style={{ padding:"6px 13px", border:`1.5px solid ${data.preISBIndustry===ind?"rgba(255,255,255,0.85)":"rgba(255,255,255,0.2)"}`, borderRadius:20, background:data.preISBIndustry===ind?"rgba(255,255,255,0.2)":"transparent", color:data.preISBIndustry===ind?"#fff":"rgba(255,255,255,0.5)", cursor:"pointer", fontSize:12, fontWeight:data.preISBIndustry===ind?700:500, fontFamily:"inherit", transition:"all 0.12s" }}>{ind}</button>
-          ))}
-        </div>
-      </div>
-    </div>,
-
-    // Step 3 — Where headed
-    <div key="s3">
-      {/* Block A — Where you're headed */}
-      <div style={{ background:"rgba(255,255,255,0.07)", borderRadius:14, border:"1.5px solid rgba(255,255,255,0.12)", padding:"14px 16px", marginBottom:12 }}>
-        <div style={{ fontSize:11, fontWeight:800, color:"rgba(255,255,255,0.85)", textTransform:"uppercase", letterSpacing:"0.05em", marginBottom:12, display:"flex", alignItems:"center", gap:6 }}>
-          <span>🎯</span> Where you're headed
-        </div>
-
-        <div style={{ marginBottom:0 }}>
-          <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:8 }}>
-            <label style={{ fontSize:12, color:"rgba(255,255,255,0.65)", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.06em" }}>Target Industry</label>
-            {!data.targetIndustry
-              ? <span style={{ fontSize:10, color:"rgba(255,175,0,0.9)", fontWeight:700, background:"rgba(255,175,0,0.12)", padding:"2px 8px", borderRadius:6 }}>Required ✱</span>
-              : <span style={{ fontSize:11, color:"#34D399", fontWeight:700 }}>✓ {data.targetIndustry}</span>}
-          </div>
-          <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
-            {INDUSTRIES_LIST.map(ind=>{
-              const active = data.targetIndustry===ind;
-              return <button key={ind} onClick={()=>set("targetIndustry",ind)}
-                style={{ padding:"7px 14px", border:`1.5px solid ${active?"rgba(255,255,255,0.9)":"rgba(255,255,255,0.16)"}`, borderRadius:22, background:active?"rgba(255,255,255,0.2)":"transparent", color:active?"#fff":"rgba(255,255,255,0.45)", cursor:"pointer", fontSize:13, fontWeight:active?800:500, fontFamily:"inherit", transition:"all 0.12s" }}>{ind}</button>;
-            })}
-          </div>
-        </div>
-
-        <div style={{ height:1, background:"rgba(255,255,255,0.1)", margin:"14px 0" }}/>
-
-        <div>
-          <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:8 }}>
-            <label style={{ fontSize:12, color:"rgba(255,255,255,0.65)", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.06em" }}>Career Goals</label>
-            <span style={{ fontSize:11, color:(data.careerGoals||[]).length>=3?"#34D399":"rgba(255,255,255,0.35)", fontWeight:700 }}>{(data.careerGoals||[]).length}/3</span>
-          </div>
-          <div style={{ display:"flex", flexWrap:"wrap", gap:7 }}>
-            {CAREER_GOALS_LIST.map(g=>{
-              const active=(data.careerGoals||[]).includes(g);
-              const maxed=(data.careerGoals||[]).length>=3&&!active;
-              return <button key={g} onClick={()=>toggleArr("careerGoals",g,3)}
-                style={{ padding:"8px 15px", border:`1.5px solid ${active?"rgba(255,255,255,0.85)":"rgba(255,255,255,0.2)"}`, borderRadius:22, background:active?"rgba(255,255,255,0.2)":"transparent", color:active?"#fff":maxed?"rgba(255,255,255,0.25)":"rgba(255,255,255,0.6)", cursor:maxed?"not-allowed":"pointer", fontSize:13, fontWeight:active?800:500, fontFamily:"inherit", transition:"all 0.12s", opacity:maxed?0.5:1 }}>{g}</button>;
-            })}
-          </div>
-        </div>
-      </div>
-
-      {/* Block B — What you bring */}
-      <div style={{ background:"rgba(255,255,255,0.04)", borderRadius:14, border:"1.5px solid rgba(255,255,255,0.08)", padding:"14px 16px" }}>
-        <div style={{ fontSize:11, fontWeight:800, color:"rgba(255,255,255,0.7)", textTransform:"uppercase", letterSpacing:"0.05em", marginBottom:12, display:"flex", alignItems:"center", gap:6 }}>
-          <span>⚡</span> What you bring
-        </div>
-        <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:8 }}>
-          <label style={{ fontSize:12, color:"rgba(255,255,255,0.65)", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.06em" }}>Skills</label>
-          <span style={{ fontSize:11, color:(data.skills||[]).length>=3?"#34D399":"rgba(255,255,255,0.35)", fontWeight:700 }}>{(data.skills||[]).length}/3</span>
-        </div>
-        <div style={{ display:"flex", flexWrap:"wrap", gap:7 }}>
-          {SKILLS_LIST.map(s=>{
-            const active=(data.skills||[]).includes(s);
-            const maxed=(data.skills||[]).length>=3&&!active;
-            return <button key={s} onClick={()=>toggleArr("skills",s,3)}
-              style={{ padding:"8px 15px", border:`1.5px solid ${active?"rgba(255,255,255,0.85)":"rgba(255,255,255,0.2)"}`, borderRadius:22, background:active?"rgba(255,255,255,0.2)":"transparent", color:active?"#fff":maxed?"rgba(255,255,255,0.25)":"rgba(255,255,255,0.6)", cursor:maxed?"not-allowed":"pointer", fontSize:13, fontWeight:active?800:500, fontFamily:"inherit", transition:"all 0.12s", opacity:maxed?0.5:1 }}>{s}</button>;
-          })}
-        </div>
-      </div>
-    </div>,
-
-    // Step 4 — Crowd
-    <div key="s4">
-      <div style={{ display:"flex", justifyContent:"flex-end", marginBottom:12 }}>
-        <span style={{ fontSize:13, color:(data.hobbies||[]).length>=10?"#34D399":"rgba(255,255,255,0.4)", fontWeight:800, background:"rgba(255,255,255,0.08)", padding:"4px 12px", borderRadius:20 }}>{(data.hobbies||[]).length}/10 selected</span>
-      </div>
-      <div style={{ display:"flex", flexWrap:"wrap", gap:7, marginBottom:16 }}>
-        {HOBBIES_LIST.map(h=>{
-          const active=(data.hobbies||[]).includes(h);
-          const maxed=(data.hobbies||[]).length>=10&&!active;
-          return <button key={h} onClick={()=>toggleArr("hobbies",h,10)}
-            style={{ padding:"8px 15px", border:`1.5px solid ${active?"rgba(255,255,255,0.85)":"rgba(255,255,255,0.2)"}`, borderRadius:22, background:active?"rgba(255,255,255,0.18)":"transparent", color:active?"#fff":maxed?"rgba(255,255,255,0.25)":"rgba(255,255,255,0.55)", cursor:maxed?"not-allowed":"pointer", fontSize:13, fontWeight:active?700:500, fontFamily:"inherit", transition:"all 0.12s" }}>{h}</button>;
+      <div style={{ display:"flex", flexWrap:"wrap", gap:8 }}>
+        {COMMUNITIES.map(({ name, icon, color }) => {
+          const active = (data.communities||[]).includes(name);
+          const maxed  = (data.communities||[]).length >= 6 && !active;
+          return (
+            <button key={name} onClick={()=>toggleArr("communities",name,6)}
+              style={{
+                padding:"8px 14px", borderRadius:22, cursor:maxed?"not-allowed":"pointer",
+                border:`1.5px solid ${active?color+"CC":"rgba(255,255,255,0.18)"}`,
+                background:active?color+"28":"transparent",
+                color:active?"#fff":maxed?"rgba(255,255,255,0.25)":"rgba(255,255,255,0.65)",
+                fontSize:13, fontWeight:active?700:500, fontFamily:"inherit",
+                transition:"all 0.15s", display:"flex", alignItems:"center", gap:6,
+                opacity:maxed?0.5:1,
+              }}>
+              <span>{icon}</span>{name}
+            </button>
+          );
         })}
       </div>
-      <div>
-        <label style={{ fontSize:11, color:"rgba(255,255,255,0.6)", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.07em", display:"block", marginBottom:7 }}>
-          A quick bio <span style={{fontWeight:400,textTransform:"none"}}>— optional</span>
-        </label>
-        <textarea value={data.bio||""} onChange={e=>set("bio",e.target.value)} placeholder="Tell your batchmates who you are in a line or two..." rows={3}
-          style={{ width:"100%", padding:"12px 14px", border:"1.5px solid rgba(255,255,255,0.2)", borderRadius:12, fontSize:13, outline:"none", fontFamily:"inherit", color:"#fff", background:"rgba(255,255,255,0.1)", boxSizing:"border-box", resize:"none" }}
-          onFocus={e=>e.target.style.borderColor="rgba(255,255,255,0.6)"}
-          onBlur={e=>e.target.style.borderColor="rgba(255,255,255,0.2)"}/>
+    </div>,
+
+    // ── Step 2 — Show value ────────────────────────────────────────────────────
+    <div key="s2">
+      {relevantEvents.length > 0 ? (
+        <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
+          {relevantEvents.map(event => {
+            const spots = event.maxSpots - event.attendees.length;
+            const firstNames = event.attendees.slice(0,2).map(n=>n.split(" ")[0]);
+            const extra = event.attendees.length - 2;
+            return (
+              <div key={event.id} style={{ background:"rgba(255,255,255,0.08)", borderRadius:14, overflow:"hidden", border:`1px solid ${event.color}33` }}>
+                <div style={{ background:`linear-gradient(135deg,${event.color},${event.color}BB)`, padding:"10px 14px" }}>
+                  <div style={{ fontSize:10, color:"rgba(255,255,255,0.7)", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.07em" }}>{event.icon} {event.community}</div>
+                  <div style={{ fontSize:15, fontWeight:800, color:"#fff", fontFamily:"'Sora',sans-serif", marginTop:2 }}>{event.title}</div>
+                </div>
+                <div style={{ padding:"10px 14px", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+                  <div style={{ fontSize:11, color:"rgba(255,255,255,0.6)" }}>
+                    🕐 {event.timeLabel} · 📍 {event.location}
+                  </div>
+                  <div style={{ fontSize:11, color:"rgba(255,255,255,0.5)", fontStyle:"italic" }}>
+                    {event.attendees.length === 0
+                      ? "Be the first to join"
+                      : firstNames.join(" · ") + (extra > 0 ? ` +${extra}` : "") + " going"}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        <div style={{ textAlign:"center", padding:"30px 0", color:"rgba(255,255,255,0.4)" }}>No events this week — check back soon</div>
+      )}
+      <div style={{ marginTop:14, fontSize:12, color:"rgba(255,255,255,0.4)", textAlign:"center" }}>
+        More events and people waiting inside →
       </div>
     </div>,
   ];
 
-  const isLast = step === 4;
+  const isLast = step === 2;
 
   return (
-    <div style={{ minHeight:"100vh", background:`linear-gradient(145deg,#003A8F,#1E3A8A,#312E81)`, display:"flex", alignItems:"center", justifyContent:"center", padding:"20px", fontFamily:"'Sora',sans-serif" }}>
+    <div style={{ minHeight:"100vh", background:"linear-gradient(145deg,#003A8F,#1E3A8A,#312E81)", display:"flex", alignItems:"center", justifyContent:"center", padding:"20px", fontFamily:"'Sora',sans-serif" }}>
       <div style={{ position:"fixed", top:-100, right:-100, width:400, height:400, borderRadius:"50%", background:"rgba(255,255,255,0.04)", pointerEvents:"none" }}/>
       <div style={{ position:"fixed", bottom:-80, left:-80, width:300, height:300, borderRadius:"50%", background:"rgba(255,255,255,0.03)", pointerEvents:"none" }}/>
 
       <div style={{ width:"100%", maxWidth:480 }}>
         {/* Logo */}
-        <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:30, justifyContent:"center" }}>
+        <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:28, justifyContent:"center" }}>
           <div style={{ width:36, height:36, borderRadius:10, background:"linear-gradient(135deg,#60A5FA,#A78BFA)", display:"flex", alignItems:"center", justifyContent:"center" }}>
-            <span style={{ color:"#fff", fontSize:17, fontWeight:900, fontFamily:"'Sora',sans-serif" }}>N</span>
+            <span style={{ color:"#fff", fontSize:17, fontWeight:900, fontFamily:"'Sora',sans-serif" }}>P</span>
           </div>
           <div style={{ color:"#fff", fontWeight:900, fontSize:18, fontFamily:"'Sora',sans-serif", letterSpacing:"-0.01em" }}>Pulse</div>
         </div>
 
         {/* Card */}
-        <div style={{ background:"rgba(255,255,255,0.08)", backdropFilter:"blur(20px)", borderRadius:22, border:"1.5px solid rgba(255,255,255,0.15)", padding:"30px 26px", boxShadow:"0 24px 80px rgba(0,0,0,0.3)" }}>
-          <div style={{ marginBottom:22 }}>
+        <div style={{ background:"rgba(255,255,255,0.08)", backdropFilter:"blur(20px)", borderRadius:22, border:"1.5px solid rgba(255,255,255,0.15)", padding:"28px 24px", boxShadow:"0 24px 80px rgba(0,0,0,0.3)" }}>
+          <div style={{ marginBottom:20 }}>
             <div style={{ fontSize:20, fontWeight:900, color:"#fff", fontFamily:"'Sora',sans-serif", lineHeight:1.3, marginBottom:5, letterSpacing:"-0.01em" }}>
               {STEPS_META[step].heading}
             </div>
-            <div style={{ fontSize:13, color:"rgba(255,255,255,0.55)", lineHeight:1.5 }}>
+            <div style={{ fontSize:13, color:"rgba(255,255,255,0.5)", lineHeight:1.5 }}>
               {STEPS_META[step].sub}
             </div>
           </div>
@@ -2709,11 +2915,11 @@ function OnboardingFlow({ onComplete }) {
             {stepContent[step]}
           </div>
 
-          <button onClick={()=>{ if(isLast){ onComplete(data); } else setStep(s=>s+1); }} disabled={!canContinue}
-            style={{ width:"100%", padding:"13px", border:"none", borderRadius:13, background:canContinue?"linear-gradient(135deg,#60A5FA,#3B82F6)":"rgba(255,255,255,0.1)", color:canContinue?"#fff":"rgba(255,255,255,0.3)", cursor:canContinue?"pointer":"not-allowed", fontWeight:800, fontSize:15, fontFamily:"'Sora',sans-serif", boxShadow:canContinue?"0 4px 20px rgba(59,130,246,0.4)":"none", marginBottom:12, marginTop:20, transition:"all 0.2s", letterSpacing:"-0.01em" }}
+          <button onClick={()=>{ if(isLast){ onComplete({...data, hobbies: data.communities}); } else setStep(s=>s+1); }} disabled={!canContinue}
+            style={{ width:"100%", padding:"13px", border:"none", borderRadius:13, background:canContinue?"linear-gradient(135deg,#60A5FA,#3B82F6)":"rgba(255,255,255,0.1)", color:canContinue?"#fff":"rgba(255,255,255,0.3)", cursor:canContinue?"pointer":"not-allowed", fontWeight:800, fontSize:15, fontFamily:"'Sora',sans-serif", boxShadow:canContinue?"0 4px 20px rgba(59,130,246,0.4)":"none", marginBottom:10, marginTop:20, transition:"all 0.2s" }}
             onMouseEnter={e=>{ if(canContinue) e.currentTarget.style.transform="translateY(-1px)"; }}
             onMouseLeave={e=>e.currentTarget.style.transform="translateY(0)"}>
-            {isLast ? "Enter Pulse →" : "Continue →"}
+            {isLast ? "Let's go →" : "Continue →"}
           </button>
 
           <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
@@ -2721,19 +2927,19 @@ function OnboardingFlow({ onComplete }) {
               ? <button onClick={()=>setStep(s=>s-1)} style={{ fontSize:12, color:"rgba(255,255,255,0.4)", background:"none", border:"none", cursor:"pointer", fontFamily:"inherit", fontWeight:600 }}>← Back</button>
               : <div/>}
             {isLast && (
-              <button onClick={()=>onComplete(data)} style={{ fontSize:12, color:"rgba(255,255,255,0.35)", background:"none", border:"none", cursor:"pointer", fontFamily:"inherit", fontWeight:600 }}>Skip for now</button>
+              <button onClick={()=>onComplete({...data, hobbies: data.communities})} style={{ fontSize:12, color:"rgba(255,255,255,0.3)", background:"none", border:"none", cursor:"pointer", fontFamily:"inherit" }}>Skip for now</button>
             )}
           </div>
         </div>
 
-        {/* Progress dots */}
-        <div style={{ display:"flex", justifyContent:"center", gap:8, marginTop:22 }}>
-          {[0,1,2,3,4].map(i=>(
-            <div key={i} style={{ width:i===step?24:8, height:8, borderRadius:4, background:i===step?"#60A5FA":i<step?"rgba(255,255,255,0.5)":"rgba(255,255,255,0.2)", transition:"all 0.3s cubic-bezier(0.4,0,0.2,1)" }}/>
+        {/* Progress dots — 3 only */}
+        <div style={{ display:"flex", justifyContent:"center", gap:8, marginTop:20 }}>
+          {[0,1,2].map(i=>(
+            <div key={i} style={{ width:i===step?24:8, height:8, borderRadius:4, background:i===step?"#60A5FA":i<step?"rgba(255,255,255,0.55)":"rgba(255,255,255,0.2)", transition:"all 0.3s cubic-bezier(0.4,0,0.2,1)" }}/>
           ))}
         </div>
-        <div style={{ textAlign:"center", marginTop:16, fontSize:11, color:"rgba(255,255,255,0.3)" }}>
-          🔒 Your data is private and only visible to your ISB batch
+        <div style={{ textAlign:"center", marginTop:14, fontSize:11, color:"rgba(255,255,255,0.28)" }}>
+          🔒 Only visible to ISB Co'27
         </div>
       </div>
     </div>
@@ -2760,6 +2966,11 @@ function App() {
   const [isOnboarded, setIsOnboarded] = useState(false);
   const [currentUser, setCurrentUser] = useState(CURRENT_USER);
   const [activePage, setActivePage] = useState("events");
+  React.useEffect(() => {
+    const handler = () => setActivePage("profile");
+    window.addEventListener("goToProfile", handler);
+    return () => window.removeEventListener("goToProfile", handler);
+  }, []);
   const [profiles, setProfiles] = useState(SAMPLE_PROFILES);
   const [selectedProfile, setSelectedProfile] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -2776,19 +2987,19 @@ function App() {
   const handleOnboardingComplete = (data) => {
     const user = {
       ...CURRENT_USER,
-      name:       data.name       || CURRENT_USER.name,
-      section:    data.section    || CURRENT_USER.section,
-      campus:     data.campus     || "Hyderabad",
-      prevRole:   data.prevRole   || CURRENT_USER.prevRole,
-      prevCompany:data.prevCompany|| CURRENT_USER.prevCompany,
-      industry:   data.industry   || CURRENT_USER.industry,
-      yearsExp:   parseInt(data.yearsExp)||CURRENT_USER.yearsExp,
-      careerGoals:data.careerGoals.length>0 ? data.careerGoals : CURRENT_USER.careerGoals,
-      skills:     data.skills.length>0     ? data.skills     : CURRENT_USER.skills,
-      hobbies:    data.hobbies.length>0    ? data.hobbies    : CURRENT_USER.hobbies,
-      undergrad:  data.undergrad  || CURRENT_USER.undergrad,
-      bio:        data.bio        || CURRENT_USER.bio,
-      photo:      null,
+      name:        data.name        || CURRENT_USER.name,
+      section:     data.section     || CURRENT_USER.section,
+      campus:      data.campus      || "Hyderabad",
+      prevRole:    data.prevRole    || CURRENT_USER.prevRole,
+      prevCompany: data.prevCompany || CURRENT_USER.prevCompany,
+      industry:    data.industry    || CURRENT_USER.industry,
+      yearsExp:    parseInt(data.yearsExp) || CURRENT_USER.yearsExp,
+      careerGoals: (data.careerGoals||[]).length > 0 ? data.careerGoals : CURRENT_USER.careerGoals,
+      skills:      (data.skills||[]).length > 0      ? data.skills      : CURRENT_USER.skills,
+      hobbies:     (data.hobbies||[]).length > 0     ? data.hobbies     : CURRENT_USER.hobbies,
+      undergrad:   data.undergrad || CURRENT_USER.undergrad,
+      bio:         data.bio       || CURRENT_USER.bio,
+      photo:       null,
     };
     setCurrentUser(user);
     setProfiles(prev => prev.map(p => ({ ...p, _rescored: calculateCompatibility(p, user) })));
