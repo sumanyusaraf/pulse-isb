@@ -1651,6 +1651,130 @@ function DashboardPage({ profiles, onViewProfile, onStatusChange, setActivePage,
 // ─────────────────────────────────────────────
 // EVENTS PAGE
 // ─────────────────────────────────────────────
+// ─────────────────────────────────────────────
+// CREATE EVENT MODAL — top-level to preserve input focus
+// ─────────────────────────────────────────────
+const EVENT_TIMES = [
+  "6 AM","6:30 AM","7 AM","7:30 AM","8 AM","8:30 AM","9 AM","9:30 AM",
+  "10 AM","10:30 AM","11 AM","11:30 AM","12 PM","12:30 PM","1 PM","1:30 PM",
+  "2 PM","2:30 PM","3 PM","3:30 PM","4 PM","4:30 PM","5 PM","5:30 PM",
+  "6 PM","6:30 PM","7 PM","7:30 PM","8 PM","8:30 PM","9 PM","9:30 PM",
+  "10 PM","10:30 PM","11 PM",
+];
+
+const EVENT_CATS = [
+  { id:"Sports",   label:"Sports",   icon:"🏃", color:"#F97316" },
+  { id:"Social",   label:"Social",   icon:"🎉", color:"#EC4899" },
+  { id:"Career",   label:"Career",   icon:"💼", color:"#8B5CF6" },
+  { id:"Wellness", label:"Wellness", icon:"🧘", color:"#0D9488" },
+  { id:"Talks",    label:"Talks",    icon:"🎙️", color:"#0F766E" },
+];
+
+function CreateEventModal({ newEvt, setNewEvt, onClose, onSubmit }) {
+  const setF = (k,v) => setNewEvt(p=>({...p,[k]:v}));
+  const canCreate = (newEvt.title||"").trim() && newEvt.category && (newEvt.location||"").trim() && (newEvt.timeLabel||"").trim();
+
+  const inputStyle = { width:"100%", padding:"10px 13px", border:"1.5px solid #E2E8F0", borderRadius:10, fontSize:13, outline:"none", fontFamily:"inherit", color:"#0F172A", background:"#fff", boxSizing:"border-box" };
+  const labelStyle = { display:"block", fontSize:11, color:"#64748B", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.05em", marginBottom:6 };
+
+  return (
+    <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.5)", zIndex:200, display:"flex", alignItems:"center", justifyContent:"center", padding:20 }}
+      onClick={onClose}>
+      <div style={{ background:"#fff", borderRadius:22, width:"100%", maxWidth:460, padding:"24px", boxShadow:"0 24px 60px rgba(0,0,0,0.25)", maxHeight:"90vh", overflowY:"auto" }}
+        onClick={e=>e.stopPropagation()}>
+
+        <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:20 }}>
+          <div style={{ fontSize:18, fontWeight:900, color:"#0F172A", fontFamily:"'Sora',sans-serif" }}>Create Event</div>
+          <button onClick={onClose} style={{ background:"#F1F5F9", border:"none", borderRadius:"50%", width:32, height:32, cursor:"pointer", fontSize:16, display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"inherit" }}>✕</button>
+        </div>
+
+        <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
+          <div>
+            <label style={labelStyle}>Event Name ✱</label>
+            <input
+              value={newEvt.title||""}
+              onChange={e=>setF("title",e.target.value)}
+              placeholder="e.g. Poker Night, Study Group, Morning Run"
+              style={inputStyle}
+              autoFocus
+            />
+          </div>
+
+          <div>
+            <label style={labelStyle}>Category ✱</label>
+            <div style={{ display:"flex", gap:7, flexWrap:"wrap" }}>
+              {EVENT_CATS.map(cat=>(
+                <button key={cat.id} onClick={()=>setF("category",cat.id)}
+                  style={{ padding:"8px 12px", border:`1.5px solid ${newEvt.category===cat.id?cat.color:"#E2E8F0"}`, borderRadius:10, background:newEvt.category===cat.id?cat.color+"18":"#fff", color:newEvt.category===cat.id?cat.color:"#64748B", cursor:"pointer", fontSize:12, fontWeight:newEvt.category===cat.id?700:500, fontFamily:"inherit", display:"flex", alignItems:"center", gap:5 }}>
+                  {cat.icon} {cat.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label style={labelStyle}>Location ✱</label>
+            <input
+              value={newEvt.location||""}
+              onChange={e=>setF("location",e.target.value)}
+              placeholder="e.g. Block 3 Common Room, Dhaba Lawn"
+              style={inputStyle}
+            />
+          </div>
+
+          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
+            <div>
+              <label style={labelStyle}>Time ✱</label>
+              <select
+                value={newEvt.timeLabel||""}
+                onChange={e=>setF("timeLabel",e.target.value)}
+                style={{ ...inputStyle, cursor:"pointer", appearance:"auto" }}
+              >
+                <option value="" disabled>Pick a time</option>
+                {EVENT_TIMES.map(t=>(
+                  <option key={t} value={t}>{t}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label style={labelStyle}>Max Spots</label>
+              <input
+                type="number"
+                value={newEvt.maxSpots||""}
+                onChange={e=>setF("maxSpots",e.target.value)}
+                placeholder="15"
+                style={inputStyle}
+                min="1" max="500"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label style={labelStyle}>Vibe <span style={{textTransform:"none",fontWeight:400}}>— optional</span></label>
+            <input
+              value={newEvt.vibe||""}
+              onChange={e=>setF("vibe",e.target.value)}
+              placeholder="One line — what's the feel of this event?"
+              style={inputStyle}
+            />
+          </div>
+        </div>
+
+        <button onClick={onSubmit} disabled={!canCreate} style={{
+          width:"100%", marginTop:20, padding:"13px", border:"none", borderRadius:13,
+          background:canCreate?"#003A8F":"#E2E8F0", color:canCreate?"#fff":"#94A3B8",
+          cursor:canCreate?"pointer":"not-allowed", fontWeight:800, fontSize:14,
+          fontFamily:"'Sora',sans-serif", boxShadow:canCreate?"0 4px 20px rgba(0,58,143,0.3)":"none",
+          transition:"all 0.2s",
+        }}>
+          Post Event →
+        </button>
+      </div>
+    </div>
+  );
+}
+
+
 function EventsPage({ currentUser, setActivePage }) {
   const [joined,      setJoined]      = React.useState({});
   const [catFilter,   setCatFilter]   = React.useState("All");
@@ -1885,101 +2009,7 @@ function EventsPage({ currentUser, setActivePage }) {
     );
   };
 
-  // ── Create Event Modal ──────────────────────────────────────────────────────
-  const CreateEventModal = () => {
-    const setF = (k,v) => setNewEvt(p=>({...p,[k]:v}));
-    const canCreate = newEvt.title.trim() && newEvt.category && newEvt.location.trim() && newEvt.timeLabel.trim();
-
-    const handleCreate = () => {
-      const today2 = new Date(); today2.setHours(0,0,0,0);
-      const created = {
-        id: Date.now(),
-        title:     newEvt.title,
-        community: newEvt.community || newEvt.category,
-        category:  newEvt.category,
-        location:  newEvt.location,
-        date:      today2.toISOString().split("T")[0],
-        time:      "18:00",
-        timeLabel: newEvt.timeLabel,
-        campus:    "Hyderabad",
-        vibe:      newEvt.vibe,
-        createdBy: (currentUser||CURRENT_USER).name,
-        attendees: [(currentUser||CURRENT_USER).name],
-        maxSpots:  parseInt(newEvt.maxSpots)||15,
-        color:     CATS.find(c=>c.id===newEvt.category)?.color || "#003A8F",
-        icon:      CATS.find(c=>c.id===newEvt.category)?.icon  || "📅",
-      };
-      setAllEvents(prev=>[created,...prev]);
-      setCreating(false);
-      setNewEvt({ title:"", community:"", category:"Social", location:"", timeLabel:"", vibe:"", maxSpots:15 });
-    };
-
-    const inputStyle = { width:"100%", padding:"10px 13px", border:"1.5px solid #E2E8F0", borderRadius:10, fontSize:13, outline:"none", fontFamily:"inherit", color:"#0F172A", background:"#fff", boxSizing:"border-box" };
-    const labelStyle = { display:"block", fontSize:11, color:"#64748B", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.05em", marginBottom:6 };
-
-    return (
-      <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.5)", zIndex:200, display:"flex", alignItems:"center", justifyContent:"center", padding:20 }}
-        onClick={()=>setCreating(false)}>
-        <div style={{ background:"#fff", borderRadius:22, width:"100%", maxWidth:460, padding:"24px", boxShadow:"0 24px 60px rgba(0,0,0,0.25)", maxHeight:"90vh", overflowY:"auto" }}
-          onClick={e=>e.stopPropagation()}>
-
-          <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:20 }}>
-            <div style={{ fontSize:18, fontWeight:900, color:"#0F172A", fontFamily:"'Sora',sans-serif" }}>Create Event</div>
-            <button onClick={()=>setCreating(false)} style={{ background:"#F1F5F9", border:"none", borderRadius:"50%", width:32, height:32, cursor:"pointer", fontSize:16, display:"flex", alignItems:"center", justifyContent:"center" }}>✕</button>
-          </div>
-
-          <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
-            <div>
-              <label style={labelStyle}>Event Name ✱</label>
-              <input value={newEvt.title} onChange={e=>setF("title",e.target.value)} placeholder="e.g. Poker Night, Study Group, Morning Run" style={inputStyle}/>
-            </div>
-
-            <div>
-              <label style={labelStyle}>Category ✱</label>
-              <div style={{ display:"flex", gap:8 }}>
-                {CATS.filter(c=>c.id!=="All").map(cat=>(
-                  <button key={cat.id} onClick={()=>setF("category",cat.id)}
-                    style={{ flex:1, padding:"9px 4px", border:`1.5px solid ${newEvt.category===cat.id?cat.color:"#E2E8F0"}`, borderRadius:10, background:newEvt.category===cat.id?cat.color+"18":"#fff", color:newEvt.category===cat.id?cat.color:"#64748B", cursor:"pointer", fontSize:11, fontWeight:newEvt.category===cat.id?700:500, fontFamily:"inherit", textAlign:"center" }}>
-                    {cat.icon}<br/>{cat.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <label style={labelStyle}>Location ✱</label>
-              <input value={newEvt.location} onChange={e=>setF("location",e.target.value)} placeholder="e.g. Block 3 Common Room" style={inputStyle}/>
-            </div>
-
-            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
-              <div>
-                <label style={labelStyle}>Time ✱</label>
-                <input value={newEvt.timeLabel} onChange={e=>setF("timeLabel",e.target.value)} placeholder="e.g. 9 PM" style={inputStyle}/>
-              </div>
-              <div>
-                <label style={labelStyle}>Max Spots</label>
-                <input type="number" value={newEvt.maxSpots} onChange={e=>setF("maxSpots",e.target.value)} placeholder="15" style={inputStyle}/>
-              </div>
-            </div>
-
-            <div>
-              <label style={labelStyle}>Vibe <span style={{textTransform:"none",fontWeight:400}}>— optional</span></label>
-              <input value={newEvt.vibe} onChange={e=>setF("vibe",e.target.value)} placeholder="One line — what's the feel of this event?" style={inputStyle}/>
-            </div>
-          </div>
-
-          <button onClick={handleCreate} disabled={!canCreate} style={{
-            width:"100%", marginTop:20, padding:"13px", border:"none", borderRadius:13,
-            background:canCreate?"#003A8F":"#E2E8F0", color:canCreate?"#fff":"#94A3B8",
-            cursor:canCreate?"pointer":"not-allowed", fontWeight:800, fontSize:14,
-            fontFamily:"'Sora',sans-serif", boxShadow:canCreate?"0 4px 20px rgba(0,58,143,0.3)":"none",
-          }}>
-            Post Event →
-          </button>
-        </div>
-      </div>
-    );
-  };
+  // ── Create Event Modal — rendered as top-level component (passed as props) ──
 
   const activeCat = CATS.find(c=>c.id===catFilter)||CATS[0];
   const TIME_TABS = [
@@ -1992,8 +2022,36 @@ function EventsPage({ currentUser, setActivePage }) {
     <div style={{ padding:"24px 28px" }}>
       {/* Detail modal */}
       {selectedEvt && <EventDetail event={selectedEvt}/>}
-      {/* Create modal */}
-      {creating && <CreateEventModal/>}
+      {/* Create modal — top-level component to preserve input focus */}
+      {creating && <CreateEventModal
+        newEvt={newEvt}
+        setNewEvt={setNewEvt}
+        onClose={()=>setCreating(false)}
+        onSubmit={()=>{
+          const today2 = new Date(); today2.setHours(0,0,0,0);
+          const catInfo = EVENT_CATS.find(c=>c.id===newEvt.category)||{color:"#003A8F",icon:"📅"};
+          const created = {
+            id: Date.now(),
+            title:     newEvt.title,
+            community: newEvt.community || newEvt.category,
+            category:  newEvt.category,
+            location:  newEvt.location,
+            date:      today2.toISOString().split("T")[0],
+            time:      "18:00",
+            timeLabel: newEvt.timeLabel,
+            campus:    "Hyderabad",
+            vibe:      newEvt.vibe,
+            createdBy: (currentUser||CURRENT_USER).name,
+            attendees: [(currentUser||CURRENT_USER).name],
+            maxSpots:  parseInt(newEvt.maxSpots)||15,
+            color:     catInfo.color,
+            icon:      catInfo.icon,
+          };
+          setAllEvents(prev=>[created,...prev]);
+          setCreating(false);
+          setNewEvt({ title:"", community:"", category:"Social", location:"", timeLabel:"", vibe:"", maxSpots:15 });
+        }}
+      />}
 
       {/* Header */}
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:16 }}>
@@ -2553,34 +2611,38 @@ function MyNetworkPage({ profiles, onViewProfile }) {
 // ─────────────────────────────────────────────
 // MY PROFILE PAGE
 // ─────────────────────────────────────────────
+function ProfileField({ label, value, onChange, textarea = false, editing }) {
+  return (
+    <div>
+      <label style={{ display:"block", fontSize:11, color:"#64748B", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.05em", marginBottom:5 }}>{label}</label>
+      {editing ? (
+        textarea ? (
+          <textarea value={value||""} onChange={e=>onChange(e.target.value)} rows={3}
+            style={{ width:"100%", border:"1.5px solid #2563EB", borderRadius:9, padding:"8px 12px", fontSize:13, fontFamily:"inherit", outline:"none", resize:"vertical", boxSizing:"border-box", color:"#0F172A" }}/>
+        ) : (
+          <input value={value||""} onChange={e=>onChange(e.target.value)}
+            style={{ width:"100%", border:"1.5px solid #2563EB", borderRadius:9, padding:"8px 12px", fontSize:13, fontFamily:"inherit", outline:"none", boxSizing:"border-box", color:"#0F172A" }}/>
+        )
+      ) : (
+        <div style={{ fontSize:13, color:value?"#0F172A":"#94A3B8", fontWeight:value?600:400, padding:"8px 0", fontStyle:value?"normal":"italic" }}>{value||"—"}</div>
+      )}
+    </div>
+  );
+}
+
+function ProfileSection({ title, children }) {
+  return (
+    <div style={{ background:"#fff", borderRadius:14, border:"1px solid #EEF2F7", padding:"20px", marginBottom:16 }}>
+      <h4 style={{ margin:"0 0 16px", fontSize:14, fontWeight:800, color:"#0F172A", fontFamily:"'Sora',sans-serif" }}>{title}</h4>
+      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14 }}>{children}</div>
+    </div>
+  );
+}
+
 function MyProfilePage({ currentUser, setCurrentUser }) {
   const [editing, setEditing] = useState(false);
   const [user, setUser] = useState(currentUser||CURRENT_USER);
   const [draft, setDraft] = useState(currentUser||CURRENT_USER);
-
-  const Field = ({ label, value, onChange, textarea = false }) => (
-    <div>
-      <label style={{ display: "block", fontSize: 11, color: "#64748B", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 5 }}>{label}</label>
-      {editing ? (
-        textarea ? (
-          <textarea value={value} onChange={e => onChange(e.target.value)} rows={3}
-            style={{ width: "100%", border: "1.5px solid #2563EB", borderRadius: 9, padding: "8px 12px", fontSize: 13, fontFamily: "inherit", outline: "none", resize: "vertical", boxSizing: "border-box", color: "#0F172A" }} />
-        ) : (
-          <input value={value} onChange={e => onChange(e.target.value)}
-            style={{ width: "100%", border: "1.5px solid #2563EB", borderRadius: 9, padding: "8px 12px", fontSize: 13, fontFamily: "inherit", outline: "none", boxSizing: "border-box", color: "#0F172A" }} />
-        )
-      ) : (
-        <div style={{ fontSize: 13, color: "#0F172A", fontWeight: 600, padding: "8px 0" }}>{value || "—"}</div>
-      )}
-    </div>
-  );
-
-  const Section = ({ title, children }) => (
-    <div style={{ background: "#fff", borderRadius: 14, border: "1px solid #EEF2F7", padding: "20px", marginBottom: 16 }}>
-      <h4 style={{ margin: "0 0 16px", fontSize: 14, fontWeight: 800, color: "#0F172A", fontFamily: "'Sora', sans-serif" }}>{title}</h4>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>{children}</div>
-    </div>
-  );
 
   return (
     <div style={{ maxWidth: 720, margin: "0 auto", padding: "24px 28px" }}>
@@ -2637,26 +2699,26 @@ function MyProfilePage({ currentUser, setCurrentUser }) {
         ) : null;
       })()}
 
-      <Section title="💼 Professional Information">
-        <Field label="Full Name" value={draft.name} onChange={v => setDraft(p => ({ ...p, name: v }))} />
-        <Field label="Previous Company" value={draft.prevCompany} onChange={v => setDraft(p => ({ ...p, prevCompany: v }))} />
-        <Field label="Previous Role" value={draft.prevRole} onChange={v => setDraft(p => ({ ...p, prevRole: v }))} />
-        <Field label="Industry" value={draft.industry} onChange={v => setDraft(p => ({ ...p, industry: v }))} />
-        <Field label="Function" value={draft.function} onChange={v => setDraft(p => ({ ...p, function: v }))} />
-        <Field label="Years of Experience" value={String(draft.yearsExp)} onChange={v => setDraft(p => ({ ...p, yearsExp: v }))} />
-      </Section>
+      <ProfileSection title="💼 Professional Information">
+        <ProfileField editing={editing} label="Full Name" value={draft.name} onChange={v => setDraft(p => ({ ...p, name: v }))} />
+        <ProfileField editing={editing} label="Previous Company" value={draft.prevCompany} onChange={v => setDraft(p => ({ ...p, prevCompany: v }))} />
+        <ProfileField editing={editing} label="Previous Role" value={draft.prevRole} onChange={v => setDraft(p => ({ ...p, prevRole: v }))} />
+        <ProfileField editing={editing} label="Industry" value={draft.industry} onChange={v => setDraft(p => ({ ...p, industry: v }))} />
+        <ProfileField editing={editing} label="Function" value={draft.function} onChange={v => setDraft(p => ({ ...p, function: v }))} />
+        <ProfileField editing={editing} label="Years of Experience" value={String(draft.yearsExp)} onChange={v => setDraft(p => ({ ...p, yearsExp: v }))} />
+      </ProfileSection>
 
       <div style={{ background: "#fff", borderRadius: 14, border: "1px solid #EEF2F7", padding: "20px", marginBottom: 16 }}>
         <h4 style={{ margin: "0 0 12px", fontSize: 14, fontWeight: 800, color: "#0F172A", fontFamily: "'Sora', sans-serif" }}>📝 Bio</h4>
-        <Field label="" value={draft.bio} onChange={v => setDraft(p => ({ ...p, bio: v }))} textarea />
+        <ProfileField editing={editing} label="" value={draft.bio} onChange={v => setDraft(p => ({ ...p, bio: v }))} textarea />
       </div>
 
-      <Section title="🎓 Academic Background">
-        <Field label="College" value={draft.undergrad} onChange={v => setDraft(p => ({ ...p, undergrad: v }))} />
-        <Field label="Degree" value={draft.degree} onChange={v => setDraft(p => ({ ...p, degree: v }))} />
-        <Field label="Major" value={draft.major} onChange={v => setDraft(p => ({ ...p, major: v }))} />
-        <Field label="Location" value={draft.location} onChange={v => setDraft(p => ({ ...p, location: v }))} />
-      </Section>
+      <ProfileSection title="🎓 Academic Background">
+        <ProfileField editing={editing} label="College" value={draft.undergrad} onChange={v => setDraft(p => ({ ...p, undergrad: v }))} />
+        <ProfileField editing={editing} label="Degree" value={draft.degree} onChange={v => setDraft(p => ({ ...p, degree: v }))} />
+        <ProfileField editing={editing} label="Major" value={draft.major} onChange={v => setDraft(p => ({ ...p, major: v }))} />
+        <ProfileField editing={editing} label="Location" value={draft.location} onChange={v => setDraft(p => ({ ...p, location: v }))} />
+      </ProfileSection>
 
       <div style={{ background: "#fff", borderRadius: 14, border: "1px solid #EEF2F7", padding: "20px", marginBottom: 16 }}>
         <h4 style={{ margin: "0 0 12px", fontSize: 14, fontWeight: 800, color: "#0F172A", fontFamily: "'Sora', sans-serif" }}>⚡ Career Goals, Skills & Interests</h4>
