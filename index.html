@@ -1456,6 +1456,7 @@ function EventsPage({ currentUser, setActivePage }) {
 
   const EventCard = ({ event }) => {
     const isJoined = joined[event.id];
+    const catColor = (CATS.find((c) => c.id === event.category) || CATS[0]).color;
     const spots = event.maxSpots === null ? null : event.maxSpots - event.attendees.length;
     const matchProfiles = event.attendees.filter((n) => matchPoolNames.includes(n)).map((name) => matchPool.find((p) => p.name === name)).filter(Boolean);
     const displayNames = event.attendees.slice(0, 3).map((n) => n.split(" ")[0]);
@@ -1464,12 +1465,12 @@ function EventsPage({ currentUser, setActivePage }) {
     return /* @__PURE__ */ React.createElement(
       "div",
       {
-        style: { background: "#fff", borderRadius: 16, border: `1.5px solid ${event.color}33`, overflow: "hidden", boxShadow: `0 2px 12px ${event.color}11`, transition: "transform 0.15s", cursor: "pointer" },
+        style: { background: "#fff", borderRadius: 16, border: `1.5px solid ${catColor}33`, overflow: "hidden", boxShadow: `0 2px 12px ${catColor}11`, transition: "transform 0.15s", cursor: "pointer" },
         onMouseEnter: (e) => e.currentTarget.style.transform = "translateY(-2px)",
         onMouseLeave: (e) => e.currentTarget.style.transform = "translateY(0)",
         onClick: () => setSelectedEvt(event)
       },
-      /* @__PURE__ */ React.createElement("div", { style: { background: `linear-gradient(135deg,${event.color},${event.color}CC)`, padding: "14px 16px 12px", position: "relative", overflow: "hidden" } },
+      /* @__PURE__ */ React.createElement("div", { style: { background: `linear-gradient(135deg,${catColor},${catColor}CC)`, padding: "14px 16px 12px", position: "relative", overflow: "hidden" } },
         /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", top: -15, right: -15, width: 70, height: 70, borderRadius: "50%", background: "rgba(255,255,255,0.08)", pointerEvents: "none" } }),
         /* @__PURE__ */ React.createElement("div", { style: { fontSize: 10, color: "rgba(255,255,255,0.75)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 3 } }, event.icon, " ", event.community, " \xB7 ", event.category),
         /* @__PURE__ */ React.createElement("div", { style: { fontSize: 15, fontWeight: 900, color: "#fff", fontFamily: "'Sora',sans-serif", letterSpacing: "-0.01em", lineHeight: 1.2 } }, event.title),
@@ -1481,9 +1482,9 @@ function EventsPage({ currentUser, setActivePage }) {
           /* @__PURE__ */ React.createElement("span", null, "\u{1F4CD} ", event.location),
           /* @__PURE__ */ React.createElement("span", { style: { marginLeft: "auto", color: event.maxSpots === null ? "#059669" : spots <= 2 ? "#EF4444" : "#94A3B8", fontWeight: 700 } }, event.maxSpots === null ? "Open to all" : spots <= 0 ? "Full" : `${spots} spots`)
         ),
-        matchProfiles.length > 0 && /* @__PURE__ */ React.createElement("div", { style: { background: `${event.color}0F`, border: `1px solid ${event.color}22`, borderRadius: 9, padding: "7px 10px", marginBottom: 10, display: "flex", alignItems: "center", gap: 8 } },
+        matchProfiles.length > 0 && /* @__PURE__ */ React.createElement("div", { style: { background: `${catColor}0F`, border: `1px solid ${catColor}22`, borderRadius: 9, padding: "7px 10px", marginBottom: 10, display: "flex", alignItems: "center", gap: 8 } },
           /* @__PURE__ */ React.createElement("div", { style: { display: "flex" } }, matchProfiles.slice(0, 3).map((p, i) => /* @__PURE__ */ React.createElement(Avatar, { key: p.name, name: p.name, photo: p.photo, size: 20, radius: 10, extraStyle: { border: "2px solid #fff", marginLeft: i > 0 ? -5 : 0 } }))),
-          /* @__PURE__ */ React.createElement("span", { style: { fontSize: 11, color: event.color, fontWeight: 700 } }, matchProfiles.length === 1 ? `${matchProfiles[0].name.split(" ")[0]} is going \u2014 top match` : `${matchProfiles[0].name.split(" ")[0]} + ${matchProfiles.length - 1} of your matches going`)
+          /* @__PURE__ */ React.createElement("span", { style: { fontSize: 11, color: catColor, fontWeight: 700 } }, matchProfiles.length === 1 ? `${matchProfiles[0].name.split(" ")[0]} is going \u2014 top match` : `${matchProfiles[0].name.split(" ")[0]} + ${matchProfiles.length - 1} of your matches going`)
         ),
         /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center" } },
           /* @__PURE__ */ React.createElement("div", { style: { flex: 1, minWidth: 0 } },
@@ -1496,7 +1497,7 @@ function EventsPage({ currentUser, setActivePage }) {
           ),
           /* @__PURE__ */ React.createElement("button", {
             onClick: (e) => { e.stopPropagation(); toggleJoin(event.id); },
-            style: { padding: "7px 14px", border: "none", borderRadius: 9, cursor: "pointer", flexShrink: 0, marginLeft: 10, fontWeight: 700, fontSize: 11, fontFamily: "'Sora',sans-serif", transition: "all 0.15s", background: isJoined ? "#ECFDF5" : event.color, color: isJoined ? "#059669" : "#fff", boxShadow: isJoined ? "none" : `0 2px 10px ${event.color}44` }
+            style: { padding: "7px 14px", border: "none", borderRadius: 9, cursor: "pointer", flexShrink: 0, marginLeft: 10, fontWeight: 700, fontSize: 11, fontFamily: "'Sora',sans-serif", transition: "all 0.15s", background: isJoined ? "#ECFDF5" : catColor, color: isJoined ? "#059669" : "#fff", boxShadow: isJoined ? "none" : `0 2px 10px ${catColor}44` }
           }, isJoined ? "\u2713 Joined" : "Join \u2192")
         )
       )
