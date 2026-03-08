@@ -1378,11 +1378,7 @@ function PitchBanner() {
       React.createElement("span", { style: { fontSize:22 } }, "⚡"),
       React.createElement("div", { style: { fontSize:15, fontWeight:800, color:"#fff", fontFamily:"'Sora',sans-serif" } }, "Welcome to Pulse — ISB Co'27's Networking App"),
     ),
-    React.createElement("div", { style: { fontSize:12, color:"rgba(255,255,255,0.8)", lineHeight:1.7, fontFamily:"'Sora',sans-serif" } },
-      "Pulse helps incoming Co'27 students connect before term starts. ",
-      React.createElement("strong", { style:{color:"#fff"} }, "Browse events, discover batchmates, and build your network"),
-      " — all in one place. Built for ISB by an ISB student.",
-    ),
+
     React.createElement("div", { style: { display:"flex", gap:8, marginTop:14, flexWrap:"wrap" } },
       ...[
         ["🗓️ Events", "Join batch meetups & campus events"],
@@ -1398,9 +1394,7 @@ function PitchBanner() {
         )
       )
     ),
-    React.createElement("div", { style:{marginTop:12, fontSize:10, color:"rgba(255,255,255,0.4)", fontFamily:"'Sora',sans-serif"} },
-      "🏆 Built for ISB BTC Live Buildathon · March 8, 2026 · Theme: Make ISB Better"
-    )
+
   );
 }
 
@@ -2138,7 +2132,7 @@ function App() {
       return null;
     }
   })();
-  const [isOnboarded, setIsOnboarded] = useState(!!savedUser);
+  const [isOnboarded, setIsOnboarded] = useState(!!(savedUser && savedUser.name && savedUser.name.trim()));
   const [currentUser, setCurrentUser] = useState(savedUser || CURRENT_USER);
   const [profiles, setProfiles] = useState(savedProfiles || SAMPLE_PROFILES);
   const [activePage, setActivePage] = useState("events");
