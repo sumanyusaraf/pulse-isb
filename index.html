@@ -1416,16 +1416,15 @@ function EventsPage({ currentUser, setActivePage }) {
     return SAMPLE_PROFILES.map((p) => ({ name: p.name, photo: p.photo, score: calculateCompatibility(p, cu) })).filter((p) => p.score >= 55);
   }, [currentUser]);
   const matchPoolNames = matchPool.map((p) => p.name);
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const today = new Date(); today.setHours(0,0,0,0);
   const todayStr = today.toISOString().split("T")[0];
+  const tomorrowStr = new Date(today.getTime() + 864e5).toISOString().split("T")[0];
 
-  const dayLabel = (dateStr) => {
-    const d = new Date(dateStr + "T00:00:00");
-    const diff = Math.round((d - today) / 864e5);
-    if (diff === 0) return "TODAY";
-    if (diff === 1) return "TOMORROW";
-    return d.toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short" }).toUpperCase();
+  const dateLabel = (dateStr) => {
+    const diff = Math.round((new Date(dateStr + "T00:00:00") - today) / 864e5);
+    if (diff === 0) return "Today";
+    if (diff === 1) return "Tomorrow";
+    return new Date(dateStr + "T00:00:00").toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short" });
   };
 
   const CATS = [
@@ -1438,20 +1437,15 @@ function EventsPage({ currentUser, setActivePage }) {
   ];
 
   const toggleJoin = (id) => setJoined((j) => ({ ...j, [id]: !j[id] }));
-  const filtered = catFilter === "All" ? allEvents : allEvents.filter((e) => e.category === catFilter);
 
-  const grouped = React.useMemo(() => {
-    const map = {};
-    [...filtered].sort((a, b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time)).forEach((e) => {
-      if (!map[e.date]) map[e.date] = [];
-      map[e.date].push(e);
-    });
-    return Object.entries(map).sort(([a], [b]) => a.localeCompare(b));
-  }, [filtered]);
+  const filtered = React.useMemo(() => {
+    const base = catFilter === "All" ? allEvents : allEvents.filter((e) => e.category === catFilter);
+    return [...base].sort((a, b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time));
+  }, [catFilter, allEvents]);
 
   const activeCat = CATS.find((c) => c.id === catFilter) || CATS[0];
 
-  const EventCard = ({ event, fullWidth }) => {
+  const EventCard = ({ event }) => {
     const isJoined = joined[event.id];
     const color = (CATS.find((c) => c.id === event.category) || CATS[0]).color;
     const spots = event.maxSpots === null ? null : event.maxSpots - event.attendees.length;
@@ -1459,6 +1453,8 @@ function EventsPage({ currentUser, setActivePage }) {
     const displayNames = event.attendees.slice(0, 3).map((n) => n.split(" ")[0]);
     const extraCount = event.attendees.length - 3;
     const attendeeLabel = event.attendees.length === 0 ? null : displayNames.join(" \xB7 ") + (extraCount > 0 ? ` +${extraCount}` : "") + " going";
+    const dateBadgeColor = event.date === todayStr ? "#003A8F" : event.date === tomorrowStr ? "#0D9488" : "#94A3B8";
+
     return /* @__PURE__ */ React.createElement(
       "div",
       {
@@ -1467,12 +1463,16 @@ function EventsPage({ currentUser, setActivePage }) {
         onMouseLeave: (e) => e.currentTarget.style.transform = "translateY(0)",
         onClick: () => setSelectedEvt(event)
       },
+      /* Card header */
       /* @__PURE__ */ React.createElement("div", { style: { background: `linear-gradient(135deg,${color},${color}CC)`, padding: "14px 16px 12px", position: "relative", overflow: "hidden" } },
         /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", top: -15, right: -15, width: 70, height: 70, borderRadius: "50%", background: "rgba(255,255,255,0.08)", pointerEvents: "none" } }),
+        /* Date badge top-right */
+        /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", top: 10, right: 12, background: "rgba(255,255,255,0.2)", borderRadius: 6, padding: "2px 8px", fontSize: 10, fontWeight: 700, color: "#fff" } }, dateLabel(event.date)),
         /* @__PURE__ */ React.createElement("div", { style: { fontSize: 10, color: "rgba(255,255,255,0.75)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 3 } }, event.icon, " ", event.community, " \xB7 ", event.category),
         /* @__PURE__ */ React.createElement("div", { style: { fontSize: 15, fontWeight: 900, color: "#fff", fontFamily: "'Sora',sans-serif", letterSpacing: "-0.01em", lineHeight: 1.2 } }, event.title),
         event.vibe && /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: "rgba(255,255,255,0.75)", fontStyle: "italic", marginTop: 3 } }, '"', event.vibe, '"')
       ),
+      /* Card body */
       /* @__PURE__ */ React.createElement("div", { style: { padding: "12px 14px" } },
         /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 14, fontSize: 11, color: "#64748B", fontWeight: 600, marginBottom: 10 } },
           /* @__PURE__ */ React.createElement("span", null, "\u{1F550} ", event.timeLabel),
@@ -1500,6 +1500,7 @@ function EventsPage({ currentUser, setActivePage }) {
       )
     );
   };
+
   const EventDetail = ({ event }) => {
     const isJoined = joined[event.id];
     const color = (CATS.find((c) => c.id === event.category) || CATS[0]).color;
@@ -1579,8 +1580,8 @@ function EventsPage({ currentUser, setActivePage }) {
       /* @__PURE__ */ React.createElement("button", { onClick: () => setCreating(true), style: { padding: "9px 20px", background: "#003A8F", color: "#fff", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 13, fontFamily: "'Sora',sans-serif", cursor: "pointer", boxShadow: "0 2px 12px rgba(0,58,143,0.25)" } }, "+ Create Event")
     ),
 
-    /* Category pills */
-    /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8, marginBottom: 28, flexWrap: "wrap" } },
+    /* Category pills only */
+    /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8, marginBottom: 24, flexWrap: "wrap" } },
       CATS.map((cat) => {
         const active = catFilter === cat.id;
         const count = cat.id === "All" ? allEvents.length : allEvents.filter((e) => e.category === cat.id).length;
@@ -1597,25 +1598,15 @@ function EventsPage({ currentUser, setActivePage }) {
       })
     ),
 
-    /* Timeline */
-    grouped.length === 0
+    /* Clean 2-col grid — no date sections */
+    filtered.length === 0
       ? /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", padding: "60px 20px", background: "#F8FAFC", borderRadius: 16, border: "1.5px dashed #E2E8F0" } },
           /* @__PURE__ */ React.createElement("div", { style: { fontSize: 32, marginBottom: 10 } }, activeCat.icon),
           /* @__PURE__ */ React.createElement("div", { style: { fontSize: 15, fontWeight: 700, color: "#64748B", fontFamily: "'Sora',sans-serif" } }, "No ", catFilter === "All" ? "" : catFilter + " ", "events yet"),
           /* @__PURE__ */ React.createElement("button", { onClick: () => setCreating(true), style: { background: "none", border: "none", color: "#2563EB", cursor: "pointer", fontWeight: 700, fontFamily: "inherit", fontSize: 12, marginTop: 6 } }, "Be the first to create one \u2192")
         )
-      : /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 28 } },
-          grouped.map(([dateStr, events]) => /* @__PURE__ */ React.createElement("div", { key: dateStr },
-            /* Date divider */
-            /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 12, marginBottom: 12 } },
-              /* @__PURE__ */ React.createElement("span", { style: { fontSize: 11, fontWeight: 900, color: dateStr === todayStr ? "#003A8F" : "#94A3B8", letterSpacing: "0.1em", fontFamily: "'Sora',sans-serif" } }, dayLabel(dateStr)),
-              /* @__PURE__ */ React.createElement("div", { style: { flex: 1, height: 1, background: dateStr === todayStr ? "#003A8F22" : "#E2E8F0" } })
-            ),
-            /* 2-col fixed grid, single events span full width */
-            /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 16 } },
-              events.map((e, i) => /* @__PURE__ */ React.createElement("div", { key: e.id, style: { gridColumn: events.length === 1 ? "1 / -1" : "auto" } }, /* @__PURE__ */ React.createElement(EventCard, { event: e })))
-            )
-          ))
+      : /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 16 } },
+          filtered.map((e) => /* @__PURE__ */ React.createElement(EventCard, { key: e.id, event: e }))
         )
   );
 }
