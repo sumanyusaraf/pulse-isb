@@ -922,7 +922,7 @@ function Sidebar({ activePage, setActivePage, currentUser }) {
     { id: "profile", label: "Profile", icon: Icon.Profile },
     { id: "settings", label: "Settings", icon: Icon.Settings }
   ];
-  const sb = isDark ? "#0A1628" : "#003A8F";
+  const sb = isDark ? "#0A1628" : "linear-gradient(180deg, #0d1f6e 0%, #1240a8 50%, #1a50c8 100%)";
   return React.createElement("aside", { style: {
     width: 220, minHeight: "100vh", background: sb,
     display: "flex", flexDirection: "column", padding: "0 0 24px 0",
@@ -1055,7 +1055,11 @@ function TopBar({ searchQuery, setSearchQuery, activePage, currentUser }) {
     display: "flex", alignItems: "center", padding: "0 28px", gap: 16,
     position: "sticky", top: 0, zIndex: 90, boxShadow: `0 1px 0 ${border}`
   }},
-    React.createElement("div", { style: { flex: 1, maxWidth: 400, position: "relative" }},
+    React.createElement("div", { style: { fontSize: 18, fontWeight: 800, color: text, fontFamily: "\'Sora\',sans-serif", letterSpacing: "-0.02em", flexShrink: 0 }},
+      pageTitles[activePage] || ""
+    ),
+    React.createElement("div", { style: { flex: 1 }}),
+    React.createElement("div", { style: { maxWidth: 380, width: "100%", position: "relative" }},
       React.createElement("span", { style: { position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "#94A3B8" }},
         React.createElement(Icon.Search, null)
       ),
@@ -2004,103 +2008,138 @@ function ProfileSection({ title, children }) {
 }
 function MyProfilePage({ currentUser, setCurrentUser }) {
   const isDark = useTheme();
-  const [editing, setEditing] = React.useState(false);
-  const [user, setUser] = React.useState(currentUser || CURRENT_USER);
   const [draft, setDraft] = React.useState(currentUser || CURRENT_USER);
-  React.useEffect(() => { setUser(currentUser); setDraft(currentUser); }, [currentUser]);
+  const [saved, setSaved] = React.useState(false);
+  const fileInputRef = React.useRef(null);
+  React.useEffect(() => { setDraft(currentUser || CURRENT_USER); }, [currentUser]);
+  const handlePhotoUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => setDraft(p => ({...p, photo: ev.target.result}));
+    reader.readAsDataURL(file);
+  };
   const bg = isDark ? "#0F172A" : "#F8FAFC";
   const card = isDark ? "#1E293B" : "#fff";
-  const bdr = isDark ? "#334155" : "#EEF2F7";
+  const bdr = isDark ? "#334155" : "#E2E8F0";
   const text = isDark ? "#F1F5F9" : "#0F172A";
   const muted = isDark ? "#94A3B8" : "#64748B";
-  const inputBg = isDark ? "#0F172A" : "#fff";
+  const inputBg = isDark ? "#1E293B" : "#fff";
   const inputBdr = isDark ? "#475569" : "#E2E8F0";
-  const fields = [user.name, user.prevRole, user.prevCompany, user.industry, user.undergrad, user.bio, (user.careerGoals||[]).length?"y":"", (user.hobbies||[]).length?"y":""];
+  const ALL_SKILLS = ["Financial Modeling","Valuation","M&A","LBO Modeling","Equity Research","Due Diligence","Capital Markets","Strategy","Consulting Frameworks","Market Sizing","Product Management","Product Strategy","Growth Hacking","Data Analytics","SQL","Python","Excel / VBA","Digital Transformation","Operations","Supply Chain","Brand Management","Marketing Analytics","Leadership","Client Management","Stakeholder Management","Pitchbook / Presentations","Business Development","UX","Agile","Cloud","Software Architecture"];
+  const ALL_GOALS = ["Investment Management","Private Equity","Venture Capital","Entrepreneurship","Strategy & Consulting","Product Management","General Management","Corporate Finance","Sales & Marketing","Social Impact","Technology & Engineering","Operations & Supply Chain","Family Business","Chief of Staff / Founder's Office"];
+  const fields = [draft.name, draft.prevRole, draft.prevCompany, draft.industry, draft.undergrad, draft.bio, (draft.careerGoals||[]).length?"y":"", (draft.hobbies||[]).length?"y":"", (draft.skills||[]).length?"y":"", draft.section];
   const pct = Math.round(fields.filter(Boolean).length / fields.length * 100);
+  const toggleSkill = (s) => setDraft(p => { const cur = p.skills||[]; return {...p, skills: cur.includes(s) ? cur.filter(x=>x!==s) : [...cur,s]}; });
+  const toggleGoal = (g) => setDraft(p => { const cur = p.careerGoals||[]; return {...p, careerGoals: cur.includes(g) ? cur.filter(x=>x!==g) : [...cur,g]}; });
+  const ALL_HOBBIES = ["Cricket","Football","Tennis","Badminton","Squash","Running","Cycling","Swimming","Gym","Yoga","Chess","Poker","Board Games","Reading","Music","Photography","Travel","Cooking","Gaming","F1","Investing","Podcasts","Art","Dance","Biking","Movies","Hiking","Volunteering","Wine Tasting","Food"];
+  const toggleHobby = (h) => setDraft(p => { const cur = p.hobbies||[]; return {...p, hobbies: cur.includes(h) ? cur.filter(x=>x!==h) : [...cur,h]}; });
   const saveEdit = () => {
-    setUser(draft);
     if (setCurrentUser) {
       setCurrentUser(draft);
       try { localStorage.setItem("pulse_currentUser", JSON.stringify(draft)); } catch(e){}
     }
-    setEditing(false);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
   };
-  const Field = ({ label, val, onChange, textarea }) => React.createElement("div", { style: { marginBottom: 16 }},
-    React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: muted, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6 }}, label),
-    textarea
-      ? React.createElement("textarea", { value: val||"", onChange: e=>onChange(e.target.value), rows: 3, style: { width: "100%", padding: "10px 12px", border: `1.5px solid ${inputBdr}`, borderRadius: 10, fontSize: 13, fontFamily: "'Sora',sans-serif", outline: "none", resize: "vertical", background: inputBg, color: text, boxSizing: "border-box" }})
-      : React.createElement("input", { value: val||"", onChange: e=>onChange(e.target.value), style: { width: "100%", padding: "10px 12px", border: `1.5px solid ${inputBdr}`, borderRadius: 10, fontSize: 13, fontFamily: "'Sora',sans-serif", outline: "none", background: inputBg, color: text, boxSizing: "border-box" }})
-  );
-  return React.createElement("div", { style: { maxWidth: 720, margin: "0 auto", padding: "24px 28px", background: bg, minHeight: "100%" }},
-    pct < 75 && React.createElement("div", { style: { background: isDark?"#2D1E00":"#FFFBEB", border: "1.5px solid #FDE68A", borderRadius: 14, padding: "14px 18px", marginBottom: 20 }},
+  const cardStyle = { background: card, borderRadius: 18, border: "1px solid " + bdr, padding: 24, marginBottom: 16, boxShadow: isDark?"0 1px 4px rgba(0,0,0,0.3)":"0 2px 12px rgba(0,0,0,0.06)" };
+  const lbl = (t) => React.createElement("div", { style: { fontSize: 10, fontWeight: 700, color: muted, textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 6 }}, t);
+  const inp = (placeholder, val, onChange) => React.createElement("input", {
+    value: val||"", onChange: e=>onChange(e.target.value), placeholder,
+    style: { width: "100%", padding: "10px 14px", border: "1.5px solid " + inputBdr, borderRadius: 10, fontSize: 13, fontFamily: "'Sora',sans-serif", outline: "none", background: inputBg, color: text, boxSizing: "border-box" },
+    onFocus: e=>e.target.style.borderColor="#1240a8", onBlur: e=>e.target.style.borderColor=inputBdr
+  });
+  const fld = (t, val, onChange) => React.createElement("div", { style: { marginBottom: 16 }}, lbl(t), inp(t, val, onChange));
+  return React.createElement("div", { style: { maxWidth: 760, margin: "0 auto", padding: "24px 28px", background: bg, minHeight: "100%" }},
+    React.createElement("div", { style: { background: isDark?"#2D1E00":"#FFFBEB", border: "1.5px solid #FDE68A", borderRadius: 14, padding: "14px 18px", marginBottom: 20 }},
       React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }},
         React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: isDark?"#FCD34D":"#92400E" }}, "\uD83C\uDFAF Complete your profile for better matches"),
         React.createElement("div", { style: { fontSize: 13, fontWeight: 800, color: isDark?"#FCD34D":"#92400E" }}, pct, "%")
       ),
-      React.createElement("div", { style: { background: isDark?"#1a1000":"#FEF3C7", borderRadius: 20, height: 6, overflow: "hidden", marginBottom: 8 }},
-        React.createElement("div", { style: { width: `${pct}%`, height: "100%", background: "linear-gradient(90deg,#F59E0B,#D97706)", borderRadius: 20, transition: "width 0.4s ease" }})
-      ),
-      !editing && React.createElement("button", { onClick: ()=>setEditing(true), style: { fontSize: 12, fontWeight: 700, color: isDark?"#FCD34D":"#B45309", background: "none", border: "none", cursor: "pointer", padding: 0, fontFamily: "'Sora',sans-serif" }}, "Complete profile \u2192")
-    ),
-    !editing && React.createElement(React.Fragment, null,
-      React.createElement("div", { style: { display: "flex", justifyContent: "flex-end", marginBottom: 12 }},
-        React.createElement("button", { onClick: ()=>setEditing(true), style: { display: "flex", alignItems: "center", gap: 6, padding: "9px 18px", background: "none", border: `1.5px solid ${bdr}`, borderRadius: 10, fontSize: 13, fontWeight: 700, color: "#2563EB", cursor: "pointer", fontFamily: "'Sora',sans-serif" }},
-          React.createElement(Icon.Edit, null), " Edit Profile"
-        )
-      ),
-      React.createElement("div", { style: { background: card, borderRadius: 18, border: `1px solid ${bdr}`, padding: 28, marginBottom: 16, boxShadow: isDark?"0 1px 4px rgba(0,0,0,0.3)":"0 1px 4px rgba(0,0,0,0.05)" }},
-        React.createElement("div", { style: { display: "flex", gap: 20, alignItems: "center", marginBottom: 20 }},
-          React.createElement(Avatar, { name: user.name, photo: user.photo, size: 72, radius: 16, extraStyle: { border: `3px solid ${bdr}` }}),
-          React.createElement("div", null,
-            React.createElement("div", { style: { fontSize: 22, fontWeight: 900, color: text, fontFamily: "'Sora',sans-serif", letterSpacing: "-0.02em" }}, user.name),
-            React.createElement("div", { style: { fontSize: 13, color: muted, marginTop: 4 }},
-              "PGP '27", user.campus ? ` \xB7 ${user.campus}` : "",
-              user.prevRole && user.prevCompany ? ` \xB7 ${user.prevRole} @ ${user.prevCompany}` : ""
-            )
-          )
-        ),
-        user.bio && React.createElement("div", { style: { fontSize: 13, color: muted, lineHeight: 1.7, marginBottom: 16, padding: "12px 16px", background: isDark?"#0F172A":"#F8FAFC", borderRadius: 10, border: `1px solid ${bdr}` }}, user.bio),
-        (user.hobbies||[]).length > 0 && React.createElement("div", { style: { marginBottom: 14 }},
-          React.createElement("div", { style: { fontSize: 12, fontWeight: 700, color: muted, marginBottom: 8 }}, "\uD83C\uDFAF Interests"),
-          React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 6 }},
-            (user.hobbies||[]).map(h => React.createElement("span", { key: h, style: { fontSize: 12, background: isDark?"#0F172A":"#F0FDF4", color: "#059669", padding: "4px 12px", borderRadius: 20, border: "1px solid #D1FAE5", fontWeight: 600 }}, hobbyIcon(h), " ", h))
-          )
-        ),
-        (user.careerGoals||[]).length > 0 && React.createElement("div", { style: { marginBottom: 14 }},
-          React.createElement("div", { style: { fontSize: 12, fontWeight: 700, color: muted, marginBottom: 8 }}, "\uD83D\uDE80 Career Goals"),
-          React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 6 }},
-            (user.careerGoals||[]).map(g => React.createElement("span", { key: g, style: { fontSize: 12, background: isDark?"#1D3461":"#EFF6FF", color: "#2563EB", padding: "4px 12px", borderRadius: 20, fontWeight: 600 }}, g))
-          )
-        ),
-        (user.skills||[]).length > 0 && React.createElement("div", null,
-          React.createElement("div", { style: { fontSize: 12, fontWeight: 700, color: muted, marginBottom: 8 }}, "\u26A1 Skills"),
-          React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 6 }},
-            (user.skills||[]).slice(0,8).map(s => React.createElement("span", { key: s, style: { fontSize: 11, background: isDark?"#0F172A":"#F8FAFC", color: isDark?"#CBD5E1":"#475569", padding: "3px 10px", borderRadius: 8, border: `1px solid ${bdr}`, fontWeight: 600 }}, s))
-          )
-        )
+      React.createElement("div", { style: { background: isDark?"#1a1000":"#FEF3C7", borderRadius: 20, height: 6, overflow: "hidden" }},
+        React.createElement("div", { style: { width: pct+"%", height: "100%", background: "linear-gradient(90deg,#F59E0B,#D97706)", borderRadius: 20, transition: "width 0.4s ease" }})
       )
     ),
-    editing && React.createElement(React.Fragment, null,
-      React.createElement("div", { style: { background: card, borderRadius: 18, border: `1px solid ${bdr}`, padding: 28, marginBottom: 16 }},
-        React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }},
-          React.createElement("div", { style: { fontSize: 16, fontWeight: 800, color: text, fontFamily: "'Sora',sans-serif" }}, "Edit Profile"),
-          React.createElement("div", { style: { display: "flex", gap: 10 }},
-            React.createElement("button", { onClick: ()=>{ setDraft(user); setEditing(false); }, style: { padding: "9px 18px", border: `1.5px solid ${bdr}`, borderRadius: 10, background: "none", color: muted, fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}, "Cancel"),
-            React.createElement("button", { onClick: saveEdit, style: { padding: "9px 20px", border: "none", borderRadius: 10, background: "#003A8F", color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}, "Save Changes")
+    React.createElement("div", { style: cardStyle },
+      React.createElement("div", { style: { display: "flex", gap: 20, alignItems: "flex-start", marginBottom: 20 }},
+        React.createElement("div", { style: { position: "relative", flexShrink: 0, cursor: "pointer" }, onClick: () => fileInputRef.current && fileInputRef.current.click() },
+          React.createElement(Avatar, { name: draft.name, photo: draft.photo, size: 72, radius: 14, extraStyle: { border: "3px solid " + bdr }}),
+          React.createElement("div", { style: { position: "absolute", inset: 0, borderRadius: 14, background: "rgba(0,0,0,0.35)", display: "flex", alignItems: "center", justifyContent: "center", opacity: 0, transition: "opacity 0.15s" },
+            onMouseEnter: e => e.currentTarget.style.opacity = "1",
+            onMouseLeave: e => e.currentTarget.style.opacity = "0"
+          },
+            React.createElement("span", { style: { fontSize: 11, color: "#fff", fontWeight: 700, textAlign: "center", lineHeight: 1.3 }}, "\uD83D\uDCF7 Change")
+          ),
+          React.createElement("input", { ref: fileInputRef, type: "file", accept: "image/*", onChange: handlePhotoUpload, style: { display: "none" }})
+        ),
+        React.createElement("div", { style: { flex: 1, display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 16px" }},
+          React.createElement("div", { style: { gridColumn: "1/-1", marginBottom: 12 }}, inp("Full Name", draft.name, v=>setDraft(p=>({...p,name:v})))),
+          React.createElement("div", { style: { gridColumn: "1/-1" }}, inp("Hometown", draft.location, v=>setDraft(p=>({...p,location:v}))))
+        )
+      ),
+      React.createElement("div", { style: { marginBottom: 16 }},
+        lbl("Bio"),
+        React.createElement("textarea", { value: draft.bio||"", onChange: e=>setDraft(p=>({...p,bio:e.target.value})), placeholder: "Tell people about yourself...", rows: 3,
+          style: { width: "100%", padding: "10px 14px", border: "1.5px solid " + inputBdr, borderRadius: 10, fontSize: 13, fontFamily: "'Sora',sans-serif", outline: "none", resize: "vertical", background: inputBg, color: text, boxSizing: "border-box" },
+          onFocus: e=>e.target.style.borderColor="#1240a8", onBlur: e=>e.target.style.borderColor=inputBdr
+        })
+      ),
+      React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 16px" }},
+        fld("Previous Company", draft.prevCompany, v=>setDraft(p=>({...p,prevCompany:v}))),
+        fld("Previous Role", draft.prevRole, v=>setDraft(p=>({...p,prevRole:v}))),
+        React.createElement("div", { style: { marginBottom: 16 }},
+          lbl("Industry"),
+          React.createElement("select", { value: draft.industry||"", onChange: e=>setDraft(p=>({...p,industry:e.target.value})),
+            style: { width: "100%", padding: "10px 14px", border: "1.5px solid " + inputBdr, borderRadius: 10, fontSize: 13, fontFamily: "'Sora',sans-serif", outline: "none", background: inputBg, color: text, boxSizing: "border-box", cursor: "pointer", appearance: "auto" }},
+            React.createElement("option", { value: "" }, "Select industry"),
+            ["Consulting & Strategy","BFSI / Financial Services","Technology","E-commerce","FMCG & Consumer","Social Sector","Conglomerates","EV / Automotive","Media & Entertainment","Healthcare","Real Estate","Manufacturing"].map(i => React.createElement("option", { key: i, value: i }, i))
           )
         ),
-        React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 20px" }},
-          React.createElement("div", { style: { gridColumn: "1/-1" }}, React.createElement(Field, { label: "Full Name", val: draft.name, onChange: v=>setDraft(p=>({...p,name:v})) })),
-          React.createElement(Field, { label: "Previous Company", val: draft.prevCompany, onChange: v=>setDraft(p=>({...p,prevCompany:v})) }),
-          React.createElement(Field, { label: "Previous Role", val: draft.prevRole, onChange: v=>setDraft(p=>({...p,prevRole:v})) }),
-          React.createElement(Field, { label: "Industry", val: draft.industry, onChange: v=>setDraft(p=>({...p,industry:v})) }),
-          React.createElement(Field, { label: "Years of Experience", val: String(draft.yearsExp||""), onChange: v=>setDraft(p=>({...p,yearsExp:v})) }),
-          React.createElement(Field, { label: "Undergraduate College", val: draft.undergrad, onChange: v=>setDraft(p=>({...p,undergrad:v})) }),
-          React.createElement(Field, { label: "Hometown", val: draft.location, onChange: v=>setDraft(p=>({...p,location:v})) }),
-          React.createElement("div", { style: { gridColumn: "1/-1" }}, React.createElement(Field, { label: "Bio", val: draft.bio, onChange: v=>setDraft(p=>({...p,bio:v})), textarea: true }))
-        )
+        React.createElement("div", { style: { marginBottom: 16 }},
+          lbl("Years of Experience"),
+          React.createElement("select", { value: draft.yearsExp||"", onChange: e=>setDraft(p=>({...p,yearsExp:parseInt(e.target.value)||""})),
+            style: { width: "100%", padding: "10px 14px", border: "1.5px solid " + inputBdr, borderRadius: 10, fontSize: 13, fontFamily: "'Sora',sans-serif", outline: "none", background: inputBg, color: text, boxSizing: "border-box", cursor: "pointer", appearance: "auto" }},
+            React.createElement("option", { value: "" }, "Select"),
+            [1,2,3,4,5,6,7,8,9,10,11,12].map(n => React.createElement("option", { key: n, value: n }, n + " year" + (n>1?"s":"")))
+          )
+        ),
+        fld("Undergraduate College", draft.undergrad, v=>setDraft(p=>({...p,undergrad:v}))),
+        fld("Degree", draft.degree, v=>setDraft(p=>({...p,degree:v})))
       )
-    )
+    ),
+    React.createElement("div", { style: cardStyle },
+      React.createElement("div", { style: { fontSize: 13, fontWeight: 800, color: text, fontFamily: "'Sora',sans-serif", marginBottom: 14 }}, "Skills"),
+      React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 8 }},
+        ALL_SKILLS.map(s => {
+          const on = (draft.skills||[]).includes(s);
+          return React.createElement("button", { key: s, onClick: ()=>toggleSkill(s), style: { padding: "6px 14px", borderRadius: 20, border: "1.5px solid " + (on?"#1240a8":"#E2E8F0"), background: on?"#EFF6FF":"transparent", color: on?"#1240a8":muted, fontSize: 12, fontWeight: on?700:500, cursor: "pointer", fontFamily: "'Sora',sans-serif", transition: "all 0.12s" }}, s);
+        })
+      )
+    ),
+    React.createElement("div", { style: cardStyle },
+      React.createElement("div", { style: { fontSize: 13, fontWeight: 800, color: text, fontFamily: "'Sora',sans-serif", marginBottom: 14 }}, "Career Goals"),
+      React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 8 }},
+        ALL_GOALS.map(g => {
+          const on = (draft.careerGoals||[]).includes(g);
+          return React.createElement("button", { key: g, onClick: ()=>toggleGoal(g), style: { padding: "6px 14px", borderRadius: 20, border: "1.5px solid " + (on?"#1240a8":"#E2E8F0"), background: on?"#EFF6FF":"transparent", color: on?"#1240a8":muted, fontSize: 12, fontWeight: on?700:500, cursor: "pointer", fontFamily: "'Sora',sans-serif", transition: "all 0.12s" }}, g);
+        })
+      )
+    ),
+    React.createElement("div", { style: cardStyle },
+      React.createElement("div", { style: { fontSize: 13, fontWeight: 800, color: text, fontFamily: "'Sora',sans-serif", marginBottom: 4 }}, "Hobbies & Interests"),
+      React.createElement("div", { style: { fontSize: 12, color: muted, marginBottom: 14 }}, "These power your compatibility matches in Discover"),
+      React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 8 }},
+        ALL_HOBBIES.map(h => {
+          const on = (draft.hobbies||[]).includes(h);
+          return React.createElement("button", { key: h, onClick: ()=>toggleHobby(h), style: { padding: "6px 14px", borderRadius: 20, border: "1.5px solid " + (on?"#059669":"#E2E8F0"), background: on?"#ECFDF5":"transparent", color: on?"#059669":muted, fontSize: 12, fontWeight: on?700:500, cursor: "pointer", fontFamily: "'Sora',sans-serif", transition: "all 0.12s" }},
+            hobbyIcon(h), " ", h
+          );
+        })
+      )
+    ),
+    React.createElement("button", { onClick: saveEdit, style: { width: "100%", padding: "14px", border: "none", borderRadius: 13, background: "linear-gradient(135deg,#1240a8,#1a50c8)", color: "#fff", fontSize: 15, fontWeight: 800, cursor: "pointer", fontFamily: "'Sora',sans-serif", boxShadow: "0 4px 20px rgba(18,64,168,0.35)", marginBottom: 32, transition: "opacity 0.15s" },
+      onMouseEnter: e=>e.currentTarget.style.opacity="0.9", onMouseLeave: e=>e.currentTarget.style.opacity="1"
+    }, saved ? "\u2713 Saved!" : "Save Profile \u2192")
   );
 }
 
@@ -2295,7 +2334,7 @@ function OnboardingFlow({ onComplete }) {
     })) : /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", padding: "30px 0", color: "rgba(255,255,255,0.4)" } }, "No events this week \u2014 check back soon"), /* @__PURE__ */ React.createElement("div", { style: { marginTop: 14, fontSize: 12, color: "rgba(255,255,255,0.4)", textAlign: "center" } }, "More events and people waiting inside \u2192"))
   ];
   const isLast = step === 2;
-  return /* @__PURE__ */ React.createElement("div", { style: { minHeight: "100vh", background: "linear-gradient(145deg,#003A8F,#1E3A8A,#312E81)", display: "flex", alignItems: "center", justifyContent: "center", padding: "20px", fontFamily: "'Sora',sans-serif" } }, /* @__PURE__ */ React.createElement("div", { style: { position: "fixed", top: -100, right: -100, width: 400, height: 400, borderRadius: "50%", background: "rgba(255,255,255,0.04)", pointerEvents: "none" } }), /* @__PURE__ */ React.createElement("div", { style: { position: "fixed", bottom: -80, left: -80, width: 300, height: 300, borderRadius: "50%", background: "rgba(255,255,255,0.03)", pointerEvents: "none" } }), /* @__PURE__ */ React.createElement("div", { style: { width: "100%", maxWidth: 480 } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10, marginBottom: 28, justifyContent: "center" } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 26, lineHeight: 1 } }, "\u26A1"), /* @__PURE__ */ React.createElement("div", { style: { color: "#fff", fontWeight: 900, fontSize: 20, fontFamily: "'Sora',sans-serif", letterSpacing: "-0.02em" } }, "Pulse")), /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(255,255,255,0.08)", backdropFilter: "blur(20px)", borderRadius: 22, border: "1.5px solid rgba(255,255,255,0.15)", padding: "28px 24px", boxShadow: "0 24px 80px rgba(0,0,0,0.3)" } }, /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 20 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 20, fontWeight: 900, color: "#fff", fontFamily: "'Sora',sans-serif", lineHeight: 1.3, marginBottom: 5, letterSpacing: "-0.01em" } }, STEPS_META[step].heading), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, color: "rgba(255,255,255,0.5)", lineHeight: 1.5 } }, STEPS_META[step].sub)), /* @__PURE__ */ React.createElement("div", { key: step, style: { animation: "cardIn 0.25s ease both" } }, stepContent[step]), /* @__PURE__ */ React.createElement(
+  return /* @__PURE__ */ React.createElement("div", { style: { minHeight: "100vh", background: "linear-gradient(160deg,#0d1f6e 0%,#1240a8 50%,#1a50c8 100%)", display: "flex", alignItems: "center", justifyContent: "center", padding: "20px", fontFamily: "'Sora',sans-serif" } }, /* @__PURE__ */ React.createElement("div", { style: { position: "fixed", top: -100, right: -100, width: 400, height: 400, borderRadius: "50%", background: "rgba(255,255,255,0.04)", pointerEvents: "none" } }), /* @__PURE__ */ React.createElement("div", { style: { position: "fixed", bottom: -80, left: -80, width: 300, height: 300, borderRadius: "50%", background: "rgba(255,255,255,0.03)", pointerEvents: "none" } }), /* @__PURE__ */ React.createElement("div", { style: { width: "100%", maxWidth: 480 } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10, marginBottom: 28, justifyContent: "center" } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 26, lineHeight: 1 } }, "\u26A1"), /* @__PURE__ */ React.createElement("div", { style: { color: "#fff", fontWeight: 900, fontSize: 20, fontFamily: "'Sora',sans-serif", letterSpacing: "-0.02em" } }, "Pulse")), /* @__PURE__ */ React.createElement("div", { style: { background: "rgba(255,255,255,0.08)", backdropFilter: "blur(20px)", borderRadius: 22, border: "1.5px solid rgba(255,255,255,0.15)", padding: "28px 24px", boxShadow: "0 24px 80px rgba(0,0,0,0.3)" } }, /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 20 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 20, fontWeight: 900, color: "#fff", fontFamily: "'Sora',sans-serif", lineHeight: 1.3, marginBottom: 5, letterSpacing: "-0.01em" } }, STEPS_META[step].heading), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, color: "rgba(255,255,255,0.5)", lineHeight: 1.5 } }, STEPS_META[step].sub)), /* @__PURE__ */ React.createElement("div", { key: step, style: { animation: "cardIn 0.25s ease both" } }, stepContent[step]), /* @__PURE__ */ React.createElement(
     "button",
     {
       onClick: () => {
