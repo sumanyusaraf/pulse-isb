@@ -23,7 +23,7 @@
     ::-webkit-scrollbar { width: 5px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 10px; }
-    input::placeholder, textarea::placeholder { color: rgba(255,255,255,0.35); }
+    input::placeholder, textarea::placeholder { color: #94A3B8; }
   </style>
 </head>
 <body>
@@ -32,6 +32,8 @@
 const { useState, useEffect, useMemo, useCallback, useRef } = React;
 const ThemeContext = React.createContext(false);
 const useTheme = () => React.useContext(ThemeContext);
+const MobileContext = React.createContext(false);
+const useMobile = () => React.useContext(MobileContext);
 
 const HOBBY_ICONS = {
   "Cricket": "\uD83C\uDFCF", "Football": "\u26BD", "Tennis": "\uD83C\uDFBE", "Running": "\uD83C\uDFC3",
@@ -901,6 +903,42 @@ function ProfileCard({ profile, onView, onStatusChange, compact = false, current
   );
 }
 
+
+function BottomNav({ activePage, setActivePage }) {
+  const items = [
+    { id: "events",   label: "Events",   icon: Icon.Calendar || Icon.Dashboard },
+    { id: "discover", label: "Discover", icon: Icon.Discover },
+    { id: "network",  label: "Network",  icon: Icon.Network },
+    { id: "profile",  label: "Profile",  icon: Icon.Profile },
+    { id: "settings", label: "Settings", icon: Icon.Settings }
+  ];
+  return React.createElement("nav", { style: {
+    position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 200,
+    height: 60, background: "#fff", borderTop: "1px solid #E2E8F0",
+    display: "flex", alignItems: "stretch",
+    boxShadow: "0 -2px 16px rgba(0,0,0,0.08)"
+  }},
+    items.map(({ id, label, icon: IconComp }) => {
+      const active = activePage === id;
+      return React.createElement("button", {
+        key: id, onClick: () => setActivePage(id),
+        style: {
+          flex: 1, display: "flex", flexDirection: "column", alignItems: "center",
+          justifyContent: "center", gap: 3, border: "none", background: "transparent",
+          color: active ? "#1240a8" : "#94A3B8", cursor: "pointer",
+          fontFamily: "'Sora',sans-serif", fontSize: 10, fontWeight: active ? 700 : 500,
+          transition: "color 0.15s", padding: "6px 0"
+        }
+      },
+        React.createElement("span", { style: { fontSize: 18, lineHeight: 1, opacity: active ? 1 : 0.6 }},
+          React.createElement(IconComp, null)
+        ),
+        label
+      );
+    })
+  );
+}
+
 function Sidebar({ activePage, setActivePage, currentUser }) {
   const isDark = useTheme();
   const items = [
@@ -911,6 +949,8 @@ function Sidebar({ activePage, setActivePage, currentUser }) {
     { id: "settings", label: "Settings", icon: Icon.Settings }
   ];
   const sb = isDark ? "#0A1628" : "linear-gradient(180deg, #0d1f6e 0%, #1240a8 50%, #1a50c8 100%)";
+  const isMobile = useMobile();
+  if (isMobile) return null;
   return React.createElement("aside", { style: {
     width: 220, minHeight: "100vh", background: sb,
     display: "flex", flexDirection: "column", padding: "0 0 24px 0",
@@ -1032,6 +1072,7 @@ function ProductTour({ onClose }) {
 
 function TopBar({ searchQuery, setSearchQuery, activePage, currentUser }) {
   const isDark = useTheme();
+  const isMobile = useMobile();
   const bg = isDark ? "#1E293B" : "#fff";
   const border = isDark ? "#334155" : "#EEF2F7";
   const text = isDark ? "#F1F5F9" : "#0F172A";
@@ -1039,15 +1080,15 @@ function TopBar({ searchQuery, setSearchQuery, activePage, currentUser }) {
   const inputBorder = isDark ? "#334155" : "#E2E8F0";
   const pageTitles = { events: "Events", discover: "Discover", network: "My Network", profile: "My Profile", settings: "Settings" };
   return React.createElement("header", { style: {
-    height: 64, background: bg, borderBottom: `1px solid ${border}`,
-    display: "flex", alignItems: "center", padding: "0 28px", gap: 16,
+    height: isMobile ? 56 : 64, background: bg, borderBottom: `1px solid ${border}`,
+    display: "flex", alignItems: "center", padding: isMobile ? "0 16px" : "0 28px", gap: isMobile ? 10 : 16,
     position: "sticky", top: 0, zIndex: 90, boxShadow: `0 1px 0 ${border}`
   }},
-    React.createElement("div", { style: { fontSize: 18, fontWeight: 800, color: text, fontFamily: "\'Sora\',sans-serif", letterSpacing: "-0.02em", flexShrink: 0 }},
+    React.createElement("div", { style: { fontSize: isMobile ? 16 : 18, fontWeight: 800, color: text, fontFamily: "\'Sora\',sans-serif", letterSpacing: "-0.02em", flexShrink: 0 }},
       pageTitles[activePage] || ""
     ),
     React.createElement("div", { style: { flex: 1 }}),
-    React.createElement("div", { style: { maxWidth: 380, width: "100%", position: "relative" }},
+    React.createElement("div", { style: { maxWidth: isMobile ? 180 : 380, width: "100%", position: "relative" }},
       React.createElement("span", { style: { position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "#94A3B8" }},
         React.createElement(Icon.Search, null)
       ),
@@ -1653,7 +1694,7 @@ function EventsPage({ currentUser, setActivePage, searchQuery }) {
     );
   };
 
-  return /* @__PURE__ */ React.createElement("div", { style: { padding: "24px 28px" } },
+  return /* @__PURE__ */ React.createElement("div", { style: { padding: isMobile ? "16px 12px" : "24px 28px" } },
     selectedEvt && /* @__PURE__ */ React.createElement(EventDetail, { event: selectedEvt }),
     creating && /* @__PURE__ */ React.createElement(CreateEventModal, {
       newEvt, setNewEvt,
@@ -1698,7 +1739,7 @@ function EventsPage({ currentUser, setActivePage, searchQuery }) {
           /* @__PURE__ */ React.createElement("div", { style: { fontSize: 15, fontWeight: 700, color: "#64748B", fontFamily: "'Sora',sans-serif" } }, "No ", catFilter === "All" ? "" : catFilter + " ", "events yet"),
           /* @__PURE__ */ React.createElement("button", { onClick: () => setCreating(true), style: { background: "none", border: "none", color: "#2563EB", cursor: "pointer", fontWeight: 700, fontFamily: "inherit", fontSize: 12, marginTop: 6 } }, "Be the first to create one \u2192")
         )
-      : /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 } },
+      : /* @__PURE__ */ React.createElement("div", { style: { display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3, 1fr)", gap: isMobile ? 12 : 16 } },
           filtered.map((e) => /* @__PURE__ */ React.createElement(EventCard, { key: e.id, event: e }))
         )
   );
@@ -1706,6 +1747,7 @@ function EventsPage({ currentUser, setActivePage, searchQuery }) {
 
 function DiscoverPage({ profiles, setProfiles, onViewProfile, searchQuery, currentUser }) {
   const isDark = useTheme();
+  const isMobile = useMobile();
   const [showAll, setShowAll] = useState({ meet: false, like: false, diverse: false });
   const cu = currentUser || CURRENT_USER;
   const bg = isDark ? "#0F172A" : "#F8FAFC";
@@ -1760,7 +1802,7 @@ function DiscoverPage({ profiles, setProfiles, onViewProfile, searchQuery, curre
     React.createElement("div", { style: { fontSize: 28, marginBottom: 8 }}, icon), msg
   );
   return React.createElement("div", { style: { display: "flex", height: "calc(100vh - 64px)", overflow: "hidden", background: bg }},
-    React.createElement("div", { style: { flex: 1, overflowY: "auto", padding: "24px 28px" }},
+    React.createElement("div", { style: { flex: 1, overflowY: "auto", padding: isMobile ? "16px 12px" : "24px 28px" }},
       isThin && React.createElement("div", { style: { background: isDark?"#1a2744":"#EFF6FF", border: "1.5px solid #BFDBFE", borderRadius: 12, padding: "11px 16px", marginBottom: 20, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }},
         React.createElement("div", { style: { fontSize: 12, color: "#1D4ED8", fontWeight: 600 }}, "\uD83D\uDCA1 Add your background to improve your matches"),
         React.createElement("button", { onClick: ()=>window.dispatchEvent(new CustomEvent("goToProfile")), style: { fontSize: 11, fontWeight: 700, color: "#1D4ED8", background: isDark?"#1e3a8a":"#DBEAFE", border: "none", borderRadius: 8, padding: "5px 12px", cursor: "pointer", fontFamily: "inherit", whiteSpace: "nowrap" }}, "Complete profile \u2192")
@@ -1868,6 +1910,7 @@ function ProfileDetailPage({ profile, onBack, onUpdate, currentUser }) {
 }
 function MyNetworkPage({ profiles, onViewProfile }) {
   const isDark = useTheme();
+  const isMobile = useMobile();
   const bg = isDark ? "#0F172A" : "#F8FAFC";
   const card = isDark ? "#1E293B" : "#fff";
   const bdr = isDark ? "#334155" : "#EEF2F7";
@@ -1996,6 +2039,7 @@ function ProfileSection({ title, children }) {
 }
 function MyProfilePage({ currentUser, setCurrentUser }) {
   const isDark = useTheme();
+  const isMobile = useMobile();
   const [draft, setDraft] = React.useState(currentUser || CURRENT_USER);
   const [saved, setSaved] = React.useState(false);
   const fileInputRef = React.useRef(null);
@@ -2038,7 +2082,7 @@ function MyProfilePage({ currentUser, setCurrentUser }) {
     onFocus: e=>e.target.style.borderColor="#1240a8", onBlur: e=>e.target.style.borderColor=inputBdr
   });
   const fld = (t, val, onChange) => React.createElement("div", { style: { marginBottom: 16 }}, lbl(t), inp(t, val, onChange));
-  return React.createElement("div", { style: { maxWidth: 760, margin: "0 auto", padding: "24px 28px", background: bg, minHeight: "100%" }},
+  return React.createElement("div", { style: { maxWidth: 760, margin: "0 auto", padding: isMobile ? "16px 12px" : "24px 28px", background: bg, minHeight: "100%" }},
     React.createElement("div", { style: { background: isDark?"#2D1E00":"#FFFBEB", border: "1.5px solid #FDE68A", borderRadius: 14, padding: "14px 18px", marginBottom: 20 }},
       React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }},
         React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: isDark?"#FCD34D":"#92400E" }}, "\uD83C\uDFAF Complete your profile for better matches"),
@@ -2060,7 +2104,7 @@ function MyProfilePage({ currentUser, setCurrentUser }) {
           ),
           React.createElement("input", { ref: fileInputRef, type: "file", accept: "image/*", onChange: handlePhotoUpload, style: { display: "none" }})
         ),
-        React.createElement("div", { style: { flex: 1, display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 16px" }},
+        React.createElement("div", { style: { flex: 1, display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: "0 16px" }},
           React.createElement("div", { style: { gridColumn: "1/-1", marginBottom: 12 }}, inp("Full Name", draft.name, v=>setDraft(p=>({...p,name:v})))),
           React.createElement("div", { style: { gridColumn: "1/-1" }}, inp("Hometown", draft.location, v=>setDraft(p=>({...p,location:v}))))
         )
@@ -2072,7 +2116,7 @@ function MyProfilePage({ currentUser, setCurrentUser }) {
           onFocus: e=>e.target.style.borderColor="#1240a8", onBlur: e=>e.target.style.borderColor=inputBdr
         })
       ),
-      React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 16px" }},
+      React.createElement("div", { style: { display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: "0 16px" }},
         fld("Previous Company", draft.prevCompany, v=>setDraft(p=>({...p,prevCompany:v}))),
         fld("Previous Role", draft.prevRole, v=>setDraft(p=>({...p,prevRole:v}))),
         React.createElement("div", { style: { marginBottom: 16 }},
@@ -2478,13 +2522,26 @@ function App() {
         return null;
     }
   };
+  const [isMobile, setIsMobile] = React.useState(() => window.innerWidth < 768);
+  React.useEffect(() => {
+    const handler = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener("resize", handler);
+    return () => window.removeEventListener("resize", handler);
+  }, []);
+  const navPage = activePage === "profileDetail" ? safeBack : activePage;
+  const handleNav = (pg) => { setActivePage(pg); setSelectedProfile(null); };
   return /* @__PURE__ */ React.createElement(ThemeContext.Provider, { value: isDark },
+    React.createElement(MobileContext.Provider, { value: isMobile },
     /* @__PURE__ */ React.createElement(React.Fragment, null,
     showTour && /* @__PURE__ */ React.createElement(ProductTour, { onClose: () => setShowTour(false) }),
-    /* @__PURE__ */ React.createElement("div", { style: { display: "flex", minHeight: "100vh", background: "#F8FAFC", fontFamily: "'Sora',sans-serif" } }, /* @__PURE__ */ React.createElement(Sidebar, { activePage: activePage === "profileDetail" ? safeBack : activePage, setActivePage: (pg) => {
-    setActivePage(pg);
-    setSelectedProfile(null);
-  }, currentUser }), /* @__PURE__ */ React.createElement("div", { style: { marginLeft: 220, flex: 1, display: "flex", flexDirection: "column", minHeight: "100vh" } }, /* @__PURE__ */ React.createElement(TopBar, { searchQuery, setSearchQuery, activePage: activePage === "profileDetail" ? "discover" : activePage, currentUser }), /* @__PURE__ */ React.createElement("main", { style: { flex: 1, overflowY: "auto" } }, renderPage())))));
+    /* @__PURE__ */ React.createElement("div", { style: { display: "flex", minHeight: "100vh", background: "#F8FAFC", fontFamily: "'Sora',sans-serif" } },
+      React.createElement(Sidebar, { activePage: navPage, setActivePage: handleNav, currentUser }),
+      React.createElement("div", { style: { marginLeft: isMobile ? 0 : 220, flex: 1, display: "flex", flexDirection: "column", minHeight: "100vh" } },
+        React.createElement(TopBar, { searchQuery, setSearchQuery, activePage: activePage === "profileDetail" ? "discover" : activePage, currentUser }),
+        React.createElement("main", { style: { flex: 1, overflowY: "auto", paddingBottom: isMobile ? 60 : 0 } }, renderPage()),
+        isMobile && React.createElement(BottomNav, { activePage: navPage, setActivePage: handleNav })
+      )
+    ))));
 }
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(/* @__PURE__ */ React.createElement(App, null));
