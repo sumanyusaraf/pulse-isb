@@ -1484,6 +1484,8 @@ function CreateEventModal({ newEvt, setNewEvt, onClose, onSubmit }) {
 
 
 function EventsPage({ currentUser, setActivePage, searchQuery }) {
+  const isDark = useTheme();
+  const isMobile = useMobile();
   const [joined, setJoined] = React.useState({});
   const [catFilter, setCatFilter] = React.useState("All");
   const [selectedEvt, setSelectedEvt] = React.useState(null);
