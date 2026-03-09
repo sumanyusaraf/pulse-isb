@@ -795,18 +795,6 @@ function Avatar({ name = "", photo, size = 40, radius = 10, extraStyle = {} }) {
     ["#FFF7ED", "#C2410C"]
   ];
   const [bg, fg] = palettes[(name.charCodeAt(0) || 65) % palettes.length];
-  const [broken, setBroken] = React.useState(false);
-  if (photo && !broken) {
-    return /* @__PURE__ */ React.createElement(
-      "img",
-      {
-        src: photo,
-        alt: name,
-        onError: () => setBroken(true),
-        style: { width: size, height: size, borderRadius: radius, objectFit: "cover", flexShrink: 0, display: "block", ...extraStyle }
-      }
-    );
-  }
   return /* @__PURE__ */ React.createElement("div", { style: {
     width: size,
     height: size,
