@@ -2434,6 +2434,12 @@ function App() {
   }, []);
   const [selectedProfile, setSelectedProfile] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isMobile, setIsMobile] = React.useState(() => window.innerWidth < 768);
+  React.useEffect(() => {
+    const handler = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener("resize", handler);
+    return () => window.removeEventListener("resize", handler);
+  }, []);
   useEffect(() => {
     const link = document.createElement("link");
     link.href = "https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800;900&display=swap";
@@ -2522,12 +2528,6 @@ function App() {
         return null;
     }
   };
-  const [isMobile, setIsMobile] = React.useState(() => window.innerWidth < 768);
-  React.useEffect(() => {
-    const handler = () => setIsMobile(window.innerWidth < 768);
-    window.addEventListener("resize", handler);
-    return () => window.removeEventListener("resize", handler);
-  }, []);
   const navPage = activePage === "profileDetail" ? safeBack : activePage;
   const handleNav = (pg) => { setActivePage(pg); setSelectedProfile(null); };
   return /* @__PURE__ */ React.createElement(ThemeContext.Provider, { value: isDark },
