@@ -1501,44 +1501,31 @@ function EventsPage({ currentUser, setActivePage, searchQuery }) {
   const matchPoolNames = matchPool.map((p) => p.name);
 
   const today = new Date(); today.setHours(0,0,0,0);
-  const todayStr = today.toISOString().split("T")[0];
+  const todayStr    = today.toISOString().split("T")[0];
   const tomorrowStr = new Date(today.getTime() + 864e5).toISOString().split("T")[0];
 
-  const dateLabel = (dateStr) => {
-    const diff = Math.round((new Date(dateStr + "T00:00:00") - today) / 864e5);
-    if (diff === 0) return "Today";
-    if (diff === 1) return "Tomorrow";
-    return new Date(dateStr + "T00:00:00").toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short" });
-  };
-
   const CATS = [
-    { id: "All", label: "All", icon: "✦", color: "#1240a8" },
-    { id: "Sports", label: "Sports", icon: "🏃", color: "#F97316" },
-    { id: "Social", label: "Social", icon: "🎉", color: "#EC4899" },
-    { id: "Career", label: "Career", icon: "💼", color: "#8B5CF6" },
-    { id: "Wellness", label: "Wellness", icon: "🧘", color: "#0D9488" },
-    { id: "Talks", label: "Talks", icon: "🎙", color: "#0F766E" }
+    { id: "All",      label: "All",      icon: "✦",  color: "#1240a8" },
+    { id: "Sports",   label: "Sports",   icon: "🏃",  color: "#F97316" },
+    { id: "Social",   label: "Social",   icon: "🎉",  color: "#EC4899" },
+    { id: "Career",   label: "Career",   icon: "💼",  color: "#8B5CF6" },
+    { id: "Wellness", label: "Wellness", icon: "🧘",  color: "#0D9488" },
+    { id: "Talks",    label: "Talks",    icon: "🎙",  color: "#0F766E" }
   ];
 
-  // Mood → maps to categories + vibes. Pulse-original concept.
   const MOODS = [
-    { id: "All",       label: "All vibes",    icon: "✦",  cats: [] },
-    { id: "Energy",    label: "High Energy",  icon: "⚡",  cats: ["Sports"] },
-    { id: "Connect",   label: "Connect",      icon: "🤝",  cats: ["Social"] },
-    { id: "Grow",      label: "Skill Up",     icon: "🚀",  cats: ["Career", "Talks"] },
-    { id: "Restore",   label: "Recharge",     icon: "🌿",  cats: ["Wellness"] }
+    { id: "All",     label: "All vibes",   icon: "✦",  cats: [] },
+    { id: "Energy",  label: "High Energy", icon: "⚡",  cats: ["Sports"] },
+    { id: "Connect", label: "Connect",     icon: "🤝",  cats: ["Social"] },
+    { id: "Grow",    label: "Skill Up",    icon: "🚀",  cats: ["Career", "Talks"] },
+    { id: "Restore", label: "Recharge",    icon: "🌿",  cats: ["Wellness"] }
   ];
 
-  // Buzz = attendees + a seeded "interest" number to make it feel live
-  const getBuzz = (event) => {
-    const seed = (event.id * 7 + event.title.length * 3) % 18;
-    return event.attendees.length + seed + 4;
-  };
-
+  const goingCount = (event) => event.attendees.length + (joined[event.id] ? 1 : 0);
   const toggleJoin = (id) => setJoined((j) => ({ ...j, [id]: !j[id] }));
 
   const filtered = React.useMemo(() => {
-    let base = allEvents;
+    let base = allEvents.filter(e => e.date === todayStr || e.date === tomorrowStr);
     if (catFilter !== "All") base = base.filter((e) => e.category === catFilter);
     if (moodFilter !== "All") {
       const mood = MOODS.find(m => m.id === moodFilter);
@@ -1555,40 +1542,33 @@ function EventsPage({ currentUser, setActivePage, searchQuery }) {
       );
     }
     return [...base].sort((a, b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time));
-  }, [catFilter, moodFilter, allEvents, searchQuery]);
+  }, [catFilter, moodFilter, allEvents, searchQuery, joined]);
 
-  // Top buzzing event today for the Pulse Strip
-  const todayEvents = allEvents.filter(e => e.date === todayStr);
-  const hotEvent = todayEvents.sort((a,b) => getBuzz(b) - getBuzz(a))[0];
-
+  const todayEvents    = filtered.filter(e => e.date === todayStr);
+  const tomorrowEvents = filtered.filter(e => e.date === tomorrowStr);
+  const hotEvent = [...allEvents].filter(e => e.date === todayStr).sort((a,b) => goingCount(b) - goingCount(a))[0];
+  const showHero = hotEvent && moodFilter === "All" && catFilter === "All" && !searchQuery;
   const activeCat = CATS.find((c) => c.id === catFilter) || CATS[0];
 
-  // ── Event Detail Modal ────────────────────────────────────────────────────
+  // ── Event Detail Modal ────────────────────────────────────────────────
   const EventDetail = ({ event }) => {
     const isJoined = joined[event.id];
     const color = (CATS.find((c) => c.id === event.category) || CATS[1]).color;
-    const spots = event.maxSpots === null ? null : event.maxSpots - event.attendees.length;
+    const going = goingCount(event);
+    const spots = event.maxSpots === null ? null : event.maxSpots - going;
+    const fillPct = event.maxSpots ? Math.min(100, Math.round(going / event.maxSpots * 100)) : Math.min(100, Math.round(going / 20 * 100));
     const matchProfiles = event.attendees.filter((n) => matchPoolNames.includes(n)).map((name) => matchPool.find((p) => p.name === name)).filter(Boolean);
-    const buzz = getBuzz(event);
-    const fillPct = event.maxSpots ? Math.min(100, Math.round(buzz / event.maxSpots * 100)) : Math.min(100, Math.round(buzz / 30 * 100));
-    return React.createElement("div", {
-      onClick: () => setSelectedEvt(null),
-      style: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.55)", zIndex: 300, display: "flex", alignItems: "flex-end", justifyContent: "center", backdropFilter: "blur(4px)" }
-    },
-      React.createElement("div", {
-        onClick: e => e.stopPropagation(),
-        style: { background: "#fff", borderRadius: "24px 24px 0 0", width: "100%", maxWidth: 520, maxHeight: "88vh", overflowY: "auto", boxShadow: "0 -8px 40px rgba(0,0,0,0.2)" }
-      },
+    return React.createElement("div", { onClick: () => setSelectedEvt(null), style: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.55)", zIndex: 300, display: "flex", alignItems: "flex-end", justifyContent: "center", backdropFilter: "blur(4px)" }},
+      React.createElement("div", { onClick: e => e.stopPropagation(), style: { background: isDark ? "#1E293B" : "#fff", borderRadius: "24px 24px 0 0", width: "100%", maxWidth: 520, maxHeight: "88vh", overflowY: "auto", boxShadow: "0 -8px 40px rgba(0,0,0,0.2)" }},
         React.createElement("div", { style: { background: `linear-gradient(135deg, ${color} 0%, ${color}CC 100%)`, padding: "24px 24px 20px", position: "relative", borderRadius: "24px 24px 0 0" }},
           React.createElement("button", { onClick: () => setSelectedEvt(null), style: { position: "absolute", top: 16, right: 16, background: "rgba(255,255,255,0.2)", border: "none", borderRadius: "50%", width: 32, height: 32, cursor: "pointer", color: "#fff", fontSize: 16, display: "flex", alignItems: "center", justifyContent: "center" }}, "✕"),
           React.createElement("div", { style: { fontSize: 11, color: "rgba(255,255,255,0.75)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 6 }}, event.icon, " ", event.community, " · ", event.category),
           React.createElement("div", { style: { fontSize: 24, fontWeight: 900, color: "#fff", fontFamily: "'Sora',sans-serif", letterSpacing: "-0.02em", lineHeight: 1.2, marginBottom: 6 }}, event.title),
           event.vibe && React.createElement("div", { style: { fontSize: 13, color: "rgba(255,255,255,0.85)", fontStyle: "italic", marginBottom: 14 }}, '"', event.vibe, '"'),
-          // Buzz bar
-          React.createElement("div", { style: { background: "rgba(255,255,255,0.15)", borderRadius: 8, padding: "10px 14px" }},
+          React.createElement("div", { style: { background: "rgba(255,255,255,0.15)", borderRadius: 10, padding: "10px 14px" }},
             React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }},
-              React.createElement("span", { style: { fontSize: 12, color: "#fff", fontWeight: 700 }}, "🔥 ", buzz, " people interested"),
-              React.createElement("span", { style: { fontSize: 11, color: "rgba(255,255,255,0.75)" }}, event.maxSpots ? `${spots > 0 ? spots : 0} spots left` : "Open event")
+              React.createElement("span", { style: { fontSize: 13, color: "#fff", fontWeight: 700 }}, going, " going"),
+              event.maxSpots && React.createElement("span", { style: { fontSize: 11, color: "rgba(255,255,255,0.75)" }}, spots > 0 ? spots + " spots left" : "Full")
             ),
             React.createElement("div", { style: { background: "rgba(255,255,255,0.2)", borderRadius: 10, height: 5 }},
               React.createElement("div", { style: { width: fillPct + "%", height: "100%", background: "#fff", borderRadius: 10, transition: "width 0.5s ease" }})
@@ -1597,94 +1577,70 @@ function EventsPage({ currentUser, setActivePage, searchQuery }) {
         ),
         React.createElement("div", { style: { padding: "20px 24px" }},
           React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 20 }},
-            [
-              { icon: "🕐", label: "Time", val: event.timeLabel },
-              { icon: "📍", label: "Location", val: event.location },
-              { icon: "👤", label: "Organiser", val: event.createdBy },
-              { icon: "🎟", label: "Spots", val: event.maxSpots === null ? "Open to all" : spots <= 0 ? "Full" : `${spots} of ${event.maxSpots} left` }
-            ].map(({ icon, label, val }) => React.createElement("div", { key: label, style: { background: "#F8FAFC", borderRadius: 12, padding: "12px 14px" }},
+            [{ icon: "🕐", label: "Time", val: event.timeLabel }, { icon: "📍", label: "Location", val: event.location }, { icon: "👤", label: "Organiser", val: event.createdBy }, { icon: "🎟", label: "Spots", val: event.maxSpots === null ? "Open to all" : spots <= 0 ? "Full" : `${spots} of ${event.maxSpots} left` }]
+            .map(({ icon, label, val }) => React.createElement("div", { key: label, style: { background: isDark ? "#0F172A" : "#F8FAFC", borderRadius: 12, padding: "12px 14px" }},
               React.createElement("div", { style: { fontSize: 10, color: "#94A3B8", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 4 }}, icon, " ", label),
-              React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: "#0F172A" }}, val)
+              React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: isDark ? "#F1F5F9" : "#0F172A" }}, val)
             ))
           ),
           matchProfiles.length > 0 && React.createElement("div", { style: { background: color + "0D", border: `1.5px solid ${color}22`, borderRadius: 12, padding: "12px 16px", marginBottom: 20 }},
             React.createElement("div", { style: { fontSize: 12, fontWeight: 800, color: color, marginBottom: 8 }}, "✦ ", matchProfiles.length === 1 ? `${matchProfiles[0].name.split(" ")[0]} is going` : `${matchProfiles.length} of your matches are going`),
             React.createElement("div", { style: { display: "flex", gap: 10, flexWrap: "wrap" }},
               matchProfiles.map((p) => React.createElement("div", { key: p.name, style: { display: "flex", alignItems: "center", gap: 7 }},
-                React.createElement(Avatar, { name: p.name, photo: p.photo, size: 28, radius: 8 }),
-                React.createElement("span", { style: { fontSize: 12, color: "#0F172A", fontWeight: 600 }}, p.name.split(" ")[0])
+                React.createElement(Avatar, { name: p.name, size: 28, radius: 8 }),
+                React.createElement("span", { style: { fontSize: 12, color: isDark ? "#F1F5F9" : "#0F172A", fontWeight: 600 }}, p.name.split(" ")[0])
               ))
             )
           ),
           React.createElement("div", { style: { marginBottom: 20 }},
-            React.createElement("div", { style: { fontSize: 12, fontWeight: 800, color: "#0F172A", marginBottom: 10, textTransform: "uppercase", letterSpacing: "0.05em" }}, "Who's going · ", event.attendees.length),
+            React.createElement("div", { style: { fontSize: 12, fontWeight: 800, color: isDark ? "#F1F5F9" : "#0F172A", marginBottom: 10, textTransform: "uppercase", letterSpacing: "0.05em" }}, "Who's going · ", going),
             event.attendees.length === 0
               ? React.createElement("div", { style: { fontSize: 13, color: "#94A3B8", fontStyle: "italic" }}, "Nobody yet — be the first!")
               : React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 8 }},
-                  event.attendees.map((name) => React.createElement("div", { key: name, style: { display: "flex", alignItems: "center", gap: 7, background: "#F8FAFC", borderRadius: 20, padding: "5px 12px 5px 6px" }},
+                  event.attendees.map((name) => React.createElement("div", { key: name, style: { display: "flex", alignItems: "center", gap: 7, background: isDark ? "#0F172A" : "#F8FAFC", borderRadius: 20, padding: "5px 12px 5px 6px" }},
                     React.createElement(Avatar, { name, size: 24, radius: 12 }),
-                    React.createElement("span", { style: { fontSize: 12, fontWeight: 600, color: "#0F172A" }}, name.split(" ")[0])
+                    React.createElement("span", { style: { fontSize: 12, fontWeight: 600, color: isDark ? "#F1F5F9" : "#0F172A" }}, name.split(" ")[0])
                   ))
                 )
           ),
-          React.createElement("button", {
-            onClick: () => { toggleJoin(event.id); setSelectedEvt(null); },
-            style: { width: "100%", padding: "14px", border: "none", borderRadius: 13, cursor: "pointer", fontWeight: 800, fontSize: 15, fontFamily: "'Sora',sans-serif", background: isJoined ? "#ECFDF5" : color, color: isJoined ? "#059669" : "#fff", boxShadow: isJoined ? "none" : `0 4px 20px ${color}44` }
-          }, isJoined ? "✓ You're going — tap to leave" : "Join this event →")
+          React.createElement("button", { onClick: () => { toggleJoin(event.id); setSelectedEvt(null); }, style: { width: "100%", padding: "14px", border: "none", borderRadius: 13, cursor: "pointer", fontWeight: 800, fontSize: 15, fontFamily: "'Sora',sans-serif", background: isJoined ? "#ECFDF5" : color, color: isJoined ? "#059669" : "#fff", boxShadow: isJoined ? "none" : `0 4px 20px ${color}44` }},
+            isJoined ? "✓ You're going — tap to leave" : "Join this event →"
+          )
         )
       )
     );
   };
 
-  // ── Event Card ────────────────────────────────────────────────────────────
-  const EventCard = ({ event, hero = false }) => {
+  // ── Event Card ────────────────────────────────────────────────────────
+  const EventCard = ({ event, hero }) => {
     const isJoined = joined[event.id];
     const color = (CATS.find((c) => c.id === event.category) || CATS[1]).color;
-    const spots = event.maxSpots === null ? null : event.maxSpots - event.attendees.length;
+    const going = goingCount(event);
+    const spots = event.maxSpots === null ? null : event.maxSpots - going;
+    const fillPct = event.maxSpots ? Math.min(100, Math.round(going / event.maxSpots * 100)) : Math.min(100, Math.round(going / 20 * 100));
     const matchProfiles = event.attendees.filter((n) => matchPoolNames.includes(n)).map((name) => matchPool.find((p) => p.name === name)).filter(Boolean);
-    const buzz = getBuzz(event) + (isJoined ? 1 : 0);
-    const fillPct = event.maxSpots ? Math.min(100, Math.round(buzz / event.maxSpots * 100)) : Math.min(100, Math.round(buzz / 30 * 100));
-    const isToday = event.date === todayStr;
-
     return React.createElement("div", {
-      style: {
-        background: hero ? `linear-gradient(145deg, ${color}F0 0%, ${color} 100%)` : (isDark ? "#1E293B" : "#fff"),
-        borderRadius: hero ? 20 : 18,
-        border: hero ? "none" : `1px solid ${isDark ? "#334155" : "#F0F0F0"}`,
-        overflow: "hidden",
-        boxShadow: hero ? `0 8px 32px ${color}55` : "0 2px 12px rgba(0,0,0,0.06)",
-        cursor: "pointer",
-        transition: "transform 0.18s, box-shadow 0.18s",
-        display: "flex", flexDirection: "column"
-      },
+      style: { background: hero ? `linear-gradient(145deg, ${color}EE 0%, ${color} 100%)` : (isDark ? "#1E293B" : "#fff"), borderRadius: hero ? 20 : 18, border: hero ? "none" : `1px solid ${isDark ? "#334155" : "#F0F0F0"}`, overflow: "hidden", boxShadow: hero ? `0 8px 32px ${color}50` : (isDark ? "0 2px 12px rgba(0,0,0,0.2)" : "0 2px 12px rgba(0,0,0,0.06)"), cursor: "pointer", transition: "transform 0.18s, box-shadow 0.18s", display: "flex", flexDirection: "column" },
       onMouseEnter: e => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = hero ? `0 16px 40px ${color}66` : "0 8px 28px rgba(0,0,0,0.13)"; },
-      onMouseLeave: e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = hero ? `0 8px 32px ${color}55` : "0 2px 12px rgba(0,0,0,0.06)"; },
+      onMouseLeave: e => { e.currentTarget.style.transform = "translateY(0)";   e.currentTarget.style.boxShadow = hero ? `0 8px 32px ${color}50`  : (isDark ? "0 2px 12px rgba(0,0,0,0.2)" : "0 2px 12px rgba(0,0,0,0.06)"); },
       onClick: () => setSelectedEvt(event)
     },
-      !hero && React.createElement("div", { style: { height: 4, background: `linear-gradient(90deg, ${color}, ${color}88)` }}),
+      !hero && React.createElement("div", { style: { height: 4, background: `linear-gradient(90deg, ${color}, ${color}77)` }}),
       React.createElement("div", { style: { padding: hero ? "22px 22px 18px" : "18px 20px 16px", flex: 1, display: "flex", flexDirection: "column" }},
         React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }},
-          React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8 }},
-            React.createElement("span", { style: { fontSize: hero ? 36 : 30, lineHeight: 1 }}, event.icon),
-            isToday && React.createElement("span", { style: { fontSize: 10, fontWeight: 800, background: hero ? "rgba(255,255,255,0.25)" : "#1240a8", color: "#fff", padding: "3px 9px", borderRadius: 20, letterSpacing: "0.04em" }}, "TODAY")
-          ),
-          React.createElement("span", { style: { fontSize: 11, fontWeight: 700, color: hero ? "rgba(255,255,255,0.85)" : color, background: hero ? "rgba(255,255,255,0.15)" : color + "15", padding: "4px 10px", borderRadius: 20 }}, event.category)
+          React.createElement("span", { style: { fontSize: hero ? 36 : 30, lineHeight: 1 }}, event.icon),
+          React.createElement("span", { style: { fontSize: 11, fontWeight: 700, color: hero ? "rgba(255,255,255,0.9)" : color, background: hero ? "rgba(255,255,255,0.18)" : color + "15", padding: "4px 10px", borderRadius: 20 }}, event.category)
         ),
         React.createElement("div", { style: { fontSize: hero ? 20 : 17, fontWeight: 900, color: hero ? "#fff" : (isDark ? "#F1F5F9" : "#0F172A"), fontFamily: "'Sora',sans-serif", letterSpacing: "-0.02em", lineHeight: 1.25, marginBottom: 5 }}, event.title),
         event.vibe && React.createElement("div", { style: { fontSize: 12, color: hero ? "rgba(255,255,255,0.8)" : "#94A3B8", fontStyle: "italic", marginBottom: 12, lineHeight: 1.5 }}, '"', event.vibe, '"'),
         React.createElement("div", { style: { display: "flex", gap: 14, marginBottom: 14, flexWrap: "wrap" }},
-          React.createElement("span", { style: { fontSize: 12, color: hero ? "rgba(255,255,255,0.8)" : (isDark ? "#94A3B8" : "#64748B"), display: "flex", alignItems: "center", gap: 5 }}, "🕐 ", event.timeLabel),
-          React.createElement("span", { style: { fontSize: 12, color: hero ? "rgba(255,255,255,0.8)" : (isDark ? "#94A3B8" : "#64748B"), display: "flex", alignItems: "center", gap: 5 }}, "📍 ", event.location)
+          React.createElement("span", { style: { fontSize: 12, color: hero ? "rgba(255,255,255,0.85)" : (isDark ? "#94A3B8" : "#64748B"), display: "flex", alignItems: "center", gap: 4 }}, "🕐 ", event.timeLabel),
+          React.createElement("span", { style: { fontSize: 12, color: hero ? "rgba(255,255,255,0.85)" : (isDark ? "#94A3B8" : "#64748B"), display: "flex", alignItems: "center", gap: 4 }}, "📍 ", event.location)
         ),
-        // Buzz bar — Pulse's own design language
         React.createElement("div", { style: { marginBottom: 14 }},
           React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 5 }},
-            React.createElement("span", { style: { fontSize: 12, fontWeight: 700, color: hero ? "#fff" : (isDark ? "#CBD5E1" : "#0F172A") }},
-              "🔥 ", buzz, " interested"
-            ),
-            event.maxSpots && React.createElement("span", { style: { fontSize: 11, color: hero ? "rgba(255,255,255,0.7)" : "#94A3B8" }},
-              spots > 0 ? spots + " spots left" : "Full"
-            )
+            React.createElement("span", { style: { fontSize: 12, fontWeight: 700, color: hero ? "#fff" : (isDark ? "#CBD5E1" : "#0F172A") }}, going, " going"),
+            event.maxSpots && React.createElement("span", { style: { fontSize: 11, color: hero ? "rgba(255,255,255,0.7)" : "#94A3B8" }}, spots > 0 ? spots + " spots left" : "Full")
           ),
           React.createElement("div", { style: { background: hero ? "rgba(255,255,255,0.2)" : (isDark ? "#334155" : "#F1F5F9"), borderRadius: 10, height: 5, overflow: "hidden" }},
             React.createElement("div", { style: { width: fillPct + "%", height: "100%", background: hero ? "#fff" : color, borderRadius: 10, transition: "width 0.5s ease" }})
@@ -1694,14 +1650,30 @@ function EventsPage({ currentUser, setActivePage, searchQuery }) {
           "✦ ", matchProfiles.length === 1 ? matchProfiles[0].name.split(" ")[0] + " is going" : matchProfiles.length + " of your matches are going"
         ),
         React.createElement("div", { style: { marginTop: "auto" }},
-          React.createElement("button", {
-            onClick: e => { e.stopPropagation(); toggleJoin(event.id); },
-            style: { width: "100%", padding: "10px", border: hero ? "2px solid rgba(255,255,255,0.5)" : "none", borderRadius: 11, cursor: "pointer", fontWeight: 700, fontSize: 13, fontFamily: "'Sora',sans-serif", background: isJoined ? (hero ? "rgba(255,255,255,0.25)" : "#ECFDF5") : (hero ? "rgba(255,255,255,0.2)" : color), color: isJoined ? (hero ? "#fff" : "#059669") : "#fff", transition: "all 0.15s" }
-          }, isJoined ? "✓ Going" : "Count me in →")
+          React.createElement("button", { onClick: e => { e.stopPropagation(); toggleJoin(event.id); }, style: { width: "100%", padding: "10px", border: hero ? "2px solid rgba(255,255,255,0.45)" : "none", borderRadius: 11, cursor: "pointer", fontWeight: 700, fontSize: 13, fontFamily: "'Sora',sans-serif", background: isJoined ? (hero ? "rgba(255,255,255,0.25)" : "#ECFDF5") : (hero ? "rgba(255,255,255,0.15)" : color), color: isJoined ? (hero ? "#fff" : "#059669") : "#fff", transition: "all 0.15s" }},
+            isJoined ? "✓ Going" : "Count me in →"
+          )
         )
       )
     );
   };
+
+  // ── Date Group ────────────────────────────────────────────────────────
+  const DateGroup = ({ label, events }) => {
+    if (events.length === 0) return null;
+    return React.createElement("div", { style: { marginBottom: 32 }},
+      React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }},
+        React.createElement("div", { style: { fontSize: 18, fontWeight: 900, color: isDark ? "#F1F5F9" : "#0F172A", fontFamily: "'Sora',sans-serif", letterSpacing: "-0.02em" }}, label),
+        React.createElement("div", { style: { fontSize: 12, fontWeight: 600, color: "#94A3B8", background: isDark ? "#1E293B" : "#F1F5F9", borderRadius: 20, padding: "3px 10px" }}, events.length, " event", events.length !== 1 ? "s" : ""),
+        React.createElement("div", { style: { flex: 1, height: 1, background: isDark ? "#334155" : "#E2E8F0" }})
+      ),
+      React.createElement("div", { style: { display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3, 1fr)", gap: isMobile ? 12 : 16 }},
+        events.map(e => React.createElement(EventCard, { key: e.id, event: e }))
+      )
+    );
+  };
+
+  const noResults = todayEvents.length === 0 && tomorrowEvents.length === 0;
 
   return React.createElement("div", { style: { padding: isMobile ? "16px 12px" : "24px 28px" }},
     selectedEvt && React.createElement(EventDetail, { event: selectedEvt }),
@@ -1718,56 +1690,50 @@ function EventsPage({ currentUser, setActivePage, searchQuery }) {
       }
     }),
 
-    /* ── Top bar: count + create button ── */
     React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }},
-      React.createElement("div", { style: { fontSize: 13, color: isDark ? "#94A3B8" : "#64748B" }}, filtered.length, " upcoming event", filtered.length !== 1 ? "s" : ""),
+      React.createElement("div", { style: { fontSize: 13, color: isDark ? "#94A3B8" : "#64748B" }},
+        (todayEvents.length + tomorrowEvents.length), " event", (todayEvents.length + tomorrowEvents.length) !== 1 ? "s" : "", " in the next 2 days"
+      ),
       React.createElement("button", { onClick: () => setCreating(true), style: { padding: "9px 20px", background: "linear-gradient(135deg,#1240a8,#1a50c8)", color: "#fff", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 13, fontFamily: "'Sora',sans-serif", cursor: "pointer", boxShadow: "0 2px 12px rgba(18,64,168,0.3)" }}, "+ Create Event")
     ),
 
-    /* ── Pulse Strip: today's hottest event ── */
-    hotEvent && React.createElement("div", { style: { marginBottom: 24 }},
+    showHero && React.createElement("div", { style: { marginBottom: 28 }},
       React.createElement("div", { style: { fontSize: 11, fontWeight: 800, color: isDark ? "#94A3B8" : "#64748B", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 10, display: "flex", alignItems: "center", gap: 6 }},
-        React.createElement("span", { style: { display: "inline-block", width: 7, height: 7, borderRadius: "50%", background: "#EF4444", boxShadow: "0 0 0 3px rgba(239,68,68,0.2)", animation: "dashPulse 1.5s infinite" }}),
-        "Happening Today"
+        React.createElement("span", { style: { width: 7, height: 7, borderRadius: "50%", background: "#EF4444", boxShadow: "0 0 0 3px rgba(239,68,68,0.2)", display: "inline-block", animation: "dashPulse 1.5s infinite" }}),
+        "Most popular today"
       ),
       React.createElement(EventCard, { event: hotEvent, hero: true })
     ),
 
-    /* ── Mood filter chips ── */
-    React.createElement("div", { style: { display: "flex", gap: 8, marginBottom: 14, overflowX: "auto", paddingBottom: 4 }},
+    React.createElement("div", { style: { display: "flex", gap: 8, marginBottom: 12, overflowX: "auto", paddingBottom: 2 }},
       MOODS.map(mood => {
         const active = moodFilter === mood.id;
-        return React.createElement("button", {
-          key: mood.id, onClick: () => { setMoodFilter(mood.id); setCatFilter("All"); },
-          style: { padding: "7px 16px", borderRadius: 22, cursor: "pointer", fontFamily: "'Sora',sans-serif", whiteSpace: "nowrap", border: `1.5px solid ${active ? "#1240a8" : (isDark ? "#334155" : "#E2E8F0")}`, background: active ? "#1240a8" : "transparent", color: active ? "#fff" : (isDark ? "#94A3B8" : "#64748B"), fontSize: 12, fontWeight: active ? 700 : 500, transition: "all 0.15s", display: "flex", alignItems: "center", gap: 5 }
-        }, mood.icon, " ", mood.label);
+        return React.createElement("button", { key: mood.id, onClick: () => { setMoodFilter(mood.id); setCatFilter("All"); }, style: { padding: "7px 16px", borderRadius: 22, cursor: "pointer", fontFamily: "'Sora',sans-serif", whiteSpace: "nowrap", border: `1.5px solid ${active ? "#1240a8" : (isDark ? "#334155" : "#E2E8F0")}`, background: active ? "#1240a8" : "transparent", color: active ? "#fff" : (isDark ? "#94A3B8" : "#64748B"), fontSize: 12, fontWeight: active ? 700 : 500, transition: "all 0.15s", display: "flex", alignItems: "center", gap: 5 }},
+          mood.icon, " ", mood.label
+        );
       })
     ),
 
-    /* ── Category filter chips ── */
-    React.createElement("div", { style: { display: "flex", gap: 8, marginBottom: 24, flexWrap: "wrap" }},
+    React.createElement("div", { style: { display: "flex", gap: 8, marginBottom: 28, flexWrap: "wrap" }},
       CATS.map((cat) => {
         const active = catFilter === cat.id;
-        const count = cat.id === "All" ? allEvents.length : allEvents.filter((e) => e.category === cat.id).length;
-        return React.createElement("button", {
-          key: cat.id, onClick: () => { setCatFilter(cat.id); setMoodFilter("All"); },
-          style: { padding: "6px 13px", borderRadius: 22, cursor: "pointer", fontFamily: "'Sora',sans-serif", border: `1.5px solid ${active ? cat.color : (isDark ? "#334155" : "#E2E8F0")}`, background: active ? cat.color : "transparent", color: active ? "#fff" : (isDark ? "#94A3B8" : "#64748B"), fontSize: 12, fontWeight: active ? 700 : 500, display: "flex", alignItems: "center", gap: 5, transition: "all 0.15s", boxShadow: active ? `0 2px 10px ${cat.color}40` : "none" }
-        },
-          React.createElement("span", null, cat.icon), cat.label,
+        const count = cat.id === "All" ? allEvents.filter(e => e.date === todayStr || e.date === tomorrowStr).length : allEvents.filter(e => e.category === cat.id && (e.date === todayStr || e.date === tomorrowStr)).length;
+        return React.createElement("button", { key: cat.id, onClick: () => { setCatFilter(cat.id); setMoodFilter("All"); }, style: { padding: "6px 13px", borderRadius: 22, cursor: "pointer", fontFamily: "'Sora',sans-serif", border: `1.5px solid ${active ? cat.color : (isDark ? "#334155" : "#E2E8F0")}`, background: active ? cat.color : "transparent", color: active ? "#fff" : (isDark ? "#94A3B8" : "#64748B"), fontSize: 12, fontWeight: active ? 700 : 500, display: "flex", alignItems: "center", gap: 5, transition: "all 0.15s", boxShadow: active ? `0 2px 10px ${cat.color}40` : "none" }},
+          cat.icon, " ", cat.label,
           React.createElement("span", { style: { fontSize: 10, background: active ? "rgba(255,255,255,0.25)" : cat.color + "18", color: active ? "#fff" : cat.color, borderRadius: 10, padding: "1px 6px", fontWeight: 700 }}, count)
         );
       })
     ),
 
-    /* ── Events grid ── */
-    filtered.length === 0
+    noResults
       ? React.createElement("div", { style: { textAlign: "center", padding: "60px 20px", background: isDark ? "#1E293B" : "#F8FAFC", borderRadius: 16, border: `1.5px dashed ${isDark ? "#334155" : "#E2E8F0"}` }},
           React.createElement("div", { style: { fontSize: 32, marginBottom: 10 }}, activeCat.icon),
-          React.createElement("div", { style: { fontSize: 15, fontWeight: 700, color: isDark ? "#94A3B8" : "#64748B", fontFamily: "'Sora',sans-serif" }}, "No events here yet"),
+          React.createElement("div", { style: { fontSize: 15, fontWeight: 700, color: isDark ? "#94A3B8" : "#64748B", fontFamily: "'Sora',sans-serif" }}, "No events in the next 2 days"),
           React.createElement("button", { onClick: () => setCreating(true), style: { background: "none", border: "none", color: "#2563EB", cursor: "pointer", fontWeight: 700, fontFamily: "inherit", fontSize: 12, marginTop: 6 }}, "Be the first to create one →")
         )
-      : React.createElement("div", { style: { display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3, 1fr)", gap: isMobile ? 12 : 16 }},
-          filtered.filter(e => !(hotEvent && e.id === hotEvent.id && moodFilter === "All" && catFilter === "All" && !searchQuery)).map((e) => React.createElement(EventCard, { key: e.id, event: e }))
+      : React.createElement(React.Fragment, null,
+          React.createElement(DateGroup, { label: "Today",    events: todayEvents.filter(e => !(showHero && hotEvent && e.id === hotEvent.id)) }),
+          React.createElement(DateGroup, { label: "Tomorrow", events: tomorrowEvents })
         )
   );
 }
