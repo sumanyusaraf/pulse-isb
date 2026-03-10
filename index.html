@@ -1488,7 +1488,6 @@ function EventsPage({ currentUser, setActivePage, searchQuery }) {
   const isMobile = useMobile();
   const [joined, setJoined] = React.useState({});
   const [catFilter, setCatFilter] = React.useState("All");
-  const [moodFilter, setMoodFilter] = React.useState("All");
   const [selectedEvt, setSelectedEvt] = React.useState(null);
   const [creating, setCreating] = React.useState(false);
   const [allEvents, setAllEvents] = React.useState(SAMPLE_EVENTS);
@@ -1513,13 +1512,6 @@ function EventsPage({ currentUser, setActivePage, searchQuery }) {
     { id: "Talks",    label: "Talks",    icon: "🎙",  color: "#0F766E" }
   ];
 
-  const MOODS = [
-    { id: "All",     label: "All vibes",   icon: "✦",  cats: [] },
-    { id: "Energy",  label: "High Energy", icon: "⚡",  cats: ["Sports"] },
-    { id: "Connect", label: "Connect",     icon: "🤝",  cats: ["Social"] },
-    { id: "Grow",    label: "Skill Up",    icon: "🚀",  cats: ["Career", "Talks"] },
-    { id: "Restore", label: "Recharge",    icon: "🌿",  cats: ["Wellness"] }
-  ];
 
   const goingCount = (event) => event.attendees.length + (joined[event.id] ? 1 : 0);
   const toggleJoin = (id) => setJoined((j) => ({ ...j, [id]: !j[id] }));
@@ -1527,10 +1519,6 @@ function EventsPage({ currentUser, setActivePage, searchQuery }) {
   const filtered = React.useMemo(() => {
     let base = allEvents.filter(e => e.date === todayStr || e.date === tomorrowStr);
     if (catFilter !== "All") base = base.filter((e) => e.category === catFilter);
-    if (moodFilter !== "All") {
-      const mood = MOODS.find(m => m.id === moodFilter);
-      if (mood && mood.cats.length) base = base.filter(e => mood.cats.includes(e.category));
-    }
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
       base = base.filter(e =>
@@ -1542,12 +1530,12 @@ function EventsPage({ currentUser, setActivePage, searchQuery }) {
       );
     }
     return [...base].sort((a, b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time));
-  }, [catFilter, moodFilter, allEvents, searchQuery, joined]);
+  }, [catFilter, allEvents, searchQuery, joined]);
 
   const todayEvents    = filtered.filter(e => e.date === todayStr);
   const tomorrowEvents = filtered.filter(e => e.date === tomorrowStr);
   const hotEvent = [...allEvents].filter(e => e.date === todayStr).sort((a,b) => goingCount(b) - goingCount(a))[0];
-  const showHero = hotEvent && moodFilter === "All" && catFilter === "All" && !searchQuery;
+  const showHero = hotEvent && catFilter === "All" && !searchQuery;
   const activeCat = CATS.find((c) => c.id === catFilter) || CATS[0];
 
   // ── Event Detail Modal ────────────────────────────────────────────────
@@ -1705,20 +1693,12 @@ function EventsPage({ currentUser, setActivePage, searchQuery }) {
       React.createElement(EventCard, { event: hotEvent, hero: true })
     ),
 
-    React.createElement("div", { style: { display: "flex", gap: 8, marginBottom: 12, overflowX: "auto", paddingBottom: 2 }},
-      MOODS.map(mood => {
-        const active = moodFilter === mood.id;
-        return React.createElement("button", { key: mood.id, onClick: () => { setMoodFilter(mood.id); setCatFilter("All"); }, style: { padding: "7px 16px", borderRadius: 22, cursor: "pointer", fontFamily: "'Sora',sans-serif", whiteSpace: "nowrap", border: `1.5px solid ${active ? "#1240a8" : (isDark ? "#334155" : "#E2E8F0")}`, background: active ? "#1240a8" : "transparent", color: active ? "#fff" : (isDark ? "#94A3B8" : "#64748B"), fontSize: 12, fontWeight: active ? 700 : 500, transition: "all 0.15s", display: "flex", alignItems: "center", gap: 5 }},
-          mood.icon, " ", mood.label
-        );
-      })
-    ),
 
     React.createElement("div", { style: { display: "flex", gap: 8, marginBottom: 28, flexWrap: "wrap" }},
       CATS.map((cat) => {
         const active = catFilter === cat.id;
         const count = cat.id === "All" ? allEvents.filter(e => e.date === todayStr || e.date === tomorrowStr).length : allEvents.filter(e => e.category === cat.id && (e.date === todayStr || e.date === tomorrowStr)).length;
-        return React.createElement("button", { key: cat.id, onClick: () => { setCatFilter(cat.id); setMoodFilter("All"); }, style: { padding: "6px 13px", borderRadius: 22, cursor: "pointer", fontFamily: "'Sora',sans-serif", border: `1.5px solid ${active ? cat.color : (isDark ? "#334155" : "#E2E8F0")}`, background: active ? cat.color : "transparent", color: active ? "#fff" : (isDark ? "#94A3B8" : "#64748B"), fontSize: 12, fontWeight: active ? 700 : 500, display: "flex", alignItems: "center", gap: 5, transition: "all 0.15s", boxShadow: active ? `0 2px 10px ${cat.color}40` : "none" }},
+        return React.createElement("button", { key: cat.id, onClick: () => setCatFilter(cat.id), style: { padding: "6px 13px", borderRadius: 22, cursor: "pointer", fontFamily: "'Sora',sans-serif", border: `1.5px solid ${active ? cat.color : (isDark ? "#334155" : "#E2E8F0")}`, background: active ? cat.color : "transparent", color: active ? "#fff" : (isDark ? "#94A3B8" : "#64748B"), fontSize: 12, fontWeight: active ? 700 : 500, display: "flex", alignItems: "center", gap: 5, transition: "all 0.15s", boxShadow: active ? `0 2px 10px ${cat.color}40` : "none" }},
           cat.icon, " ", cat.label,
           React.createElement("span", { style: { fontSize: 10, background: active ? "rgba(255,255,255,0.25)" : cat.color + "18", color: active ? "#fff" : cat.color, borderRadius: 10, padding: "1px 6px", fontWeight: 700 }}, count)
         );
