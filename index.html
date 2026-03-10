@@ -10,7 +10,7 @@
   <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin></script>
 <style>
     *, *::before, *::after { box-sizing: border-box; }
-    body { margin: 0; font-family: 'Sora', sans-serif; background: #F8FAFC; }
+    body { margin: 0; font-family: 'Sora', sans-serif; background: #F8FAFC; font-size: 15px; }
     @keyframes cardIn {
       from { opacity: 0; transform: translateY(8px); }
       to   { opacity: 1; transform: translateY(0); }
@@ -853,7 +853,7 @@ function Sidebar({ activePage, setActivePage, currentUser }) {
         React.createElement("svg", { width: 32, height: 32, viewBox: "0 0 32 32", style: { flexShrink: 0 } }, React.createElement("rect", { width: 32, height: 32, rx: 8, fill: "#1a50c8" }), React.createElement("polyline", { points: "3,16 9,16 12,8 16.5,24 20,4 23.5,19 26,16 29,16", stroke: "white", strokeWidth: 2.4, fill: "none", strokeLinecap: "round", strokeLinejoin: "round" })),
         React.createElement("div", null,
           React.createElement("div", { style: { color: "#fff", fontWeight: 900, fontSize: 17, fontFamily: "'Sora',sans-serif", letterSpacing: "-0.02em" }}, "Pulse"),
-          React.createElement("div", { style: { color: "#93C5FD", fontSize: 10, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase" }}, "Where ISB Co'27 lives 24/7")
+          React.createElement("div", { style: { color: "#93C5FD", fontSize: 9, fontWeight: 500, letterSpacing: "0.01em", lineHeight: 1.4 }}, "The live pulse of ISB Co'27")
         )
       )
     ),
@@ -975,7 +975,7 @@ function TopBar({ searchQuery, setSearchQuery, activePage, currentUser }) {
     display: "flex", alignItems: "center", padding: isMobile ? "0 16px" : "0 28px", gap: isMobile ? 10 : 16,
     position: "sticky", top: 0, zIndex: 90, boxShadow: `0 1px 0 ${border}`
   }},
-    React.createElement("div", { style: { fontSize: isMobile ? 16 : 18, fontWeight: 800, color: text, fontFamily: "\'Sora\',sans-serif", letterSpacing: "-0.02em", flexShrink: 0 }},
+    React.createElement("div", { style: { fontSize: isMobile ? 14 : 16, fontWeight: 800, color: text, fontFamily: "\'Sora\',sans-serif", letterSpacing: "-0.02em", flexShrink: 0 }},
       pageTitles[activePage] || ""
     ),
     React.createElement("div", { style: { flex: 1 }}),
@@ -1509,7 +1509,7 @@ function EventsPage({ currentUser, setActivePage, searchQuery }) {
           React.createElement("span", { style: { fontSize: hero ? 36 : 30, lineHeight: 1 }}, event.icon),
           React.createElement("span", { style: { fontSize: 11, fontWeight: 700, color: hero ? "rgba(255,255,255,0.9)" : color, background: hero ? "rgba(255,255,255,0.18)" : color + "15", padding: "4px 10px", borderRadius: 20 }}, event.category)
         ),
-        React.createElement("div", { style: { fontSize: hero ? 20 : 17, fontWeight: 900, color: hero ? "#fff" : (isDark ? "#F1F5F9" : "#0F172A"), fontFamily: "'Sora',sans-serif", letterSpacing: "-0.02em", lineHeight: 1.25, marginBottom: 5 }}, event.title),
+        React.createElement("div", { style: { fontSize: hero ? 18 : 15, fontWeight: 900, color: hero ? "#fff" : (isDark ? "#F1F5F9" : "#0F172A"), fontFamily: "'Sora',sans-serif", letterSpacing: "-0.02em", lineHeight: 1.25, marginBottom: 5 }}, event.title),
         event.vibe && React.createElement("div", { style: { fontSize: 12, color: hero ? "rgba(255,255,255,0.8)" : "#94A3B8", fontStyle: "italic", marginBottom: 12, lineHeight: 1.5 }}, '"', event.vibe, '"'),
         React.createElement("div", { style: { display: "flex", gap: 14, marginBottom: 14, flexWrap: "wrap" }},
           React.createElement("span", { style: { fontSize: 12, color: hero ? "rgba(255,255,255,0.85)" : (isDark ? "#94A3B8" : "#64748B"), display: "flex", alignItems: "center", gap: 4 }}, "\uD83D\uDD50 ", event.timeLabel),
