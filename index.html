@@ -19,6 +19,10 @@
       0%, 100% { opacity: 1; transform: scale(1); }
       50%       { opacity: 0.4; transform: scale(0.8); }
     }
+    @keyframes shimmer {
+      0%   { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
     select option { color: #0F172A; background: #fff; }
     ::-webkit-scrollbar { width: 5px; }
     ::-webkit-scrollbar-track { background: transparent; }
@@ -493,197 +497,98 @@ const SAMPLE_PROFILES = [
   }
 ];
 function getEventDate(daysFromNow) {
-  const d = /* @__PURE__ */ new Date();
+  const d = new Date();
   d.setDate(d.getDate() + daysFromNow);
-  return d.toISOString().split("T")[0];
+  return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
 }
 const SAMPLE_EVENTS = [
-  // LIVE RIGHT NOW
-  {
-    id: 1, live: true,
-    title: "Poker Night",
-    community: "Poker Club",
-    category: "Social",
-    location: "Block 3 Common Room",
-    date: getEventDate(0), time: "21:00", timeLabel: "9 PM \u2013 Midnight",
-    campus: "Hyderabad",
-    vibe: "\u20B9500 buy-in. Snacks on us. Last few seats.",
-    createdBy: "Karan Malhotra",
-    attendees: ["Arjun Mehta", "Priya Sharma", "Rahul Nair", "Vikram Singh", "Kabir Sethi"],
-    maxSpots: 8, color: "#F59E0B", icon: "\uD83C\uDCCF"
-  },
+  // LIVE RIGHT NOW — Social (counts in Social chip)
+  { id:1, live:true, title:"Poker Night", community:"Poker Club", category:"Social",
+    location:"Block 3 Common Room", date:getEventDate(0), time:"21:00", timeLabel:"9 PM \u2013 Midnight",
+    campus:"Hyderabad", vibe:"\u20B9500 buy-in. Snacks on us. Last few seats.",
+    createdBy:"Karan Malhotra", attendees:["Arjun Mehta","Priya Sharma","Rahul Nair","Vikram Singh","Kabir Sethi"],
+    maxSpots:8, color:"#F59E0B", icon:"\uD83C\uDCCF" },
+
   // TODAY
-  {
-    id: 2,
-    title: "Morning Run",
-    community: "Running Club",
-    category: "Sports",
-    location: "Campus Loop, Main Gate",
-    date: getEventDate(0), time: "05:45", timeLabel: "5:45 AM",
-    campus: "Hyderabad",
-    vibe: "Easy 5K. Chai at the end.",
-    createdBy: "Meera Iyer",
-    attendees: ["Sneha Reddy", "Divya Patel", "Ananya Krishnan"],
-    maxSpots: 20, color: "#10B981", icon: "\uD83C\uDFC3"
-  },
-  {
-    id: 3,
-    title: "Coffee Chat: AI & Tech",
-    community: "AI & Tech Club",
-    category: "Career",
-    location: "Dhaba, Main Campus",
-    date: getEventDate(0), time: "10:00", timeLabel: "10 AM",
-    campus: "Hyderabad",
-    vibe: "No decks. Just chai and ideas.",
-    createdBy: "Kabir Sethi",
-    attendees: ["Vikram Singh", "Sneha Reddy", "Aditya Banerjee", "Divya Patel"],
-    maxSpots: 15, color: "#0EA5E9", icon: "\u2615"
-  },
-  {
-    id: 4,
-    title: "AMA: Consulting Recruiting",
-    community: "Consulting Club",
-    category: "Career",
-    location: "Auditorium, Block 1",
-    date: getEventDate(0), time: "16:00", timeLabel: "4 PM",
-    campus: "Hyderabad",
-    vibe: "Ask McKinsey, BCG & Bain folks anything.",
-    createdBy: "Tanvi Mehrotra",
-    attendees: ["Arjun Mehta", "Priya Sharma", "Rahul Nair", "Meera Iyer", "Nisha Agarwal", "Rohan Gupta"],
-    maxSpots: null, color: "#8B5CF6", icon: "\uD83C\uDFAF"
-  },
-  {
-    id: 5,
-    title: "Case Prep Session",
-    community: "Consulting Club",
-    category: "Career",
-    location: "Case Room 2, Academic Block",
-    date: getEventDate(0), time: "19:00", timeLabel: "7 PM",
-    campus: "Hyderabad",
-    vibe: "Pairs practice. Bring your frameworks.",
-    createdBy: "Siddharth Rao",
-    attendees: ["Aditya Banerjee", "Pooja Venkataraman", "Varun Khanna"],
-    maxSpots: 10, color: "#6366F1", icon: "\uD83D\uDCDD"
-  },
-  {
-    id: 6,
-    title: "Jam Session",
-    community: "Music Club",
-    category: "Social",
-    location: "Music Room, Student Centre",
-    date: getEventDate(0), time: "22:00", timeLabel: "10 PM",
-    campus: "Hyderabad",
-    vibe: "Bring your instrument. Or just your ears.",
-    createdBy: "Amit Sharma",
-    attendees: ["Shreya Joshi", "Karan Malhotra"],
-    maxSpots: 20, color: "#EC4899", icon: "\uD83C\uDFB8"
-  },
+  { id:2, title:"Morning Run", community:"Running Club", category:"Sports",
+    location:"Campus Loop, Main Gate", date:getEventDate(0), time:"05:45", timeLabel:"5:45 AM",
+    campus:"Hyderabad", vibe:"Easy 5K. Chai at the end.",
+    createdBy:"Meera Iyer", attendees:["Sneha Reddy","Divya Patel","Ananya Krishnan"],
+    maxSpots:20, color:"#10B981", icon:"\uD83C\uDFC3" },
+  { id:3, title:"Coffee Chat: AI & Tech", community:"AI & Tech Club", category:"Career",
+    location:"Dhaba, Main Campus", date:getEventDate(0), time:"10:00", timeLabel:"10 AM",
+    campus:"Hyderabad", vibe:"No decks. Just chai and ideas.",
+    createdBy:"Kabir Sethi", attendees:["Vikram Singh","Sneha Reddy","Aditya Banerjee","Divya Patel"],
+    maxSpots:15, color:"#0EA5E9", icon:"\u2615" },
+  { id:15, title:"Evening Meditation", community:"Wellness Club", category:"Wellness",
+    location:"Amphitheatre Lawn", date:getEventDate(0), time:"18:30", timeLabel:"6:30 PM",
+    campus:"Hyderabad", vibe:"Switch off. 30 mins of quiet.",
+    createdBy:"Divya Patel", attendees:["Sneha Reddy","Meera Iyer"],
+    maxSpots:20, color:"#0D9488", icon:"\uD83C\uDF19" },
+  { id:4, title:"AMA: Consulting Recruiting", community:"Consulting Club", category:"Career",
+    location:"Auditorium, Block 1", date:getEventDate(0), time:"16:00", timeLabel:"4 PM",
+    campus:"Hyderabad", vibe:"Ask McKinsey, BCG & Bain folks anything.",
+    createdBy:"Tanvi Mehrotra", attendees:["Arjun Mehta","Priya Sharma","Rahul Nair","Meera Iyer","Nisha Agarwal","Rohan Gupta"],
+    maxSpots:null, color:"#8B5CF6", icon:"\uD83C\uDFAF" },
+  { id:6, title:"Jam Session", community:"Music Club", category:"Social",
+    location:"Music Room, Student Centre", date:getEventDate(0), time:"22:00", timeLabel:"10 PM",
+    campus:"Hyderabad", vibe:"Bring your instrument. Or just your ears.",
+    createdBy:"Amit Sharma", attendees:["Shreya Joshi","Karan Malhotra"],
+    maxSpots:20, color:"#EC4899", icon:"\uD83C\uDFB8" },
+
   // TOMORROW
-  {
-    id: 7,
-    title: "Cricket Nets",
-    community: "Cricket Club",
-    category: "Sports",
-    location: "Main Turf, Block 12",
-    date: getEventDate(1), time: "06:00", timeLabel: "6 AM",
-    campus: "Hyderabad",
-    vibe: "Competitive but chill. Batting + bowling.",
-    createdBy: "Arjun Mehta",
-    attendees: ["Rahul Nair", "Vikram Singh", "Karan Malhotra", "Aditya Banerjee", "Siddharth Rao"],
-    maxSpots: 11, color: "#F97316", icon: "\uD83C\uDFCF"
-  },
-  {
-    id: 8,
-    title: "Yoga & Meditation",
-    community: "Wellness Club",
-    category: "Wellness",
-    location: "Lawn outside Cafeteria",
-    date: getEventDate(1), time: "07:00", timeLabel: "7 AM",
-    campus: "Hyderabad",
-    vibe: "Mats provided. Start the day right.",
-    createdBy: "Divya Patel",
-    attendees: ["Sneha Reddy", "Meera Iyer", "Ananya Krishnan"],
-    maxSpots: 15, color: "#0D9488", icon: "\uD83E\uDDD8"
-  },
-  {
-    id: 9,
-    title: "VC Pitch Circle",
-    community: "VC & Startups Club",
-    category: "Career",
-    location: "Library Discussion Room 2",
-    date: getEventDate(1), time: "19:00", timeLabel: "7 PM",
-    campus: "Hyderabad",
-    vibe: "Bring one deal you'd back.",
-    createdBy: "Priya Sharma",
-    attendees: ["Arjun Mehta", "Vikram Singh", "Kabir Sethi", "Rohan Gupta"],
-    maxSpots: 6, color: "#8B5CF6", icon: "\uD83D\uDCBC"
-  },
-  {
-    id: 10,
-    title: "Sunday Brunch Run",
-    community: "Running Club",
-    category: "Sports",
-    location: "Gachibowli Stadium Loop",
-    date: getEventDate(1), time: "08:00", timeLabel: "8 AM",
-    campus: "Hyderabad",
-    vibe: "8K recovery run. Brunch after at Dhaba.",
-    createdBy: "Sneha Reddy",
-    attendees: ["Meera Iyer", "Varun Khanna", "Divya Patel"],
-    maxSpots: 25, color: "#10B981", icon: "\uD83C\uDFC5"
-  },
+  { id:7, title:"Cricket Nets", community:"Cricket Club", category:"Sports",
+    location:"Main Turf, Block 12", date:getEventDate(1), time:"06:00", timeLabel:"6 AM",
+    campus:"Hyderabad", vibe:"Competitive but chill. Batting + bowling.",
+    createdBy:"Arjun Mehta", attendees:["Rahul Nair","Vikram Singh","Karan Malhotra","Aditya Banerjee","Siddharth Rao"],
+    maxSpots:11, color:"#F97316", icon:"\uD83C\uDFCF" },
+  { id:10, title:"Sunday Brunch Run", community:"Running Club", category:"Sports",
+    location:"Gachibowli Stadium Loop", date:getEventDate(1), time:"08:00", timeLabel:"8 AM",
+    campus:"Hyderabad", vibe:"8K recovery run. Brunch after at Dhaba.",
+    createdBy:"Sneha Reddy", attendees:["Meera Iyer","Varun Khanna","Divya Patel"],
+    maxSpots:25, color:"#10B981", icon:"\uD83C\uDFC5" },
+  { id:8, title:"Yoga & Meditation", community:"Wellness Club", category:"Wellness",
+    location:"Lawn outside Cafeteria", date:getEventDate(1), time:"07:00", timeLabel:"7 AM",
+    campus:"Hyderabad", vibe:"Mats provided. Start the day right.",
+    createdBy:"Divya Patel", attendees:["Sneha Reddy","Meera Iyer","Ananya Krishnan"],
+    maxSpots:15, color:"#0D9488", icon:"\uD83E\uDDD8" },
+  { id:9, title:"VC Pitch Circle", community:"VC & Startups Club", category:"Career",
+    location:"Library Discussion Room 2", date:getEventDate(1), time:"19:00", timeLabel:"7 PM",
+    campus:"Hyderabad", vibe:"Bring one deal you'd back.",
+    createdBy:"Priya Sharma", attendees:["Arjun Mehta","Vikram Singh","Kabir Sethi","Rohan Gupta"],
+    maxSpots:6, color:"#8B5CF6", icon:"\uD83D\uDCBC" },
+
   // THIS WEEK
-  {
-    id: 11,
-    title: "Alumni Talk: Life at BCG",
-    community: "Consulting Club",
-    category: "Talks",
-    location: "Auditorium, Block 1",
-    date: getEventDate(2), time: "18:00", timeLabel: "6 PM",
-    campus: "Hyderabad",
-    vibe: "PGP '22 alum. Unfiltered QnA.",
-    createdBy: "Tanvi Mehrotra",
-    attendees: ["Arjun Mehta", "Priya Sharma", "Kabir Sethi", "Nisha Agarwal", "Rohan Gupta", "Aditya Banerjee", "Pooja Venkataraman"],
-    maxSpots: null, color: "#0F766E", icon: "\uD83C\uDFA4"
-  },
-  {
-    id: 12,
-    title: "PE & Finance Workshop",
-    community: "Finance Club",
-    category: "Career",
-    location: "Case Room 4, Academic Block",
-    date: getEventDate(3), time: "17:00", timeLabel: "5 PM",
-    campus: "Hyderabad",
-    vibe: "LBO modelling. Bring your laptops.",
-    createdBy: "Tanvi Mehrotra",
-    attendees: ["Arjun Mehta", "Vikram Singh", "Siddharth Rao"],
-    maxSpots: 20, color: "#1240a8", icon: "\uD83D\uDCCA"
-  },
-  {
-    id: 13,
-    title: "Board Game Night",
-    community: "Board Games Club",
-    category: "Social",
-    location: "Student Lounge, Level 1",
-    date: getEventDate(4), time: "20:00", timeLabel: "8 PM",
-    campus: "Hyderabad",
-    vibe: "Catan, Codenames, Resistance. Bring your game.",
-    createdBy: "Rohan Gupta",
-    attendees: ["Priya Sharma", "Meera Iyer", "Divya Patel", "Shreya Joshi"],
-    maxSpots: 12, color: "#EC4899", icon: "\uD83C\uDFB2"
-  },
-  {
-    id: 14,
-    title: "Open Mic Night",
-    community: "Arts & Culture",
-    category: "Social",
-    location: "Amphitheatre, Main Campus",
-    date: getEventDate(5), time: "20:30", timeLabel: "8:30 PM",
-    campus: "Hyderabad",
-    vibe: "5 mins. Anything goes. Comedy, poetry, music.",
-    createdBy: "Shreya Joshi",
-    attendees: ["Amit Sharma", "Ananya Krishnan", "Karan Malhotra", "Meera Iyer"],
-    maxSpots: null, color: "#F59E0B", icon: "\uD83C\uDFA4"
-  }
+  { id:11, title:"Alumni Talk: Life at BCG", community:"Consulting Club", category:"Talks",
+    location:"Auditorium, Block 1", date:getEventDate(2), time:"18:00", timeLabel:"6 PM",
+    campus:"Hyderabad", vibe:"PGP '22 alum. Unfiltered QnA.",
+    createdBy:"Tanvi Mehrotra", attendees:["Arjun Mehta","Priya Sharma","Kabir Sethi","Nisha Agarwal","Rohan Gupta","Aditya Banerjee","Pooja Venkataraman"],
+    maxSpots:null, color:"#0F766E", icon:"\uD83C\uDFA4" },
+  { id:16, title:"Quiz Night", community:"Student Council", category:"Social",
+    location:"Student Lounge, Level 1", date:getEventDate(2), time:"20:00", timeLabel:"8 PM",
+    campus:"Hyderabad", vibe:"4-person teams. General knowledge + ISB trivia.",
+    createdBy:"Rohan Gupta", attendees:["Priya Sharma","Meera Iyer","Aditya Banerjee","Shreya Joshi"],
+    maxSpots:40, color:"#F59E0B", icon:"\uD83C\uDDEE\uD83C\uDDF3" },
+  { id:17, title:"Fireside: Breaking into PE", community:"Finance Club", category:"Talks",
+    location:"Case Room 1, Academic Block", date:getEventDate(3), time:"17:00", timeLabel:"5 PM",
+    campus:"Hyderabad", vibe:"Two ISB alums in PE. No slides, just stories.",
+    createdBy:"Tanvi Mehrotra", attendees:["Arjun Mehta","Vikram Singh","Siddharth Rao","Nisha Agarwal"],
+    maxSpots:25, color:"#0F766E", icon:"\uD83D\uDD25" },
+  { id:12, title:"PE & Finance Workshop", community:"Finance Club", category:"Career",
+    location:"Case Room 4, Academic Block", date:getEventDate(3), time:"19:00", timeLabel:"7 PM",
+    campus:"Hyderabad", vibe:"LBO modelling. Bring your laptops.",
+    createdBy:"Tanvi Mehrotra", attendees:["Arjun Mehta","Vikram Singh","Siddharth Rao"],
+    maxSpots:20, color:"#1240a8", icon:"\uD83D\uDCCA" },
+  { id:13, title:"Board Game Night", community:"Board Games Club", category:"Social",
+    location:"Student Lounge, Level 1", date:getEventDate(4), time:"20:00", timeLabel:"8 PM",
+    campus:"Hyderabad", vibe:"Catan, Codenames, Resistance. Bring your game.",
+    createdBy:"Rohan Gupta", attendees:["Priya Sharma","Meera Iyer","Divya Patel","Shreya Joshi"],
+    maxSpots:12, color:"#EC4899", icon:"\uD83C\uDFB2" },
+  { id:14, title:"Open Mic Night", community:"Arts & Culture", category:"Social",
+    location:"Amphitheatre, Main Campus", date:getEventDate(5), time:"20:30", timeLabel:"8:30 PM",
+    campus:"Hyderabad", vibe:"5 mins. Anything goes. Comedy, poetry, music.",
+    createdBy:"Shreya Joshi", attendees:["Amit Sharma","Ananya Krishnan","Karan Malhotra","Meera Iyer"],
+    maxSpots:null, color:"#F59E0B", icon:"\uD83C\uDF99" }
 ];
 
 const CURRENT_USER = {
@@ -1474,9 +1379,13 @@ function EventsPage({ currentUser, setActivePage, searchQuery }) {
   }, [currentUser]);
   const matchPoolNames = matchPool.map((p) => p.name);
 
-  const today = new Date(); today.setHours(0,0,0,0);
-  const todayStr    = today.toISOString().split("T")[0];
-  const tomorrowStr = new Date(today.getTime() + 864e5).toISOString().split("T")[0];
+  const _now = new Date();
+  const _pad = n => String(n).padStart(2,"0");
+  const _ld  = d => d.getFullYear()+"-"+_pad(d.getMonth()+1)+"-"+_pad(d.getDate());
+  const todayStr    = _ld(_now);
+  const _tom = new Date(_now); _tom.setDate(_now.getDate()+1);
+  const tomorrowStr = _ld(_tom);
+  const today = new Date(_now); today.setHours(0,0,0,0);
 
   const CATS = [
     { id: "All",      label: "All",      icon: "\u2726", color: "#1240a8" },
@@ -1512,7 +1421,7 @@ function EventsPage({ currentUser, setActivePage, searchQuery }) {
   const tomorrowEvents = applyFilters(allEvents.filter(e => e.date === tomorrowStr));
   const weekEvents     = applyFilters(allEvents.filter(e => {
     if (e.live || e.date === todayStr || e.date === tomorrowStr) return false;
-    const diff = Math.round((new Date(e.date + "T00:00:00") - today) / 864e5);
+    const diff = Math.round((new Date(e.date + "T00:00:00") - new Date(todayStr + "T00:00:00")) / 864e5);
     return diff >= 2 && diff <= 6;
   }));
 
@@ -1642,74 +1551,66 @@ function EventsPage({ currentUser, setActivePage, searchQuery }) {
     );
   };
 
-  // ── Live Right Now strip ──────────────────────────────────────────────────
+  // ── Live Right Now — horizontal bar ──────────────────────────────────────
   const LiveStrip = () => {
     if (liveEvents.length === 0) return null;
     const event = liveEvents[0];
-    const color = (CATS.find(c => c.id === event.category) || CATS[1]).color;
     const isJoined = joined[event.id];
     const going = goingCount(event);
     const spots = event.maxSpots === null ? null : event.maxSpots - going;
-    const fillPct = event.maxSpots ? Math.min(100, Math.round(going / event.maxSpots * 100)) : Math.min(100, Math.round(going / 20 * 100));
+    const fillPct = event.maxSpots ? Math.min(100, Math.round(going / event.maxSpots * 100)) : 80;
     const matchProfiles = event.attendees.filter(n => matchPoolNames.includes(n));
-    return React.createElement("div", { style: { marginBottom: 32 }},
-      // Section header
-      React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }},
-        React.createElement("span", { style: { display: "inline-block", width: 8, height: 8, borderRadius: "50%", background: "#EF4444", boxShadow: "0 0 0 3px rgba(239,68,68,0.25)", animation: "dashPulse 1.4s infinite" }}),
-        React.createElement("span", { style: { fontSize: 13, fontWeight: 900, color: "#EF4444", letterSpacing: "0.06em", textTransform: "uppercase", fontFamily: "'Sora',sans-serif" }}, "Live Right Now"),
-        React.createElement("div", { style: { flex: 1, height: 1, background: isDark ? "#334155" : "#FECACA" }})
-      ),
-      // Compact live card — same size as regular cards, red glow border
-      React.createElement("div", { style: { display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3, 1fr)", gap: isMobile ? 12 : 16 }},
-        React.createElement("div", {
-          style: { background: isDark ? "#1E293B" : "#fff", borderRadius: 18, border: "2px solid #EF4444", overflow: "hidden", boxShadow: "0 0 0 4px rgba(239,68,68,0.1), 0 4px 20px rgba(239,68,68,0.15)", cursor: "pointer", transition: "transform 0.18s, box-shadow 0.18s", display: "flex", flexDirection: "column" },
-          onMouseEnter: e => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 0 0 4px rgba(239,68,68,0.15), 0 10px 32px rgba(239,68,68,0.22)"; },
-          onMouseLeave: e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 0 0 4px rgba(239,68,68,0.1), 0 4px 20px rgba(239,68,68,0.15)"; },
-          onClick: () => setSelectedEvt(event)
-        },
-          React.createElement("div", { style: { height: 4, background: "linear-gradient(90deg, #EF4444, #F97316)" }}),
-          React.createElement("div", { style: { padding: "16px 18px", flex: 1, display: "flex", flexDirection: "column" }},
-            // Top row: icon + LIVE badge
-            React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }},
-              React.createElement("span", { style: { fontSize: 30, lineHeight: 1 }}, event.icon),
-              React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6 }},
-                React.createElement("span", { style: { display: "inline-block", width: 6, height: 6, borderRadius: "50%", background: "#EF4444", animation: "dashPulse 1.4s infinite" }}),
-                React.createElement("span", { style: { fontSize: 11, fontWeight: 800, color: "#EF4444", letterSpacing: "0.06em" }}, "LIVE")
-              )
-            ),
-            React.createElement("div", { style: { fontSize: 17, fontWeight: 900, color: isDark ? "#F1F5F9" : "#0F172A", fontFamily: "'Sora',sans-serif", letterSpacing: "-0.02em", lineHeight: 1.25, marginBottom: 5 }}, event.title),
-            event.vibe && React.createElement("div", { style: { fontSize: 12, color: "#94A3B8", fontStyle: "italic", marginBottom: 12, lineHeight: 1.5 }}, '"', event.vibe, '"'),
-            React.createElement("div", { style: { display: "flex", gap: 14, marginBottom: 14, flexWrap: "wrap" }},
-              React.createElement("span", { style: { fontSize: 12, color: isDark ? "#94A3B8" : "#64748B", display: "flex", alignItems: "center", gap: 4 }}, "\uD83D\uDD50 ", event.timeLabel),
-              React.createElement("span", { style: { fontSize: 12, color: isDark ? "#94A3B8" : "#64748B", display: "flex", alignItems: "center", gap: 4 }}, "\uD83D\uDCCD ", event.location)
-            ),
-            // Going bar
-            React.createElement("div", { style: { marginBottom: 12 }},
-              React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 5 }},
-                React.createElement("span", { style: { fontSize: 12, fontWeight: 700, color: isDark ? "#CBD5E1" : "#0F172A" }}, going, " going"),
-                event.maxSpots && React.createElement("span", { style: { fontSize: 11, color: "#94A3B8" }}, spots > 0 ? spots + " spots left" : "Full")
-              ),
-              React.createElement("div", { style: { background: isDark ? "#334155" : "#FEE2E2", borderRadius: 10, height: 5, overflow: "hidden" }},
-                React.createElement("div", { style: { width: fillPct + "%", height: "100%", background: "#EF4444", borderRadius: 10, transition: "width 0.8s ease" }})
-              )
-            ),
-            // Joined X min ago ticker
-            React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 7, marginBottom: 12 }},
-              React.createElement(Avatar, { name: liveNames[liveNameIdx] || "Meera Iyer", size: 20, radius: 10 }),
-              React.createElement("span", { style: { fontSize: 11, color: isDark ? "#94A3B8" : "#64748B" }},
-                React.createElement("b", { style: { color: isDark ? "#F1F5F9" : "#0F172A" }}, (liveNames[liveNameIdx] || "Meera").split(" ")[0]),
-                " joined ", liveMinsAgo, " min ago"
-              )
-            ),
-            matchProfiles.length > 0 && React.createElement("div", { style: { fontSize: 12, color: "#EF4444", fontWeight: 700, marginBottom: 10 }},
-              "\u2726 ", matchProfiles.length === 1 ? matchProfiles[0].split(" ")[0] + " is here" : matchProfiles.length + " of your matches are here"
-            ),
-            React.createElement("div", { style: { marginTop: "auto" }},
-              React.createElement("button", { onClick: e => { e.stopPropagation(); toggleJoin(event.id); }, style: { width: "100%", padding: "10px", border: "none", borderRadius: 11, cursor: "pointer", fontWeight: 700, fontSize: 13, fontFamily: "'Sora',sans-serif", background: isJoined ? "#ECFDF5" : "#EF4444", color: isJoined ? "#059669" : "#fff", transition: "all 0.15s", boxShadow: isJoined ? "none" : "0 4px 16px rgba(239,68,68,0.35)" }},
-                isJoined ? "\u2713 Going" : "Join now \u2192"
-              )
+
+    // Mobile: stacked 2-line bar. Desktop: single row.
+    return React.createElement("div", {
+      style: { marginBottom: 28, borderRadius: 16, overflow: "hidden", border: "1.5px solid #FCA5A5", boxShadow: "0 0 0 3px rgba(239,68,68,0.08), 0 4px 20px rgba(239,68,68,0.12)", cursor: "pointer", background: isDark ? "#1E0A0A" : "#FFF5F5" },
+      onClick: () => setSelectedEvt(event)
+    },
+      // Red accent line at top
+      React.createElement("div", { style: { height: 3, background: "linear-gradient(90deg,#EF4444,#F97316,#EF4444)", backgroundSize: "200% 100%", animation: "shimmer 2s linear infinite" }}),
+      React.createElement("div", { style: { padding: isMobile ? "12px 14px" : "14px 20px" }},
+        // Row 1: live badge + title + meta + join button
+        React.createElement("div", { style: { display: "flex", alignItems: "center", gap: isMobile ? 10 : 16, flexWrap: isMobile ? "wrap" : "nowrap" }},
+          // LIVE badge
+          React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }},
+            React.createElement("span", { style: { width: 8, height: 8, borderRadius: "50%", background: "#EF4444", boxShadow: "0 0 0 3px rgba(239,68,68,0.3)", display: "inline-block", animation: "dashPulse 1.4s infinite" }}),
+            React.createElement("span", { style: { fontSize: 11, fontWeight: 900, color: "#EF4444", letterSpacing: "0.08em", textTransform: "uppercase" }}, "Live")
+          ),
+          // Icon + title
+          React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8, flex: 1, minWidth: 0 }},
+            React.createElement("span", { style: { fontSize: 20 }}, event.icon),
+            React.createElement("span", { style: { fontSize: 15, fontWeight: 900, color: isDark ? "#FEF2F2" : "#7F1D1D", fontFamily: "'Sora',sans-serif", letterSpacing: "-0.01em", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}, event.title)
+          ),
+          // Time + location (hidden on small mobile)
+          !isMobile && React.createElement("div", { style: { display: "flex", gap: 14, flexShrink: 0 }},
+            React.createElement("span", { style: { fontSize: 12, color: isDark ? "#FCA5A5" : "#991B1B", display: "flex", alignItems: "center", gap: 4 }}, "\uD83D\uDD50 ", event.timeLabel),
+            React.createElement("span", { style: { fontSize: 12, color: isDark ? "#FCA5A5" : "#991B1B", display: "flex", alignItems: "center", gap: 4 }}, "\uD83D\uDCCD ", event.location)
+          ),
+          // Going count
+          React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }},
+            React.createElement("span", { style: { fontSize: 13, fontWeight: 800, color: isDark ? "#FEF2F2" : "#991B1B" }}, going, " going"),
+            event.maxSpots && spots !== null && React.createElement("span", { style: { fontSize: 11, color: "#EF4444", fontWeight: 700, background: "rgba(239,68,68,0.1)", padding: "2px 8px", borderRadius: 20 }}, spots <= 0 ? "Full" : spots + " left")
+          ),
+          // Joined ticker
+          React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }},
+            React.createElement(Avatar, { name: liveNames[liveNameIdx] || "Meera Iyer", size: 20, radius: 10 }),
+            React.createElement("span", { style: { fontSize: 11, color: isDark ? "#FCA5A5" : "#991B1B" }},
+              React.createElement("b", null, (liveNames[liveNameIdx] || "Meera").split(" ")[0]),
+              " joined ", liveMinsAgo, "m ago"
             )
-          )
+          ),
+          matchProfiles.length > 0 && !isMobile && React.createElement("span", { style: { fontSize: 11, color: "#EF4444", fontWeight: 700, flexShrink: 0 }},
+            "\u2726 ", matchProfiles[0].split(" ")[0], " is here"
+          ),
+          // Join button
+          React.createElement("button", {
+            onClick: ev => { ev.stopPropagation(); toggleJoin(event.id); },
+            style: { padding: "8px 18px", borderRadius: 10, border: "none", cursor: "pointer", fontWeight: 800, fontSize: 12, fontFamily: "'Sora',sans-serif", background: isJoined ? "#ECFDF5" : "#EF4444", color: isJoined ? "#059669" : "#fff", flexShrink: 0, transition: "all 0.15s", boxShadow: isJoined ? "none" : "0 2px 10px rgba(239,68,68,0.4)" }
+          }, isJoined ? "\u2713 Going" : "Join now \u2192")
+        ),
+        // Thin fill bar beneath
+        React.createElement("div", { style: { marginTop: 10, background: isDark ? "#4B0000" : "#FEE2E2", borderRadius: 10, height: 3, overflow: "hidden" }},
+          React.createElement("div", { style: { width: fillPct + "%", height: "100%", background: "linear-gradient(90deg,#EF4444,#F97316)", borderRadius: 10, transition: "width 0.8s ease" }})
         )
       )
     );
@@ -1723,9 +1624,10 @@ function EventsPage({ currentUser, setActivePage, searchQuery }) {
       newEvt, setNewEvt,
       onClose: () => setCreating(false),
       onSubmit: () => {
-        const t = new Date(); t.setHours(0,0,0,0);
+        const _ct = new Date(); const _cp = n => String(n).padStart(2,"0");
+        const _cdate = _ct.getFullYear()+"-"+_cp(_ct.getMonth()+1)+"-"+_cp(_ct.getDate());
         const catInfo = EVENT_CATS.find(c => c.id === newEvt.category) || { color: "#1240a8", icon: "\uD83D\uDCC5" };
-        const created = { id: Date.now(), title: newEvt.title, community: newEvt.community || newEvt.category, category: newEvt.category, location: newEvt.location, date: t.toISOString().split("T")[0], time: "18:00", timeLabel: newEvt.timeLabel, campus: "Hyderabad", vibe: newEvt.vibe, createdBy: (currentUser || CURRENT_USER).name, attendees: [(currentUser || CURRENT_USER).name], maxSpots: newEvt.noLimit ? null : parseInt(newEvt.maxSpots) || 15, color: catInfo.color, icon: catInfo.icon };
+        const created = { id: Date.now(), title: newEvt.title, community: newEvt.community || newEvt.category, category: newEvt.category, location: newEvt.location, date: _cdate, time: "18:00", timeLabel: newEvt.timeLabel, campus: "Hyderabad", vibe: newEvt.vibe, createdBy: (currentUser || CURRENT_USER).name, attendees: [(currentUser || CURRENT_USER).name], maxSpots: newEvt.noLimit ? null : parseInt(newEvt.maxSpots) || 15, color: catInfo.color, icon: catInfo.icon };
         setAllEvents(prev => [created, ...prev]);
         setCreating(false);
         setNewEvt({ title: "", community: "", category: "Social", location: "", timeLabel: "", vibe: "", maxSpots: 15, noLimit: false });
@@ -1744,7 +1646,7 @@ function EventsPage({ currentUser, setActivePage, searchQuery }) {
         const active = catFilter === cat.id;
         const windowEvents = allEvents.filter(e => {
           if (e.live) return true;
-          const diff = Math.round((new Date(e.date + "T00:00:00") - today) / 864e5);
+          const diff = Math.round((new Date(e.date + "T00:00:00") - new Date(todayStr + "T00:00:00")) / 864e5);
           return diff >= 0 && diff <= 6;
         });
         const count = cat.id === "All" ? windowEvents.length : windowEvents.filter(e => e.category === cat.id).length;
