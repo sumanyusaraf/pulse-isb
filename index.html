@@ -33,6 +33,7 @@
     }
   </style>
 </head>
+<script>document.title = "Pulse | ISB Co'27";</script>
 <body>
   <div id="root"></div>
   <script>
@@ -743,7 +744,7 @@ function ProfileCard({ profile, onView, onStatusChange, compact = false, current
     React.createElement("div", { style: { display: "flex", alignItems: "flex-start", gap: 14, marginTop: 6, marginBottom: 14 }},
       React.createElement(Avatar, { name: profile.name, photo: profile.photo, size: 48, radius: 12, extraStyle: { border: `2px solid ${bdr}`, flexShrink: 0 }}),
       React.createElement("div", { style: { flex: 1, minWidth: 0 }},
-        React.createElement("div", { style: { fontWeight: 800, fontSize: 15, color: text, fontFamily: "'Sora',sans-serif", marginBottom: 2, letterSpacing: "-0.01em" }}, profile.name),
+        React.createElement("div", { style: { fontWeight: 700, fontSize: 13, color: text, fontFamily: "'Sora',sans-serif", marginBottom: 2, letterSpacing: "-0.01em" }}, profile.name),
         profile.prevRole && React.createElement("div", { style: { fontSize: 12, color: "#2563EB", fontWeight: 600, marginBottom: 1 }}, profile.prevRole),
         profile.prevCompany
           ? React.createElement("div", { style: { fontSize: 12, color: muted }}, profile.prevCompany)
@@ -1509,7 +1510,7 @@ function EventsPage({ currentUser, setActivePage, searchQuery }) {
           React.createElement("span", { style: { fontSize: hero ? 36 : 30, lineHeight: 1 }}, event.icon),
           React.createElement("span", { style: { fontSize: 11, fontWeight: 700, color: hero ? "rgba(255,255,255,0.9)" : color, background: hero ? "rgba(255,255,255,0.18)" : color + "15", padding: "4px 10px", borderRadius: 20 }}, event.category)
         ),
-        React.createElement("div", { style: { fontSize: hero ? 18 : 15, fontWeight: 900, color: hero ? "#fff" : (isDark ? "#F1F5F9" : "#0F172A"), fontFamily: "'Sora',sans-serif", letterSpacing: "-0.02em", lineHeight: 1.25, marginBottom: 5 }}, event.title),
+        React.createElement("div", { style: { fontSize: hero ? 17 : 14, fontWeight: 800, color: hero ? "#fff" : (isDark ? "#F1F5F9" : "#0F172A"), fontFamily: "'Sora',sans-serif", letterSpacing: "-0.02em", lineHeight: 1.25, marginBottom: 5 }}, event.title),
         event.vibe && React.createElement("div", { style: { fontSize: 12, color: hero ? "rgba(255,255,255,0.8)" : "#94A3B8", fontStyle: "italic", marginBottom: 12, lineHeight: 1.5 }}, '"', event.vibe, '"'),
         React.createElement("div", { style: { display: "flex", gap: 14, marginBottom: 14, flexWrap: "wrap" }},
           React.createElement("span", { style: { fontSize: 12, color: hero ? "rgba(255,255,255,0.85)" : (isDark ? "#94A3B8" : "#64748B"), display: "flex", alignItems: "center", gap: 4 }}, "\uD83D\uDD50 ", event.timeLabel),
