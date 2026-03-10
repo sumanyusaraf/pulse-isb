@@ -853,7 +853,7 @@ function Sidebar({ activePage, setActivePage, currentUser }) {
         React.createElement("svg", { width: 32, height: 32, viewBox: "0 0 32 32", style: { flexShrink: 0 } }, React.createElement("rect", { width: 32, height: 32, rx: 8, fill: "#1a50c8" }), React.createElement("polyline", { points: "3,16 9,16 12,8 16.5,24 20,4 23.5,19 26,16 29,16", stroke: "white", strokeWidth: 2.4, fill: "none", strokeLinecap: "round", strokeLinejoin: "round" })),
         React.createElement("div", null,
           React.createElement("div", { style: { color: "#fff", fontWeight: 900, fontSize: 17, fontFamily: "'Sora',sans-serif", letterSpacing: "-0.02em" }}, "Pulse"),
-          React.createElement("div", { style: { color: "#93C5FD", fontSize: 9, fontWeight: 500, letterSpacing: "0.01em", lineHeight: 1.4 }}, "The live pulse of ISB Co'27")
+          React.createElement("div", { style: { color: "#93C5FD", fontSize: 11, fontWeight: 500, letterSpacing: "0.01em", lineHeight: 1.35 }}, "The live pulse of ISB Co'27")
         )
       )
     ),
@@ -1541,7 +1541,7 @@ function EventsPage({ currentUser, setActivePage, searchQuery }) {
     if (events.length === 0) return null;
     return React.createElement("div", { style: { marginBottom: 32 }},
       React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }},
-        React.createElement("div", { style: { fontSize: 18, fontWeight: 900, color: isDark ? "#F1F5F9" : "#0F172A", fontFamily: "'Sora',sans-serif", letterSpacing: "-0.02em" }}, label),
+        React.createElement("div", { style: { fontSize: 14, fontWeight: 700, color: isDark ? "#F1F5F9" : "#0F172A", fontFamily: "'Sora',sans-serif", letterSpacing: "-0.02em" }}, label),
         React.createElement("div", { style: { fontSize: 12, fontWeight: 600, color: "#94A3B8", background: isDark ? "#1E293B" : "#F1F5F9", borderRadius: 20, padding: "3px 10px" }}, events.length, " event", events.length !== 1 ? "s" : ""),
         React.createElement("div", { style: { flex: 1, height: 1, background: isDark ? "#334155" : "#E2E8F0" }})
       ),
@@ -1719,7 +1719,7 @@ function DiscoverPage({ profiles, setProfiles, onViewProfile, searchQuery, curre
   const SectionHeader = ({ title, subtitle, count, seeAll, onSeeAll }) =>
     React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 14 }},
       React.createElement("div", null,
-        React.createElement("div", { style: { fontSize: 16, fontWeight: 900, color: text, fontFamily: "'Sora',sans-serif", letterSpacing: "-0.01em" }}, title),
+        React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: text, fontFamily: "'Sora',sans-serif", letterSpacing: "-0.01em" }}, title),
         subtitle && React.createElement("div", { style: { fontSize: 12, color: muted, marginTop: 2 }}, subtitle)
       ),
       count > 4 && React.createElement("button", { onClick: onSeeAll, style: { fontSize: 12, color: "#2563EB", fontWeight: 700, background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }},
@@ -1901,7 +1901,7 @@ function MyNetworkPage({ profiles, onViewProfile }) {
     return React.createElement("div", { style: { marginBottom: 32 }},
       React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }},
         React.createElement("span", { style: { fontSize: 18 }}, icon),
-        React.createElement("span", { style: { fontSize: 16, fontWeight: 900, color: text, fontFamily: "'Sora',sans-serif", letterSpacing: "-0.01em" }}, title),
+        React.createElement("span", { style: { fontSize: 13, fontWeight: 700, color: text, fontFamily: "'Sora',sans-serif", letterSpacing: "-0.01em" }}, title),
         React.createElement("span", { style: { fontSize: 12, background: isDark?"#334155":"#EEF2F7", color: muted, padding: "2px 8px", borderRadius: 20, fontWeight: 700 }}, items.length)
       ),
       React.createElement("div", { style: { display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fill, minmax(300px, 1fr))", gap: isMobile ? 10 : 14 }},
