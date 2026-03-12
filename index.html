@@ -8,7 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin></script>
-  <script>document.title = "Pulse | ISB Co\u202727";</script>
+  <script>document.title = "Pulse | ISB Co'27";</script>
 <style>
     *, *::before, *::after { box-sizing: border-box; }
     body { margin: 0; font-family: 'Sora', sans-serif; background: #F8FAFC; font-size: 15px; }
@@ -1348,7 +1348,7 @@ function CreateEventModal({ newEvt, setNewEvt, onClose, onSubmit }) {
 }
 
 
-function EventsPage({ currentUser, setActivePage, searchQuery }) {
+function EventsPage({ currentUser, setActivePage, searchQuery, profiles }) {
   const isDark = useTheme();
   const isMobile = useMobile();
   const [joined, setJoined] = React.useState({});
@@ -1618,6 +1618,9 @@ function EventsPage({ currentUser, setActivePage, searchQuery }) {
   };
 
   const noResults = totalVisible === 0;
+  const todayStr2 = new Date().toISOString().slice(0, 10);
+  const todayFollowUps = (profiles||[]).filter(p => p.contactStatus === "Follow-up scheduled" && p.followUpDate === todayStr2);
+  const overdueFollowUps = (profiles||[]).filter(p => p.contactStatus === "Follow-up scheduled" && p.followUpDate && p.followUpDate < todayStr2);
 
   return React.createElement("div", { style: { padding: isMobile ? "16px 12px" : "24px 28px" }},
     selectedEvt && React.createElement(EventDetail, { event: selectedEvt }),
@@ -1634,6 +1637,22 @@ function EventsPage({ currentUser, setActivePage, searchQuery }) {
         setNewEvt({ title: "", community: "", category: "Social", location: "", timeLabel: "", vibe: "", maxSpots: 15, noLimit: false });
       }
     }),
+
+    /* ── Follow-up nudge widget ── */
+    (overdueFollowUps.length > 0 || todayFollowUps.length > 0) && React.createElement("div", {
+      onClick: () => setActivePage("network"),
+      style: { background: isDark ? "#2D1500" : "#FFF7ED", border: `1.5px solid ${overdueFollowUps.length > 0 ? "#FCA5A5" : "#FDE68A"}`, borderRadius: 14, padding: "12px 16px", marginBottom: 16, display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }
+    },
+      React.createElement("span", { style: { fontSize: 20 }}, overdueFollowUps.length > 0 ? "\uD83D\uDD34" : "\uD83D\uDCC5"),
+      React.createElement("div", { style: { flex: 1 }},
+        React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: isDark ? "#FCD34D" : overdueFollowUps.length > 0 ? "#9A1212" : "#92400E" }},
+          overdueFollowUps.length > 0
+            ? `${overdueFollowUps.length} overdue follow-up${overdueFollowUps.length > 1 ? "s" : ""}: ${overdueFollowUps.slice(0,3).map(p=>p.name.split(" ")[0]).join(", ")}`
+            : `${todayFollowUps.length} follow-up${todayFollowUps.length > 1 ? "s" : ""} due today: ${todayFollowUps.map(p=>p.name.split(" ")[0]).join(", ")}`
+        ),
+        React.createElement("div", { style: { fontSize: 11, color: isDark ? "#94A3B8" : "#78716C", marginTop: 2 }}, "Tap to go to My Network \u2192")
+      )
+    ),
 
     /* ── Top bar ── */
     React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }},
@@ -1837,7 +1856,7 @@ function ProfileDetailPage({ profile, onBack, onUpdate, currentUser }) {
     }
   ), /* @__PURE__ */ React.createElement("button", { onClick: saveChanges, style: { padding: "9px 18px", background: "#003A8F", color: "#fff", border: "none", borderRadius: 9, cursor: "pointer", fontWeight: 700, fontSize: 12, fontFamily: "inherit" } }, "Save Interaction")), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h4", { style: { margin: "0 0 12px", fontSize: 13, fontWeight: 800, color: "#0F172A", fontFamily: "'Sora', sans-serif" } }, "\u{1F4CB} Interaction History"), (profile.interactions || []).length === 0 ? /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", padding: "30px", background: "#F8FAFC", borderRadius: 12, color: "#94A3B8", fontSize: 13 } }, "No interactions yet. Start networking!") : /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 10 } }, [...profile.interactions].reverse().map((interaction, i) => /* @__PURE__ */ React.createElement("div", { key: i, style: { background: "#fff", border: "1px solid #EEF2F7", borderRadius: 12, padding: "14px 16px" } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: "#94A3B8", fontWeight: 700, marginBottom: 6 } }, interaction.date), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, color: "#475569" } }, interaction.note)))))));
 }
-function MyNetworkPage({ profiles, onViewProfile }) {
+function MyNetworkPage({ profiles, setProfiles, onStatusChange, onViewProfile }) {
   const isDark = useTheme();
   const isMobile = useMobile();
   const bg = isDark ? "#0F172A" : "#F8FAFC";
@@ -1845,10 +1864,29 @@ function MyNetworkPage({ profiles, onViewProfile }) {
   const bdr = isDark ? "#334155" : "#EEF2F7";
   const text = isDark ? "#F1F5F9" : "#0F172A";
   const muted = isDark ? "#94A3B8" : "#64748B";
+  const todayStr = new Date().toISOString().slice(0, 10);
   const allContacted = (profiles||[]).filter(p => p.contactStatus !== "Not contacted");
   const active = allContacted.filter(p => p.contactStatus === "Active connection");
-  const followUp = allContacted.filter(p => p.contactStatus === "Follow-up scheduled");
+  const followUp = allContacted.filter(p => p.contactStatus === "Follow-up scheduled")
+    .sort((a, b) => {
+      if (!a.followUpDate && !b.followUpDate) return 0;
+      if (!a.followUpDate) return 1;
+      if (!b.followUpDate) return -1;
+      return a.followUpDate.localeCompare(b.followUpDate);
+    });
   const contacted = allContacted.filter(p => p.contactStatus === "Contacted");
+  const overdueCount = followUp.filter(p => p.followUpDate && p.followUpDate < todayStr).length;
+  const dueTodayCount = followUp.filter(p => p.followUpDate === todayStr).length;
+  const handleSnooze = (id) => {
+    const snoozeDate = new Date();
+    snoozeDate.setDate(snoozeDate.getDate() + 3);
+    const newDate = snoozeDate.toISOString().slice(0, 10);
+    setProfiles(prev => {
+      const next = prev.map(p => p.id === id ? { ...p, followUpDate: newDate } : p);
+      try { localStorage.setItem("pulse_profiles", JSON.stringify(next)); } catch(e) {}
+      return next;
+    });
+  };
   const NetworkCard = ({ p }) => {
     const scoreColor = getCompatibilityColor(calculateCompatibility(p, CURRENT_USER));
     const score = calculateCompatibility(p, CURRENT_USER);
@@ -1857,15 +1895,22 @@ function MyNetworkPage({ profiles, onViewProfile }) {
     const reason = sharedH.length && sharedG.length ? `Both into ${sharedH[0]} \xB7 ${sharedG[0]}`
       : sharedH.length ? `Both into ${sharedH.slice(0,2).join(" & ")}`
       : sharedG.length ? `Both targeting ${sharedG[0]}` : null;
+    const isOverdue = p.followUpDate && p.followUpDate < todayStr;
+    const isDueToday = p.followUpDate === todayStr;
+    const isFollowUp = p.contactStatus === "Follow-up scheduled";
     return React.createElement("div", {
-      style: { background: card, borderRadius: 16, border: `1px solid ${bdr}`, padding: isMobile ? "14px" : "20px", boxShadow: isDark?"0 1px 4px rgba(0,0,0,0.3)":"0 1px 4px rgba(0,0,0,0.04)", transition: "all 0.18s" },
+      style: { background: card, borderRadius: 16, border: `1.5px solid ${isOverdue ? "#FCA5A5" : isDueToday ? "#FDE68A" : bdr}`, padding: isMobile ? "14px" : "20px", boxShadow: isDark?"0 1px 4px rgba(0,0,0,0.3)":"0 1px 4px rgba(0,0,0,0.04)", transition: "all 0.18s" },
       onMouseEnter: e => e.currentTarget.style.boxShadow = `0 6px 24px rgba(0,58,143,${isDark?'0.25':'0.1'})`,
       onMouseLeave: e => e.currentTarget.style.boxShadow = isDark?"0 1px 4px rgba(0,0,0,0.3)":"0 1px 4px rgba(0,0,0,0.04)"
     },
       React.createElement("div", { style: { display: "flex", gap: isMobile ? 10 : 14, alignItems: "flex-start", marginBottom: 12 }},
         React.createElement(Avatar, { name: p.name, photo: p.photo, size: isMobile ? 38 : 48, radius: isMobile ? 10 : 12, extraStyle: { border: `2px solid ${bdr}`, flexShrink: 0 }}),
         React.createElement("div", { style: { flex: 1, minWidth: 0 }},
-          React.createElement("div", { style: { fontWeight: 800, fontSize: 14, color: text, fontFamily: "'Sora',sans-serif", letterSpacing: "-0.01em" }}, p.name),
+          React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }},
+            React.createElement("div", { style: { fontWeight: 800, fontSize: 14, color: text, fontFamily: "'Sora',sans-serif", letterSpacing: "-0.01em" }}, p.name),
+            isOverdue && React.createElement("span", { style: { fontSize: 10, fontWeight: 800, background: "#FEE2E2", color: "#DC2626", padding: "2px 7px", borderRadius: 20, letterSpacing: "0.03em" }}, "\u{1F534} OVERDUE"),
+            isDueToday && React.createElement("span", { style: { fontSize: 10, fontWeight: 800, background: "#FEF3C7", color: "#D97706", padding: "2px 7px", borderRadius: 20, letterSpacing: "0.03em" }}, "\u{1F7E1} TODAY")
+          ),
           p.prevRole && React.createElement("div", { style: { fontSize: 12, color: "#2563EB", fontWeight: 600 }}, p.prevRole),
           p.prevCompany && React.createElement("div", { style: { fontSize: 12, color: muted }}, p.prevCompany)
         ),
@@ -1888,12 +1933,25 @@ function MyNetworkPage({ profiles, onViewProfile }) {
         (p.careerGoals||[]).slice(0,2).map(g => React.createElement("span", { key: g, style: { fontSize: 11, background: isDark?"#1D3461":"#EFF6FF", color: "#2563EB", padding: "2px 8px", borderRadius: 20, fontWeight: 600 }}, g))
       ),
       reason && React.createElement("div", { style: { fontSize: 11, color: "#0F766E", fontWeight: 600, background: isDark?"#0D2E2E":"#F0FDFA", border: "1px solid #99F6E4", borderRadius: 8, padding: "4px 9px", marginBottom: 10 }}, "\u2726 ", reason),
-      React.createElement("div", { style: { display: "flex", alignItems: "center", justifyContent: "space-between" }},
+      isFollowUp && p.followUpDate && React.createElement("div", { style: { fontSize: 11, color: isOverdue?"#DC2626":isDueToday?"#D97706":"#64748B", marginBottom: 10, fontWeight: isOverdue||isDueToday?700:400 }},
+        "\uD83D\uDCC5 Follow up: ", p.followUpDate
+      ),
+      React.createElement("div", { style: { display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8 }},
         React.createElement(StatusBadge, { status: p.contactStatus }),
-        React.createElement("button", {
-          onClick: () => onViewProfile(p),
-          style: { fontSize: 11, padding: "5px 14px", borderRadius: 8, background: isDark?"#1E3A8A":"#003A8F", color: "#fff", border: "none", cursor: "pointer", fontWeight: 700, fontFamily: "inherit" }
-        }, "View")
+        React.createElement("div", { style: { display: "flex", gap: 6 }},
+          isFollowUp && React.createElement("button", {
+            onClick: (e) => { e.stopPropagation(); onStatusChange(p.id, "Active connection"); },
+            style: { fontSize: 11, padding: "5px 10px", borderRadius: 8, background: "#ECFDF5", color: "#059669", border: "1.5px solid #6EE7B7", cursor: "pointer", fontWeight: 700, fontFamily: "inherit" }
+          }, "\u2713 Done"),
+          isFollowUp && React.createElement("button", {
+            onClick: (e) => { e.stopPropagation(); handleSnooze(p.id); },
+            style: { fontSize: 11, padding: "5px 10px", borderRadius: 8, background: isDark?"#1E293B":"#F8FAFC", color: muted, border: `1px solid ${bdr}`, cursor: "pointer", fontWeight: 600, fontFamily: "inherit" }
+          }, "\u23F0 +3 days"),
+          React.createElement("button", {
+            onClick: () => onViewProfile(p),
+            style: { fontSize: 11, padding: "5px 14px", borderRadius: 8, background: isDark?"#1E3A8A":"#003A8F", color: "#fff", border: "none", cursor: "pointer", fontWeight: 700, fontFamily: "inherit" }
+          }, "View")
+        )
       )
     );
   };
@@ -1924,11 +1982,19 @@ function MyNetworkPage({ profiles, onViewProfile }) {
         )
       )
     ),
-    followUp.length > 0 && React.createElement("div", { style: { background: isDark?"#2D1E00":"#FFFBEB", border: "1.5px solid #FDE68A", borderRadius: 14, padding: "12px 18px", marginBottom: 24, display: "flex", alignItems: "center", gap: 12 }},
-      React.createElement("span", { style: { fontSize: 18 }}, "\u23F0"),
-      React.createElement("div", { style: { flex: 1, fontSize: 13, fontWeight: 700, color: isDark?"#FCD34D":"#92400E" }},
-        followUp.length, " ", followUp.length===1?"person is":"people are", " waiting to hear from you: ",
-        React.createElement("span", { style: { fontWeight: 500 }}, followUp.slice(0,3).map(p=>p.name.split(" ")[0]).join(", "))
+    followUp.length > 0 && React.createElement("div", { style: { background: isDark?"#2D1E00":"#FFFBEB", border: `1.5px solid ${overdueCount > 0 ? "#FCA5A5" : "#FDE68A"}`, borderRadius: 14, padding: "12px 18px", marginBottom: 24, display: "flex", alignItems: "center", gap: 12 }},
+      React.createElement("span", { style: { fontSize: 18 }}, overdueCount > 0 ? "\uD83D\uDD34" : "\u23F0"),
+      React.createElement("div", { style: { flex: 1, fontSize: 13, fontWeight: 700, color: isDark?"#FCD34D":overdueCount>0?"#991B1B":"#92400E" }},
+        overdueCount > 0
+          ? `${overdueCount} overdue follow-up${overdueCount>1?"s":""} — don't let these slip! `
+          : dueTodayCount > 0
+            ? `${dueTodayCount} follow-up${dueTodayCount>1?"s":""} due today: `
+            : `${followUp.length} ${followUp.length===1?"person is":"people are"} waiting to hear from you: `,
+        React.createElement("span", { style: { fontWeight: 500 }},
+          overdueCount > 0
+            ? followUp.filter(p=>p.followUpDate&&p.followUpDate<todayStr).slice(0,3).map(p=>p.name.split(" ")[0]).join(", ")
+            : followUp.slice(0,3).map(p=>p.name.split(" ")[0]).join(", ")
+        )
       )
     ),
     allContacted.length === 0
@@ -2444,11 +2510,11 @@ function App() {
     }
     switch (activePage) {
       case "events":
-        return /* @__PURE__ */ React.createElement(EventsPage, { currentUser, setActivePage, searchQuery });
+        return /* @__PURE__ */ React.createElement(EventsPage, { currentUser, setActivePage, searchQuery, profiles });
       case "discover":
         return /* @__PURE__ */ React.createElement(DiscoverPage, { profiles, setProfiles, onViewProfile: handleViewProfile, searchQuery, currentUser });
       case "network":
-        return /* @__PURE__ */ React.createElement(MyNetworkPage, { profiles, onViewProfile: handleViewProfile });
+        return /* @__PURE__ */ React.createElement(MyNetworkPage, { profiles, setProfiles, onStatusChange: handleStatusChange, onViewProfile: handleViewProfile });
       case "profile":
         return /* @__PURE__ */ React.createElement(MyProfilePage, { currentUser, setCurrentUser });
       case "settings":
