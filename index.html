@@ -796,36 +796,56 @@ function ProfileCard({ profile, onView, onStatusChange, compact = false, current
 }
 
 
-function BottomNav({ activePage, setActivePage }) {
+function BottomNav({ activePage, setActivePage, onAddEvent }) {
+  const isDark = useTheme();
+  const navBg = isDark ? "#1E293B" : "#fff";
+  const navBorder = isDark ? "#334155" : "#E2E8F0";
   const items = [
     { id: "events",   label: "Events",   icon: Icon.Calendar || Icon.Dashboard },
     { id: "discover", label: "Discover", icon: Icon.Discover },
+    { id: "add",      label: "",         isAdd: true },
     { id: "network",  label: "Network",  icon: Icon.Network },
-    { id: "profile",  label: "Profile",  icon: Icon.Profile },
     { id: "settings", label: "Settings", icon: Icon.Settings }
   ];
   return React.createElement("nav", { style: {
     position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 200,
-    height: 60, background: "#fff", borderTop: "1px solid #E2E8F0",
-    display: "flex", alignItems: "stretch",
+    height: 64, background: navBg, borderTop: `1px solid ${navBorder}`,
+    display: "flex", alignItems: "center",
     boxShadow: "0 -2px 16px rgba(0,0,0,0.08)"
   }},
-    items.map(({ id, label, icon: IconComp }) => {
+    items.map(({ id, label, icon: IconComp, isAdd }) => {
+      if (isAdd) return React.createElement("div", { key: "add", style: { flex: 1, display: "flex", justifyContent: "center", alignItems: "center" }},
+        React.createElement("button", {
+          onClick: onAddEvent,
+          style: {
+            width: 50, height: 50, borderRadius: "50%",
+            background: "linear-gradient(135deg, #1240a8 0%, #1a50c8 100%)",
+            border: "none", cursor: "pointer", display: "flex", alignItems: "center",
+            justifyContent: "center", boxShadow: "0 4px 16px rgba(18,64,168,0.45)",
+            transform: "translateY(-10px)", transition: "transform 0.15s, box-shadow 0.15s",
+            fontFamily: "inherit"
+          },
+          onMouseEnter: e => { e.currentTarget.style.transform = "translateY(-13px)"; e.currentTarget.style.boxShadow = "0 8px 24px rgba(18,64,168,0.55)"; },
+          onMouseLeave: e => { e.currentTarget.style.transform = "translateY(-10px)"; e.currentTarget.style.boxShadow = "0 4px 16px rgba(18,64,168,0.45)"; }
+        },
+          React.createElement("span", { style: { color: "#fff", fontSize: 28, lineHeight: 1, marginTop: -2, fontWeight: 300 }}, "+")
+        )
+      );
       const active = activePage === id;
       return React.createElement("button", {
         key: id, onClick: () => setActivePage(id),
         style: {
           flex: 1, display: "flex", flexDirection: "column", alignItems: "center",
           justifyContent: "center", gap: 3, border: "none", background: "transparent",
-          color: active ? "#1240a8" : "#94A3B8", cursor: "pointer",
+          color: active ? "#1240a8" : (isDark ? "#64748B" : "#94A3B8"), cursor: "pointer",
           fontFamily: "'Sora',sans-serif", fontSize: 10, fontWeight: active ? 700 : 500,
-          transition: "color 0.15s", padding: "6px 0"
+          transition: "color 0.15s", padding: "6px 0", height: "100%"
         }
       },
         React.createElement("span", { style: { fontSize: 18, lineHeight: 1, opacity: active ? 1 : 0.6 }},
           React.createElement(IconComp, null)
         ),
-        label
+        React.createElement("span", null, label)
       );
     })
   );
@@ -834,10 +854,9 @@ function BottomNav({ activePage, setActivePage }) {
 function Sidebar({ activePage, setActivePage, currentUser }) {
   const isDark = useTheme();
   const items = [
-    { id: "events", label: "Events", icon: Icon.Calendar || Icon.Dashboard },
+    { id: "events",   label: "Events",   icon: Icon.Calendar || Icon.Dashboard },
     { id: "discover", label: "Discover", icon: Icon.Discover },
-    { id: "network", label: "Network", icon: Icon.Network },
-    { id: "profile", label: "Profile", icon: Icon.Profile },
+    { id: "network",  label: "Network",  icon: Icon.Network },
     { id: "settings", label: "Settings", icon: Icon.Settings }
   ];
   const sb = isDark ? "#0A1628" : "linear-gradient(180deg, #0d1f6e 0%, #1240a8 50%, #1a50c8 100%)";
@@ -859,6 +878,18 @@ function Sidebar({ activePage, setActivePage, currentUser }) {
       )
     ),
     React.createElement("nav", { style: { flex: 1, padding: "8px 10px" }},
+      React.createElement("button", {
+        onClick: () => { setActivePage("events"); setTimeout(() => setActivePage("events"), 0); window.dispatchEvent(new CustomEvent("pulse:createEvent")); },
+        style: {
+          width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+          padding: "11px 12px", borderRadius: 10, border: "none", marginBottom: 12,
+          background: "linear-gradient(135deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.12) 100%)",
+          color: "#fff", cursor: "pointer", fontFamily: "'Sora',sans-serif", fontSize: 13, fontWeight: 700,
+          boxShadow: "0 2px 12px rgba(0,0,0,0.15)", transition: "all 0.15s"
+        },
+        onMouseEnter: e => e.currentTarget.style.background = "linear-gradient(135deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.18) 100%)",
+        onMouseLeave: e => e.currentTarget.style.background = "linear-gradient(135deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.12) 100%)"
+      }, "+ Create Event"),
       items.map(({ id, label, icon: IconComp }) => {
         const active = activePage === id;
         return React.createElement("button", {
@@ -962,7 +993,7 @@ function ProductTour({ onClose }) {
   );
 }
 
-function TopBar({ searchQuery, setSearchQuery, activePage, currentUser }) {
+function TopBar({ searchQuery, setSearchQuery, activePage, currentUser, setActivePage }) {
   const isDark = useTheme();
   const isMobile = useMobile();
   const bg = isDark ? "#1E293B" : "#fff";
@@ -997,7 +1028,9 @@ function TopBar({ searchQuery, setSearchQuery, activePage, currentUser }) {
       })
     ),
     React.createElement(BellDropdown, { currentUser }),
-    React.createElement(Avatar, { name: currentUser.name, photo: currentUser.photo, size: 38, radius: 10, extraStyle: { border: "2px solid #003A8F", cursor: "pointer" }})
+    React.createElement("div", { onClick: () => setActivePage && setActivePage("profile"), style: { cursor: "pointer" }},
+      React.createElement(Avatar, { name: currentUser.name, photo: currentUser.photo, size: 38, radius: 10, extraStyle: { border: "2px solid #003A8F" }})
+    )
   );
 }
 
@@ -1348,13 +1381,62 @@ function CreateEventModal({ newEvt, setNewEvt, onClose, onSubmit }) {
 }
 
 
-function EventsPage({ currentUser, setActivePage, searchQuery, profiles }) {
+function PastEventCard({ event: e, isDark, eventResources, setEventResources, CATS }) {
+  const isStructured = ["Talks","Career"].includes(e.category);
+  const [showResForm, setShowResForm] = React.useState(false);
+  const [resLink, setResLink] = React.useState("");
+  const resources = eventResources[e.id] || [];
+  return React.createElement("div", { style: { background: isDark ? "#1E293B" : "#F8FAFC", borderRadius: 16, border: `1px solid ${isDark ? "#334155" : "#E2E8F0"}`, padding: "16px", opacity: 0.85 }},
+    React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }},
+      React.createElement("div", null,
+        React.createElement("div", { style: { fontSize: 13, fontWeight: 800, color: isDark ? "#CBD5E1" : "#475569", fontFamily: "'Sora',sans-serif" }}, e.icon, " ", e.title),
+        React.createElement("div", { style: { fontSize: 11, color: "#94A3B8", marginTop: 2 }}, e.date, " · ", e.location)
+      ),
+      React.createElement("span", { style: { fontSize: 10, fontWeight: 700, background: isDark ? "#334155" : "#E2E8F0", color: "#94A3B8", padding: "3px 8px", borderRadius: 20 }}, "Past")
+    ),
+    resources.length > 0 && React.createElement("div", { style: { marginBottom: 8 }},
+      resources.map((r, i) => React.createElement("a", { key: i, href: r.url, target: "_blank", rel: "noopener noreferrer", style: { display: "block", fontSize: 11, color: "#2563EB", fontWeight: 600, marginBottom: 4, textDecoration: "none" }},
+        "\uD83D\uDCCE ", r.label || r.url
+      ))
+    ),
+    isStructured && React.createElement("div", null,
+      !showResForm
+        ? React.createElement("button", { onClick: () => setShowResForm(true), style: { fontSize: 11, color: isDark ? "#60A5FA" : "#2563EB", background: "none", border: "none", cursor: "pointer", fontWeight: 600, fontFamily: "inherit", padding: 0 }},
+            resources.length > 0 ? "+ Add another resource" : "+ Add recording / slides"
+          )
+        : React.createElement("div", { style: { display: "flex", gap: 6, marginTop: 6 }},
+            React.createElement("input", {
+              value: resLink, onChange: ev => setResLink(ev.target.value),
+              placeholder: "Paste link (Drive, YouTube\u2026)",
+              style: { flex: 1, fontSize: 11, padding: "6px 10px", border: `1.5px solid ${isDark ? "#334155" : "#CBD5E1"}`, borderRadius: 8, background: isDark ? "#0F172A" : "#fff", color: isDark ? "#F1F5F9" : "#0F172A", fontFamily: "inherit", outline: "none" }
+            }),
+            React.createElement("button", {
+              onClick: () => {
+                if (!resLink.trim()) return;
+                setEventResources(prev => ({ ...prev, [e.id]: [...(prev[e.id]||[]), { url: resLink.trim(), label: "" }] }));
+                setResLink(""); setShowResForm(false);
+              },
+              style: { fontSize: 11, padding: "6px 10px", background: "#1240a8", color: "#fff", border: "none", borderRadius: 8, cursor: "pointer", fontWeight: 700, fontFamily: "inherit" }
+            }, "Save"),
+            React.createElement("button", { onClick: () => setShowResForm(false), style: { fontSize: 11, padding: "6px 8px", background: "none", border: "none", cursor: "pointer", color: "#94A3B8", fontFamily: "inherit" }}, "\u2715")
+          )
+    )
+  );
+}
+
+function EventsPage({ currentUser, setActivePage, searchQuery, profiles, showCreateEvent, setShowCreateEvent }) {
   const isDark = useTheme();
   const isMobile = useMobile();
   const [joined, setJoined] = React.useState({});
   const [catFilter, setCatFilter] = React.useState("All");
   const [selectedEvt, setSelectedEvt] = React.useState(null);
   const [creating, setCreating] = React.useState(false);
+  React.useEffect(() => { if (showCreateEvent) { setCreating(true); if (setShowCreateEvent) setShowCreateEvent(false); } }, [showCreateEvent]);
+  React.useEffect(() => {
+    const handler = () => setCreating(true);
+    window.addEventListener("pulse:createEvent", handler);
+    return () => window.removeEventListener("pulse:createEvent", handler);
+  }, []);
   const [allEvents, setAllEvents] = React.useState(SAMPLE_EVENTS);
   const [newEvt, setNewEvt] = React.useState({ title: "", community: "", category: "Social", location: "", timeLabel: "", vibe: "", maxSpots: 15, noLimit: false });
 
@@ -1401,7 +1483,37 @@ function EventsPage({ currentUser, setActivePage, searchQuery, profiles }) {
     const base = event.id === (liveEvent && liveEvent.id) ? liveCount : event.attendees.length;
     return base + (joined[event.id] ? 1 : 0);
   };
-  const toggleJoin = (id) => setJoined((j) => ({ ...j, [id]: !j[id] }));
+  const addToCalendar = (event) => {
+    try {
+      const now = new Date();
+      const dateStr = event.date ? event.date.replace(/-/g, "") : now.toISOString().slice(0,10).replace(/-/g,"");
+      const timeStr = event.time ? event.time.replace(":","") + "00" : "120000";
+      const endTimeStr = event.time ? (String(parseInt(event.time.split(":")[0])+2).padStart(2,"0") + event.time.split(":")[1] + "00") : "140000";
+      const ics = [
+        "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Pulse ISB//EN",
+        "BEGIN:VEVENT",
+        `DTSTART:${dateStr}T${timeStr}`,
+        `DTEND:${dateStr}T${endTimeStr}`,
+        `SUMMARY:${event.title}`,
+        `DESCRIPTION:${event.vibe || ""} — ${event.community}`,
+        `LOCATION:${event.location || "ISB Campus"}`,
+        "END:VEVENT", "END:VCALENDAR"
+      ].join("\r\n");
+      const blob = new Blob([ics], { type: "text/calendar" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url; a.download = `${event.title.replace(/\s+/g,"-")}.ics`; a.click();
+      URL.revokeObjectURL(url);
+    } catch(e) {}
+  };
+  const toggleJoin = (id) => {
+    const wasJoined = !!joined[id];
+    setJoined((j) => ({ ...j, [id]: !j[id] }));
+    if (!wasJoined) {
+      const event = allEvents.find(e => e.id === id);
+      if (event) addToCalendar(event);
+    }
+  };
 
   const applyFilters = (events) => {
     let base = catFilter !== "All" ? events.filter(e => e.category === catFilter) : events;
@@ -1425,6 +1537,13 @@ function EventsPage({ currentUser, setActivePage, searchQuery, profiles }) {
     const diff = Math.round((new Date(e.date + "T00:00:00") - new Date(todayStr + "T00:00:00")) / 864e5);
     return diff >= 2 && diff <= 6;
   }));
+  const pastEvents = allEvents.filter(e => {
+    if (e.live) return false;
+    const diff = Math.round((new Date(e.date + "T00:00:00") - new Date(todayStr + "T00:00:00")) / 864e5);
+    return diff < 0;
+  }).sort((a, b) => b.date.localeCompare(a.date));
+  const [showPast, setShowPast] = React.useState(false);
+  const [eventResources, setEventResources] = React.useState({});
 
   const activeCat = CATS.find(c => c.id === catFilter) || CATS[0];
   const totalVisible = liveEvents.length + todayEvents.length + tomorrowEvents.length + weekEvents.length;
@@ -1496,7 +1615,6 @@ function EventsPage({ currentUser, setActivePage, searchQuery, profiles }) {
     const color = (CATS.find(c => c.id === event.category) || CATS[1]).color;
     const going = goingCount(event);
     const spots = event.maxSpots === null ? null : event.maxSpots - going;
-    const fillPct = event.maxSpots ? Math.min(100, Math.round(going / event.maxSpots * 100)) : Math.min(100, Math.round(going / 20 * 100));
     const matchProfiles = event.attendees.filter(n => matchPoolNames.includes(n));
     return React.createElement("div", {
       style: { background: hero ? `linear-gradient(145deg, ${color}EE 0%, ${color} 100%)` : (isDark ? "#1E293B" : "#fff"), borderRadius: hero ? 20 : 18, border: hero ? "none" : `1px solid ${isDark ? "#334155" : "#F0F0F0"}`, overflow: "hidden", boxShadow: hero ? `0 8px 32px ${color}50` : (isDark ? "0 2px 12px rgba(0,0,0,0.2)" : "0 2px 12px rgba(0,0,0,0.06)"), cursor: "pointer", transition: "transform 0.18s, box-shadow 0.18s", display: "flex", flexDirection: "column" },
@@ -1516,19 +1634,21 @@ function EventsPage({ currentUser, setActivePage, searchQuery, profiles }) {
           React.createElement("span", { style: { fontSize: 12, color: hero ? "rgba(255,255,255,0.85)" : (isDark ? "#94A3B8" : "#64748B"), display: "flex", alignItems: "center", gap: 4 }}, "\uD83D\uDD50 ", event.timeLabel),
           React.createElement("span", { style: { fontSize: 12, color: hero ? "rgba(255,255,255,0.85)" : (isDark ? "#94A3B8" : "#64748B"), display: "flex", alignItems: "center", gap: 4 }}, "\uD83D\uDCCD ", event.location)
         ),
-        React.createElement("div", { style: { marginBottom: 14 }},
-          React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 5 }},
-            React.createElement("span", { style: { fontSize: 12, fontWeight: 700, color: hero ? "#fff" : (isDark ? "#CBD5E1" : "#0F172A") }}, going, " going"),
-            event.maxSpots && React.createElement("span", { style: { fontSize: 11, color: hero ? "rgba(255,255,255,0.7)" : "#94A3B8" }}, spots > 0 ? spots + " spots left" : "Full")
-          ),
-          React.createElement("div", { style: { background: hero ? "rgba(255,255,255,0.2)" : (isDark ? "#334155" : "#F1F5F9"), borderRadius: 10, height: 5, overflow: "hidden" }},
-            React.createElement("div", { style: { width: fillPct + "%", height: "100%", background: hero ? "#fff" : color, borderRadius: 10, transition: "width 0.8s ease" }})
-          )
-        ),
         matchProfiles.length > 0 && React.createElement("div", { style: { fontSize: 12, color: hero ? "rgba(255,255,255,0.9)" : color, fontWeight: 700, marginBottom: 10 }},
           "\u2726 ", matchProfiles.length === 1 ? matchProfiles[0].split(" ")[0] + " is going" : matchProfiles.length + " of your matches are going"
         ),
-        React.createElement("div", { style: { marginTop: "auto" }},
+        React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }},
+          React.createElement("div", { style: { display: "flex" }},
+            event.attendees.slice(0, 5).map((name, i) =>
+              React.createElement("div", { key: name, style: { width: 26, height: 26, borderRadius: "50%", border: `2px solid ${hero ? "rgba(255,255,255,0.6)" : (isDark ? "#1E293B" : "#fff")}`, marginLeft: i > 0 ? -8 : 0, zIndex: 5 - i, overflow: "hidden", background: isDark ? "#334155" : "#E2E8F0", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 9, fontWeight: 800, color: hero ? "#fff" : "#64748B", fontFamily: "'Sora',sans-serif" }},
+                name.split(" ").map(n => n[0]).join("").slice(0,2)
+              )
+            )
+          ),
+          React.createElement("span", { style: { fontSize: 11, color: hero ? "rgba(255,255,255,0.75)" : (isDark ? "#94A3B8" : "#64748B"), fontWeight: 600 }},
+            going, " going", event.maxSpots && spots > 0 ? ` · ${spots} spots left` : event.maxSpots && spots <= 0 ? " · Full" : ""
+          )
+        ),
           React.createElement("button", { onClick: e => { e.stopPropagation(); toggleJoin(event.id); }, style: { width: "100%", padding: "10px", border: hero ? "2px solid rgba(255,255,255,0.45)" : "none", borderRadius: 11, cursor: "pointer", fontWeight: 700, fontSize: 13, fontFamily: "'Sora',sans-serif", background: isJoined ? (hero ? "rgba(255,255,255,0.25)" : "#ECFDF5") : (hero ? "rgba(255,255,255,0.15)" : color), color: isJoined ? (hero ? "#fff" : "#059669") : "#fff", transition: "all 0.15s" }},
             isJoined ? "\u2713 Going" : "Count me in \u2192"
           )
@@ -1668,7 +1788,20 @@ function EventsPage({ currentUser, setActivePage, searchQuery, profiles }) {
           React.createElement(LiveStrip, null),
           React.createElement(DateGroup, { label: "Today",      events: todayEvents }),
           React.createElement(DateGroup, { label: "Tomorrow",   events: tomorrowEvents }),
-          React.createElement(DateGroup, { label: "This Week",  events: weekEvents })
+          React.createElement(DateGroup, { label: "This Week",  events: weekEvents }),
+          React.createElement("div", { style: { marginTop: 32, paddingTop: 24, borderTop: `1px solid ${isDark ? "#334155" : "#E2E8F0"}` }},
+            React.createElement("button", {
+              onClick: () => setShowPast(s => !s),
+              style: { display: "flex", alignItems: "center", gap: 8, background: "none", border: "none", cursor: "pointer", padding: 0, fontFamily: "'Sora',sans-serif" }
+            },
+              React.createElement("span", { style: { fontSize: 13, fontWeight: 700, color: isDark ? "#64748B" : "#94A3B8" }}, showPast ? "▲ Hide past events" : "▼ Show past events"),
+              pastEvents.length > 0 && React.createElement("span", { style: { fontSize: 11, background: isDark ? "#334155" : "#F1F5F9", color: isDark ? "#94A3B8" : "#64748B", padding: "2px 8px", borderRadius: 20, fontWeight: 700 }}, pastEvents.length)
+            ),
+            showPast && pastEvents.length === 0 && React.createElement("div", { style: { fontSize: 13, color: "#94A3B8", marginTop: 12 }}, "No past events yet."),
+            showPast && pastEvents.length > 0 && React.createElement("div", { style: { display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3, 1fr)", gap: isMobile ? 10 : 14, marginTop: 16 }},
+              pastEvents.map(e => React.createElement(PastEventCard, { key: e.id, event: e, isDark, eventResources, setEventResources, CATS }))
+            )
+          )
         )
   );
 }
@@ -2393,6 +2526,7 @@ function App() {
   })();
   const [isOnboarded, setIsOnboarded] = useState(!!(savedUser && savedUser.name && savedUser.name.trim()));
   const [showTour, setShowTour] = React.useState(false);
+  const [showCreateEvent, setShowCreateEvent] = React.useState(false);
   const [isDark, setIsDark] = React.useState(() => {
     try { return localStorage.getItem('pulse_dark')==='1'; } catch(e){ return false; }
   });
@@ -2491,7 +2625,7 @@ function App() {
     }
     switch (activePage) {
       case "events":
-        return /* @__PURE__ */ React.createElement(EventsPage, { currentUser, setActivePage, searchQuery, profiles });
+        return /* @__PURE__ */ React.createElement(EventsPage, { currentUser, setActivePage, searchQuery, profiles, showCreateEvent, setShowCreateEvent });
       case "discover":
         return /* @__PURE__ */ React.createElement(DiscoverPage, { profiles, setProfiles, onViewProfile: handleViewProfile, searchQuery, currentUser });
       case "network":
@@ -2513,9 +2647,9 @@ function App() {
     /* @__PURE__ */ React.createElement("div", { style: { display: "flex", minHeight: "100vh", background: isDark ? "#0F172A" : "#F8FAFC", fontFamily: "'Sora',sans-serif" } },
       React.createElement(Sidebar, { activePage: navPage, setActivePage: handleNav, currentUser }),
       React.createElement("div", { style: { marginLeft: isMobile ? 0 : 220, flex: 1, display: "flex", flexDirection: "column", minHeight: "100vh" } },
-        React.createElement(TopBar, { searchQuery, setSearchQuery, activePage: activePage === "profileDetail" ? "discover" : activePage, currentUser }),
+        React.createElement(TopBar, { searchQuery, setSearchQuery, activePage: activePage === "profileDetail" ? "discover" : activePage, currentUser, setActivePage: handleNav }),
         React.createElement("main", { style: { flex: 1, overflowY: "auto", paddingBottom: isMobile ? 60 : 0 } }, renderPage()),
-        isMobile && React.createElement(BottomNav, { activePage: navPage, setActivePage: handleNav })
+        isMobile && React.createElement(BottomNav, { activePage: navPage, setActivePage: handleNav, onAddEvent: () => { handleNav("events"); setShowCreateEvent(true); } })
       )
     ))));
 }
