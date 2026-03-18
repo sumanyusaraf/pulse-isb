@@ -1649,9 +1649,8 @@ function EventsPage({ currentUser, setActivePage, searchQuery, profiles, showCre
             going, " going", event.maxSpots && spots > 0 ? ` · ${spots} spots left` : event.maxSpots && spots <= 0 ? " · Full" : ""
           )
         ),
-          React.createElement("button", { onClick: e => { e.stopPropagation(); toggleJoin(event.id); }, style: { width: "100%", padding: "10px", border: hero ? "2px solid rgba(255,255,255,0.45)" : "none", borderRadius: 11, cursor: "pointer", fontWeight: 700, fontSize: 13, fontFamily: "'Sora',sans-serif", background: isJoined ? (hero ? "rgba(255,255,255,0.25)" : "#ECFDF5") : (hero ? "rgba(255,255,255,0.15)" : color), color: isJoined ? (hero ? "#fff" : "#059669") : "#fff", transition: "all 0.15s" }},
-            isJoined ? "\u2713 Going" : "Count me in \u2192"
-          )
+        React.createElement("button", { onClick: e => { e.stopPropagation(); toggleJoin(event.id); }, style: { width: "100%", padding: "10px", border: hero ? "2px solid rgba(255,255,255,0.45)" : "none", borderRadius: 11, cursor: "pointer", fontWeight: 700, fontSize: 13, fontFamily: "'Sora',sans-serif", background: isJoined ? (hero ? "rgba(255,255,255,0.25)" : "#ECFDF5") : (hero ? "rgba(255,255,255,0.15)" : color), color: isJoined ? (hero ? "#fff" : "#059669") : "#fff", transition: "all 0.15s" }},
+          isJoined ? "\u2713 Going" : "Count me in \u2192"
         )
       )
     );
